@@ -1,0 +1,4 @@
+.ui * {
+  direction: rtl;
+  text-align: right;
+}
