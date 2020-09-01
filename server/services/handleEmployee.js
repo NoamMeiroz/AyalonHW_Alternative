@@ -14,7 +14,8 @@ employeeList = employeeList.map((emp)=>{
         WORKER_ID: emp[empFields.WORKER_ID],
         CITY: emp[empFields.CITY],
         STREET: emp[empFields.STREET],
-        BUILDING_NUMBER: emp[empFields.BUILDING_NUMBER]
+        BUILDING_NUMBER: emp[empFields.BUILDING_NUMBER],    
+        BEST_ROUTE: {}
     }
     site = employer.Sites.filter((site)=>{
         return (site.NAME===emp[siteFields.NAME])

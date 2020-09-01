@@ -1,22 +1,39 @@
-
+import axios from 'axios';
+import { SERVER } from './utils/config';
 
 
 export default function checkProgress() {
-    var count = 0;
     var progress = {};
+    var employerId = -1;
 
     const addProgress = () => {
-        count = count + 10; 
-        if (count === 100) {
-            clearInterval(progress); 
-            postMessage(count);
-            count = 0;
-        }
-        else
-            postMessage(count);
+        axios.get(`${SERVER}/api/employer/${employerId}/employee/precentReady`)
+            .then(payload => {
+                if (payload.precent) {
+                    if (payload.precent === 100) {
+                        clearInterval(progress);
+                    }
+                    postMessage(payload);
+                }
+                else {
+                    clearInterval(progress);
+                    postMessage({ err: "בעיה במערכת, תשובה מהשרת לא תקינה" });
+                }
+            }).catch(err => {
+                clearInterval(progress);
+                let message = "";
+                if (err.response.status === 500) {
+                    message = "בעיה במערכת";
+                }
+                else
+                    message = err.response.data;
+                postMessage({ err: message });
+            });
     }
 
+
     self.addEventListener("message", event => { /* eslint-disable-line no-restricted-globals */
-        progress = setInterval(addProgress, 5000); 
+        employerId = event.data.employerID;
+        progress = setInterval(addProgress, 5000);
     });
 }

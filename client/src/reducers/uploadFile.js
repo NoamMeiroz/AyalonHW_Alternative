@@ -9,9 +9,9 @@ const INITIAL_STATE = {
 export default function(state = INITIAL_STATE, action) {
     switch (action.type) {
         case FILE_UPLOAD:
-            return {...state, isLoaded: true, data: action.data };
+            return {...state, isSuccess: true, data: action.data };
         case FILE_ERROR:
-            return {...state, errorMessage: action.errorMessage, isLoaded: false };
+            return {...state, errorMessage: action.errorMessage, isSuccess: false };
         default:
             return state;
     }

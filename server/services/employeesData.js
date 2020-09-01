@@ -56,4 +56,16 @@ const getEmployeesOfEmployer = (empId) => {
 	});
 }
 
-module.exports = { run, getEmployeesOfEmployer }
+const getPrecentFinished = (empId) => {
+	return new Promise(function (resolve, reject) {
+		employeeSchema.getPrecentFinished(empId, (err, payload) => {
+			if (err) {
+				logger.error(err);
+				reject(new ServerError(500, "internal error"))
+			}
+			resolve({employerID: empId, precent: payload});
+		});
+	});
+}
+
+module.exports = { run, getEmployeesOfEmployer, getPrecentFinished }

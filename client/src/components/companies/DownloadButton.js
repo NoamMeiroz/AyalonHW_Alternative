@@ -4,9 +4,6 @@ import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
 import axios from 'axios';
 
-//import worker from 'workerize-loader!../../worker'; // eslint-disable-line import/no-webpack-loader-syntax
-import worker from "../../worker.js";
-import WebWorker from "../../workerSetup";
 import * as actions from '../../actions';
 
 import IconButton from '@material-ui/core/IconButton';
@@ -27,14 +24,6 @@ class DownloadButton extends Component {
         this.state = { uploadProgess: 0, isWorkerStarted: false };
 
     }
-
-    // function to handle status from worker;
-    receive = event => {
-        let uploadProgess = event.data;
-        if (uploadProgess) {
-            this.setState({ uploadProgess: uploadProgess });
-        }
-    };
 
 
     saveEmployeesList = (employerId, fileName) => {
@@ -65,23 +54,17 @@ class DownloadButton extends Component {
 
     render() {
         let jsx = {};
-        if (this.props.csvData.EMPLOYEES_READY)
+        if (this.props.csvData.EMPLOYEES_READY || this.props.uploadProgess===100)
             jsx = <IconButton color="primary" aria-label="upload picture" component="span"
                 onClick={(e) => { this.saveEmployeesList(this.props.csvData.id, this.props.fileName) }}>
                 <SaveRoundedIcon />
                 {this.state.count}
             </IconButton>;
         else {
-            if (!this.state.isWorkerStarted) {
-                this.workerInstance = new WebWorker(worker);
-                this.workerInstance.addEventListener('message', this.receive);
-                this.setState({ isWorkerStarted: true });
-                this.workerInstance.postMessage("start");
-            }
             jsx = <div>
             <Typography variant="caption" color="textSecondary">טעינת עובדים</Typography>
             <Box position="relative" display="inline-flex">
-                <CircularProgress variant="static" value={this.state.uploadProgess} />
+                <CircularProgress variant="static" value={this.props.uploadProgess} />
                 <Box
                     top={0}
                     left={0}
@@ -92,7 +75,7 @@ class DownloadButton extends Component {
                     alignItems="center"
                     justifyContent="center"
                 >
-                    <Typography variant="caption" component="div" color="textSecondary">{`${this.state.uploadProgess}%`}</Typography>
+                    <Typography variant="caption" component="div" color="textSecondary">{`${this.props.uploadProgess}%`}</Typography>
                 </Box>
             </Box>
             </div>
@@ -101,4 +84,11 @@ class DownloadButton extends Component {
     }
 }
 
-export default connect(null, actions)(DownloadButton);
+const mapStateToProps = (state, ownProps) => {
+    if ( state.employeesData.employerID === ownProps.csvData.id)
+        return {uploadProgess: state.employeesData.uploadProgess};
+    else
+        return {};
+  };
+
+export default connect(mapStateToProps, actions)(DownloadButton);
