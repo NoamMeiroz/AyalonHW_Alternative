@@ -1,21 +1,41 @@
 
-import { EMPLOYEES_DATA } from '../actions/types';
+import { EMPLOYEES_DATA, CHECK_PROGRESS, CHECK_PROGRESS_ERROR } from '../actions/types';
 
 const INITIAL_STATE = {
     isSuccess: false,
     errorMessage: '',
-    employeesList: []
-
+    employeesList: [],
+    employerID: -1,
+    uploadProgess: 0,
+    timestamp: new Date()
 }
 
-export default function(state = INITIAL_STATE, action) {
+export default function (state = INITIAL_STATE, action) {
     switch (action.type) {
         case EMPLOYEES_DATA:
-            return {...state, 
-                isSuccess: action.isSuccess, 
+            return {
+                ...state,
+                isSuccess: action.isSuccess,
                 employeesList: action.employeesList,
-                errorMessage: action.errorMessage
+                errorMessage: action.errorMessage,
+                timestamp: new Date()
             };
+        case CHECK_PROGRESS:
+            return {
+                ...state,
+                employerID: action.employerID,
+                uploadProgess: action.uploadProgess,
+                errorMessage: "",
+                timestamp: new Date()
+            }
+        case CHECK_PROGRESS_ERROR:
+            return {
+                ...state,
+                employerID: action.employerID,
+                uploadProgess: 100,
+                errorMessage: action.errorMessage,
+                timestamp: new Date()
+            }
         default:
             return state;
     }

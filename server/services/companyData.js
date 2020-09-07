@@ -12,7 +12,7 @@ const employeesData = require("./employeesData");
  */
 function defined_structure(obj, attrs) {
     if (!obj)
-        return { valid: false, attribute: "נתונים חסרים" };
+        return { valid: false, attribute: "רשימת עובדים" };
     var tmp = obj;
     for (i = 0; i < attrs.length; ++i) {
         if (tmp[attrs[i]] == undefined)
@@ -32,7 +32,6 @@ const handleEmployerData = (data) => {
             "כן": 1,
             "לא": 0
         };
-
         result = defined_structure(data, [
             empFields.NAME,
             empFields.SECTOR,
@@ -43,56 +42,68 @@ const handleEmployerData = (data) => {
             empFields.WORK_FROM_HOME
         ]);
         if (!result.valid) {
-            reject(new ServerError(status = 400,
+            return reject(new ServerError(status = 400,
                 message = `פרטי החברה לא כוללים נתוני ${result.attribute}`));
         }
-        // get sectorlist
-        employerSchema.getAllSectors((err, sectorData) => {
-            if (err) {
-                logger.error(err);
-                reject(new ServerError(500, sectorData));
-            }
-            // create valid employer entity
-            currSector = sectorData.find(sector => sector.dataValues.SECTOR == data[empFields.SECTOR]);
-            employer = {
-                NAME: data[empFields.NAME],
-                SECTOR: currSector.dataValues.id,
-                PRIVATE_CAR_SOLUTION: BOOL[data[empFields.PRIVATE_CAR]],
-                SHUTTLE_SOLUTION: BOOL[data[empFields.SHUTTLE]],
-                MASS_TRANSPORTATION_SOLUTION: BOOL[data[empFields.MASS_TRANSPORTATION]],
-                CAR_POOL_SOLUTION: BOOL[data[empFields.CAR_POOL]],
-                WORK_FROM_HOME_SOLUTION: BOOL[data[empFields.WORK_FROM_HOME]],
-                EMPLOYER_ID: 0
-            };
-            employerSchema.insertEmployer(employer, (err, data) => {
-                if (!err)
-                    resolve(data);
-                else {
+        else {
+            // get sectorlist
+            employerSchema.getAllSectors((err, sectorData) => {
+                if (err) {
                     logger.error(err);
-                    reject(new ServerError(500, data));
+                    return reject(new ServerError(500, sectorData));
                 }
+                // create valid employer entity
+                currSector = sectorData.find(sector => sector.dataValues.SECTOR == data[empFields.SECTOR]);
+                if (currSector==null) {
+                    logger.info("incorrect sector");
+                    return reject(new ServerError(400, "סקטור לא תקין או לא קיים במערכת."));
+                }
+                employer = {
+                    NAME: data[empFields.NAME],
+                    SECTOR: currSector.dataValues.id,
+                    PRIVATE_CAR_SOLUTION: BOOL[data[empFields.PRIVATE_CAR]],
+                    SHUTTLE_SOLUTION: BOOL[data[empFields.SHUTTLE]],
+                    MASS_TRANSPORTATION_SOLUTION: BOOL[data[empFields.MASS_TRANSPORTATION]],
+                    CAR_POOL_SOLUTION: BOOL[data[empFields.CAR_POOL]],
+                    WORK_FROM_HOME_SOLUTION: BOOL[data[empFields.WORK_FROM_HOME]],
+                    EMPLOYER_ID: 0
+                };
+                employerSchema.insertEmployer(employer, (err, data) => {
+                    if (!err)
+                        resolve(data);
+                    else {
+                        logger.error(err);
+                        return reject(new ServerError(500, data));
+                    }
+                });
+
             });
-        });
+        }
     });
 }
 
 const readSheet = (company_sheets) => {
     return new Promise(function (resolve, reject) {
         if (company_sheets == undefined) {
-            reject(new ServerError(status = 400, message = "קובץ אקסל לא תקין"));
+            return reject(new ServerError(status = 400, message = "קובץ אקסל לא תקין"));
         }
         if (company_sheets["פרטי חברה"] == null) {
-            reject(new ServerError(status = 400, message = "חוצץ פרטי חברה חסר"));
+            return reject(new ServerError(status = 400, message = "חוצץ פרטי חברה חסר"));
         }
         let employerData = company_sheets["פרטי חברה"][0];
         if (employerData == undefined) {
-            reject(new ServerError(status = 400, message = "חוצץ נתוני עובדים חסר"));
+            return reject(new ServerError(status = 400, message = "פרטי החברה חסרים"));
         }
 
         let employees = company_sheets["פרטי עובדים"];
+        if (employees == undefined)
+            return reject(new ServerError(status = 400, message = "חוצץ פרטי עובדים חסר"));
+        else if (employees[0] === undefined)
+            return reject(new ServerError(status = 400, message = "חוצץ פרטי עובדים אינו מכיל מידע על העובדים"));
+
         result = defined_structure(employees[0], ["שם אתר", "מזהה עובד", "עיר מגורים", "רחוב", "מספר בניין", "כתובת עבודה-עיר", "כתובת עבודה-רחוב", "כתובת עבודה-מספר בניין"]);
         if (!result.valid) {
-            reject(new ServerError(status = 400, message = `פרטי עובדים לא כוללים נתוני ${result.attribute}`));
+            return reject(new ServerError(status = 400, message = `פרטי עובדים לא כוללים  ${result.attribute}`));
         }
         //
         handleEmployerData(employerData)
@@ -105,19 +116,18 @@ const readSheet = (company_sheets) => {
                             employeesData.run(employer, employees);
                             resolve(employer);
                         }
-                        catch(error) {
+                        catch (error) {
                             logger.error(err);
-                            reject(new ServerError(500, error));
+                            return reject(new ServerError(500, error));
                         }
                     })
                     .catch((err) => {
                         logger.error(err);
-                        reject(new ServerError(500, err));
+                        return reject(new ServerError(500, err));
                     })
             })
             .catch((err) => {
-                logger.error(err);
-                reject(new ServerError(500, err));
+                return reject(err);
             });
 
 

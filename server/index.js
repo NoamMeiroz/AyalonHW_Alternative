@@ -1,6 +1,9 @@
+require('dotenv').config();
+
 const express = require("express");
 const bodyParser = require("body-parser");
-const routes = require("./routes");
+const authRoutes = require("./routes/authRoutes");
+const employerRoutes = require("./routes/employerRoutes");
 const db = require("./db/database");
 const {logger} = require('./log');
 const cors = require("cors");
@@ -30,7 +33,9 @@ server_app.use( (req, res, done) => {
 server_app.use(bodyParser.json()); 
 server_app.use(cors());
 server_app.use(formidableMiddleware());
-server_app.use("/api", routes);
+server_app.use("/api", authRoutes);
+server_app.use("/api/employer", employerRoutes);
+
 
 // error handling. must be last call 
 server_app.use(function(err, req, res, next) {

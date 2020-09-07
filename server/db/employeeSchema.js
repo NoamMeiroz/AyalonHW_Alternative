@@ -73,6 +73,11 @@ const insertEmployees = (employerId, employees, callback) => {
             callback(err, getMessage(err));});
   }
 
+  /**
+   * Return list of employees of specific employer
+   * @param {int} employerId 
+   * @param {*} callback 
+   */
   const getEmployeesOfEmployer = (employerId, callback) => {
       Employee.findAll({
         where: {
@@ -81,4 +86,40 @@ const insertEmployees = (employerId, employees, callback) => {
       }).then(data=>{callback(null, data)})
         .catch(err=>{callback(err, getMessage(err));});
   }
-  module.exports = { insertBulk, updateRoute, getEmployeesOfEmployer };
+
+  /**
+   * Return % of finished calculation on employees 
+   * @param {int} employerID 
+   * @param {*} callback 
+   */
+  const getPrecentFinished = (employerID, callback) => {
+    let countFinished = 0;
+    let total = 0;
+    console.log(employerID);
+    Employee.count({
+        where: {
+          EMPLOYER_ID: employerID,
+          BEST_ROUTE: {
+            [db.Sequelize.Op.ne]: null
+          }
+        }
+      }).then(data=>{
+        countFinished = data;
+        Employee.count({
+          where: {
+            EMPLOYER_ID: employerID 
+          }
+        }
+      ).then(countAll=>{
+        let precent = 0;
+        total = countAll;
+        if (countFinished==0)
+          precent = 0;
+        else {
+          precent = parseInt(countFinished / total )*100;
+        }
+        callback(null, precent);
+      })})
+      .catch(err=>{callback(err, getMessage(err));});
+  }
+  module.exports = { insertBulk, updateRoute, getEmployeesOfEmployer, getPrecentFinished };

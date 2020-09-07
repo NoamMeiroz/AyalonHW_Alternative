@@ -1,6 +1,5 @@
 const passport = require('passport');
 const userSchema = require("../db/userSchema");
-const config = require('../config/config');
 const { logger }  = require('../log');
 const { ExtractJwt } = require('passport-jwt');
 const jwtStrategy = require('passport-jwt').Strategy;
@@ -11,7 +10,7 @@ const jwtOptions = {
     // this tells jwt where in the request object the payload exists.
     jwtFromRequest: ExtractJwt.fromHeader('authorization'),
     // this tells what secret to use in order to decode the payload
-    secretOrKey: config.secret
+    secretOrKey: process.env.secret
 };
 
 // setup options for local strategy (simple http user, password)
