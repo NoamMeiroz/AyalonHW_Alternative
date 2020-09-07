@@ -1,11 +1,10 @@
 const jwt = require("jwt-simple");
 const userSchema = require("../db/userSchema");
 const {logger} = require("../log");
-const config = require("../config/config");
 
 tokenForUser = (userId) => {
     const timestamp = new Date().getTime();
-    return jwt.encode({sub:userId, iat: timestamp}, config.secret);
+    return jwt.encode({sub:userId, iat: timestamp}, process.env.secret);
 }
 
 /**

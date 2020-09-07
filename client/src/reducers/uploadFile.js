@@ -3,15 +3,16 @@ import { FILE_UPLOAD, FILE_ERROR } from '../actions/types';
 
 const INITIAL_STATE = {
     isLoaded: false,
-    errorMessage: ''
+    errorMessage: '',
+    timestamp: new Date()
 }
 
 export default function(state = INITIAL_STATE, action) {
     switch (action.type) {
         case FILE_UPLOAD:
-            return {...state, isSuccess: true, data: action.data };
+            return {...state, timestamp: new Date(), isSuccess: true, data: action.data };
         case FILE_ERROR:
-            return {...state, errorMessage: action.errorMessage, isSuccess: false };
+            return {...state, timestamp: new Date(), errorMessage: action.errorMessage, isSuccess: false };
         default:
             return state;
     }

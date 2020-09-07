@@ -44,7 +44,7 @@ class Companies extends Component {
 
     componentDidUpdate(prevProps, prevState, snapshot) {
         // check if to handle uploadFile results
-        if (this.props.uploadFile.isSuccess !== prevProps.uploadFile.isSuccess) {
+        if (this.props.uploadFile.timestamp !== prevProps.uploadFile.timestamp) {
             if (this.props.uploadFile.isSuccess) {
                 this.snackBarElement.current.showSnackBar(true, "נתוני חברה בתהליך טעינה...");
                 // start check if finished uploading 
@@ -55,7 +55,7 @@ class Companies extends Component {
                     sessionStorage.removeItem(employerID)
                 }
                 //let processID = setInterval(this.props.checkProgress(employerID), 3000);
-                let processID = setInterval(()=>{this.props.checkProgress(employerID)}, 3000);
+                let processID = setInterval(() => { this.props.checkProgress(employerID) }, 3000);
                 // save process id
                 sessionStorage.setItem(employerID, processID);
             }
@@ -63,25 +63,21 @@ class Companies extends Component {
                 this.snackBarElement.current.showSnackBar(true, this.props.uploadFile.errorMessage);
         }
         // check if to show load initial employers data error message
-        if (this.props.loadData.isSuccess !== prevProps.loadData.isSuccess) {
+        if (this.props.loadData.timestamp !== prevProps.loadData.timestamp) {
             if (!this.props.loadData.isSuccess)
                 this.snackBarElement.current.showSnackBar(true, this.props.loadData.errorMessage);
         }
         // check if to show check employees loading progress error message
-        if (this.props.employeesData.errorMessage !== prevProps.employeesData.errorMessage) {
-            clearInterval(sessionStorage.getItem(this.props.employeesData.employerID));
-            sessionStorage.removeItem(this.props.employeesData.employerID);
-            if (this.props.employeesData.errorMessage !== "")
-                this.snackBarElement.current.showSnackBar(true, this.props.employeesData.errorMessage);
-        }
-        // check if employees loading progress is finished
-        if (this.props.employeesData.uploadProgess !== prevProps.employeesData.uploadProgess) {
-            if (this.props.employeesData.uploadProgess==100)
-                if (sessionStorage.getItem(this.props.employeesData.employerID)) {
-                    clearInterval(sessionStorage.getItem(this.props.employeesData.employerID));
-                    sessionStorage.removeItem(this.props.employeesData.employerID)
+        if (this.props.employeesData.timestamp !== prevProps.employeesData.timestamp) {
+            if (this.props.employeesData.errorMessage!=="" || this.props.employeesData.uploadProgess === 100)  {
+                clearInterval(sessionStorage.getItem(this.props.employeesData.employerID));
+                sessionStorage.removeItem(this.props.employeesData.employerID);
+                if (this.props.employeesData.errorMessage !== "")
+                    this.snackBarElement.current.showSnackBar(true, this.props.employeesData.errorMessage);
             }
         }
+
+
     }
 
     render() {
@@ -139,18 +135,21 @@ function mapStateToProps(state) {
         uploadFile: {
             newCompany: state.uploadFile.data,
             isSuccess: state.uploadFile.isSuccess,
-            errorMessage: state.uploadFile.errorMessage
+            errorMessage: state.uploadFile.errorMessage,
+            timestamp: state.uploadFile.timestamp
         },
         loadData: {
             sectorList: state.loadData.sectorList,
             isSuccess: state.loadData.isSuccess,
             errorMessage: state.loadData.errorMessage,
-            companyList: tempList
+            companyList: tempList,
+            timestamp: state.loadData.timestamp
         },
         employeesData: {
             employerID: state.employeesData.employerID,
             uploadProgess: state.employeesData.uploadProgess,
-            errorMessage: state.employeesData.errorMessage
+            errorMessage: state.employeesData.errorMessage,
+            timestamp: state.employeesData.timestamp
         }
     };
 }

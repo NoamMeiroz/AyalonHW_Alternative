@@ -105,7 +105,6 @@ const insertEmployees = (employerId, employees, callback) => {
         }
       }).then(data=>{
         countFinished = data;
-        console.log("finished: "+ countFinished);
         Employee.count({
           where: {
             EMPLOYER_ID: employerID 
@@ -114,7 +113,6 @@ const insertEmployees = (employerId, employees, callback) => {
       ).then(countAll=>{
         let precent = 0;
         total = countAll;
-        console.log("total: "+ countAll);
         if (countFinished==0)
           precent = 0;
         else {

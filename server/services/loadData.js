@@ -24,7 +24,9 @@ const getData = (callback) => {
                     logger.error(err);
                     reject(new ServerError(500, comapniesData));
                 }
-                let companyList = comapniesData.map(company=>company.dataValues);
+                let companyList = {};
+                if (comapniesData)
+                    companyList = comapniesData.map(company=>company.dataValues);
                 resolve({"sectors": sectorList, "companies": companyList});          
             });
         });

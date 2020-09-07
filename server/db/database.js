@@ -2,7 +2,7 @@ const Sequelize = require("sequelize");
 const dbConfig = require("../config/config.js");
 const MYSQL_SERVER = process.env.mysql_server || dbConfig.HOST;
 
-const sequelize = new Sequelize('alternative', dbConfig.USER, dbConfig.PASSWORD, {
+const sequelize = new Sequelize('alternative', process.env.DB_USER, process.env.DB_PASSWORD, {
   host: MYSQL_SERVER,
   dialect: dbConfig.dialect,
   pool: {

@@ -4,8 +4,8 @@ const INITIAL_STATE = {
     isSuccess: false,
     errorMessage: '',
     sectorList: {}, 
-    companyList: []
-
+    companyList: [],
+    timestamp: new Date()
 }
 
 export default function(state = INITIAL_STATE, action) {
@@ -15,7 +15,8 @@ export default function(state = INITIAL_STATE, action) {
                 isSuccess: action.isSuccess, 
                 sectorList: action.sectorList,
                 companyList: action.companyList,
-                errorMessage: action.errorMessage
+                errorMessage: action.errorMessage,
+                timestamp: new Date()
             };
         default:
             return state;

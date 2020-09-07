@@ -6,7 +6,8 @@ const INITIAL_STATE = {
     errorMessage: '',
     employeesList: [],
     employerID: -1,
-    uploadProgess: 0
+    uploadProgess: 0,
+    timestamp: new Date()
 }
 
 export default function (state = INITIAL_STATE, action) {
@@ -16,21 +17,24 @@ export default function (state = INITIAL_STATE, action) {
                 ...state,
                 isSuccess: action.isSuccess,
                 employeesList: action.employeesList,
-                errorMessage: action.errorMessage
+                errorMessage: action.errorMessage,
+                timestamp: new Date()
             };
         case CHECK_PROGRESS:
             return {
                 ...state,
                 employerID: action.employerID,
                 uploadProgess: action.uploadProgess,
-                errorMessage: ""
+                errorMessage: "",
+                timestamp: new Date()
             }
         case CHECK_PROGRESS_ERROR:
             return {
                 ...state,
                 employerID: action.employerID,
                 uploadProgess: 100,
-                errorMessage: action.errorMessage
+                errorMessage: action.errorMessage,
+                timestamp: new Date()
             }
         default:
             return state;
