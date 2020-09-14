@@ -3,10 +3,6 @@ const { logger, ServerError } = require('../log');
 
 const employeeSchema = require("../db/employeeSchema");
 const employerSchema = require("../db/employerSchema");
-const { sleep } = require("../tools")
-
-
-//const { resolve } = require('app-root-path');
 
 function employeesService(workerData) {
 	return new Promise((resolve, reject) => {
@@ -15,24 +11,29 @@ function employeesService(workerData) {
 		worker.on('error', reject);
 		worker.on('exit', (code) => {
 			if (code !== 0)
-				reject(new Error(`Worker stopped with exit code ${code}`));
+				return reject(new ServerError(500, `Worker stopped with exit code ${code}`));
 		})
 	})
 }
 
 async function run(employer, employees) {
 	logger.info(employer.NAME + ": Computing employees information...");
-	//sleep(5000).catch(err=>{logger.debug(err)});
-	const result = await employeesService({ employer, employees });
-	employerSchema.setEmploeeReady(employer.id, true, 
-			(err, result)=>{
-				if(result)
-					logger.debug(result);
-				else
-					logger.error(err.stack);
+	//await employeesService({ employer, employees })
+	result = await employeesService({ employer, employees });
+	if (!result.Employees) {
+		logger.error(result.message);
+	}
+	// finish working on employees
+	employerSchema.setEmploeeReady(employer.id, true,
+		(err, result) => {
+			if (result)
+				logger.debug(result);
+			else {
+				logger.error(err.stack)
+			}
 		});
-	//return result;
-}
+
+};
 
 /**
  * Check the data of the employer and then insert it to the database
@@ -44,12 +45,20 @@ const getEmployeesOfEmployer = (empId) => {
 		employeeSchema.getEmployeesOfEmployer(empId, (err, payload) => {
 			if (err) {
 				logger.error(err);
-				reject(new ServerError(500, "internal error"))
+				return reject(new ServerError(500, "internal error"))
 			}
 			let employeesList = [];
 			for (i in payload) {
 				employee = payload[i];
 				employeesList[i] = employee.dataValues;
+				let workSite = employeesList[i].Site.dataValues
+				employeesList[i].WORK_SITE = workSite.ADDRESS_STREET + " " + 
+					workSite.ADDRESS_BUILDING_NUMBER + ", " + workSite.ADDRESS_CITY;
+				delete employeesList[i].updatedAt;
+				delete employeesList[i].createdAt;
+				delete employeesList[i].EMPLOYER_ID;
+				delete employeesList[i].id;
+				delete employeesList[i].Site;
 			}
 			resolve(employeesList);
 		});
@@ -63,7 +72,7 @@ const getPrecentFinished = (empId) => {
 				logger.error(err);
 				reject(new ServerError(500, "internal error"))
 			}
-			resolve({employerID: empId, precent: payload});
+			resolve({ employerID: empId, precent: payload });
 		});
 	});
 }

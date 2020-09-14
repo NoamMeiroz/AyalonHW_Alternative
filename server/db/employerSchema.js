@@ -12,12 +12,13 @@ const getMessage = require("./errorCode").getMessage;
  * @param {*} callback 
  */
 const insert = (employer, callback) => {
-    // Save Tutorial in the database
-    Employer.create(employer)
-      .then(data=>{callback(null, data)})
-      .catch(err=>{ 
-          callback(err, getMessage(err));});
-  };
+  // Save Tutorial in the database
+  Employer.create(employer)
+    .then(data => { callback(null, data) })
+    .catch(err => {
+      callback(err, getMessage(err));
+    });
+};
 
 /**
  * Delete an employer
@@ -25,10 +26,11 @@ const insert = (employer, callback) => {
  * @param {*} callback 
  */
 const deleteEmployer = (employer, callback) => {
-    Employer.destroy({ where: { name: employer.NAME }})
-        .then(data=>{callback(null, data)})
-        .catch(err=>{ 
-            callback(err, getMessage(err));});
+  Employer.destroy({ where: { name: employer.NAME } })
+    .then(data => { callback(null, data) })
+    .catch(err => {
+      callback(err, getMessage(err));
+    });
 }
 
 /**
@@ -37,14 +39,14 @@ const deleteEmployer = (employer, callback) => {
  * @param {*} callback (err, result)
  */
 const insertEmployer = (employer, callback) => {
-    // Save Tutorial in the database
-    deleteEmployer(employer, (err, data) => {
-        if (!err)
-            insert(employer, callback);
-        else
-            callback(err, data);
-    });
-  };
+  // Save Tutorial in the database
+  deleteEmployer(employer, (err, data) => {
+    if (!err)
+      insert(employer, callback);
+    else
+      callback(err, data);
+  });
+};
 
 /**
  * Find employer by name
@@ -52,14 +54,14 @@ const insertEmployer = (employer, callback) => {
  * @param {function} callback (err, result)
  */
 const findByName = (name, callback) => {
-    // find emp in the database
-    Employer.findAll({
-      where: {
-        name: name
-      }
-    }).then(data=>{callback(null, data)})
-      .catch(err=>{callback(err, getMessage(err));});
-  };
+  // find emp in the database
+  Employer.findAll({
+    where: {
+      name: name
+    }
+  }).then(data => { callback(null, data) })
+    .catch(err => { callback(err, getMessage(err)); });
+};
 
 /**
  * Get all companies
@@ -68,10 +70,10 @@ const findByName = (name, callback) => {
 const getAllComapnies = (callback) => {
   // find emp in the database
   Employer.findAll({
-    include:[{ model: EmployerSites, as: "Sites"}]
+    include: [{ model: EmployerSites, as: "Sites" }]
     //{ model: Employee, as: "Employees" }]
-  }).then(data=>{callback(null, data)})
-    .catch(err=>{callback(err, getMessage(err));});
+  }).then(data => { callback(null, data) })
+    .catch(err => { callback(err, getMessage(err)); });
 };
 
 /**
@@ -81,20 +83,45 @@ const getAllComapnies = (callback) => {
  */
 const setEmploeeReady = (employerId, isReady, callback) => {
   // Save Tutorial in the database
-  Employer.update({ 'EMPLOYEES_READY': isReady},
-    {where: { id: employerId}}).then(data=>{callback(null, data)})
-    .catch(err=>{callback(err, getMessage(err));});
+  Employer.update({ 'EMPLOYEES_READY': isReady },
+    { where: { id: employerId } }).then(data => { callback(null, data) })
+    .catch(err => { callback(err, getMessage(err)); });
 };
+
+/**
+ * update employer with id equal to employerId with EMPLOYEES_READY = isReady.
+ * @param {integer} employerId
+ * @param {boolean} isReady
+ */
+const isFinishedWithEmployees = (employerId, callback) => {
+  // Save Tutorial in the database
+  Employer.findAll({
+    where: {
+      id: employerId
+    }
+  }).then(data => {
+    result = false;
+    if (data.length > 0)
+      if (data[0].dataValues.EMPLOYEES_READY == -1)
+        result = true;
+    callback(null, result)
+  })
+    .catch(err => { callback(err, getMessage(err)); });
+};
+
 
 /**
  * return SectorList
  */
 const getAllSectors = (callback) => {
   // find emp in the database
-  Sector.findAll().then(data=>callback(null, data))
-    .catch(err=>{
-      callback(err, getMessage(err));});
+  Sector.findAll().then(data => callback(null, data))
+    .catch(err => {
+      callback(err, getMessage(err));
+    });
 };
 
-module.exports = { insertEmployer, deleteEmployer, findByName, 
-  getAllSectors, getAllComapnies, setEmploeeReady};
+module.exports = {
+  insertEmployer, deleteEmployer, findByName,
+  getAllSectors, getAllComapnies, setEmploeeReady, isFinishedWithEmployees
+};
