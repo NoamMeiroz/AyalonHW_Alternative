@@ -6,15 +6,51 @@ import {
 } from './types';
 import { SERVER } from '../utils/config';
 
-const handleError = (status) => {
-    switch (status) {
+const MAJOR_FAILURE = "בעיה במערכת. נא לנסות מאוחר יותר";
+
+const handleErrorResponse = (response) => {
+    switch (response.status) {
+        case 400:
+            return response.data;
         case 401:
             return "שם משתמש או סיסמה שגויים";
+        case 422:
+            return "המערכת לא הצליחה ליצור משתמש חדש.";
+        case 500:
+            return MAJOR_FAILURE;
         default:
-            return "בעיה במערכת. נא לנסות מאוחר יותר";
+            return MAJOR_FAILURE;
     }
 };
 
+/**
+ * Convert error to meaningfull message
+ * @param {Error} error 
+ */
+export const handleError = (error) => {
+    let errorMessage = "";
+    if (!error.response) {
+        if (error.message)
+            if (error.message === "Network Error")
+                errorMessage = "קיימת בעיית תקשורת עם השרת";
+            else
+                errorMessage = error.message;
+        else
+            errorMessage = "בעיה במערכת";
+    }
+    else if (error.response.status) {
+        errorMessage = handleErrorResponse(error.response);
+    }
+    else
+        errorMessage = MAJOR_FAILURE;
+    return errorMessage;
+}
+
+/**
+ * Signin method.If success then store user token localy
+ * @param {*} formProps 
+ * @param {*} callback 
+ */
 export const signin = (formProps, callback) => {
     const form = new FormData();
     form.append("userId", formProps.userId);
@@ -31,11 +67,15 @@ export const signin = (formProps, callback) => {
                 localStorage.setItem('token', data.data.token); // save token use for later
                 callback();
             }).catch(err => {
-                dispatch({ type: AUTH_ERROR, payload: handleError(err.response.status) })
+                let message = handleError(err);
+                dispatch({ type: AUTH_ERROR, payload: message })
             });
     }
 };
 
+/**
+ * Signout method. removes token from local store
+ */
 export const signOut = () => {
     localStorage.removeItem('token');
     return { type: AUTH_USER, payload: '' };
@@ -60,15 +100,7 @@ export const upload = (file, callback) => {
                 dispatch({ type: FILE_UPLOAD, isSuccess: true, data: data.data });
                 dispatch(checkProgress(data.data.id));
             }).catch(err => {
-                let message = "";
-                if (!err.response) {
-                    message = "יש בעיה באתר";
-                }
-                else if (err.response.status === 500) {
-                    message = "טעינת קובץ נכשלה עקב בעיה במערכת";
-                }
-                else
-                    message = err.response.data;
+                let message = handleError(err);
                 dispatch({ type: FILE_ERROR, isSuccess: false, errorMessage: message })
             });
     }
@@ -83,15 +115,8 @@ export const getData = () => {
             .then(payload => {
                 dispatch({ type: LOAD_DATA, isSuccess: true, sectorList: payload.data.sectors, companyList: payload.data.companies });
             }).catch(err => {
-                let message = "";
-                if (!err.response)
-                    message = err;
-                else if (err.response.status === 500) {
-                    message = "בעיה במערכת";
-                }
-                else
-                    message = err.response.data;
-                dispatch({ type: LOAD_DATA, isSuccess: false, errorMessage: message });
+                let message = handleError(err);
+                dispatch({ type: LOAD_DATA, isSuccess: false, errorMessage: message, sectorList: {}, companyList: [] });
             });
     }
 };
@@ -105,12 +130,7 @@ export const getEmployeesOfEmployer = (employerId) => {
             .then(payload => {
                 dispatch({ type: EMPLOYEES_DATA, isSuccess: true, employeesList: payload.data });
             }).catch(err => {
-                let message = "";
-                if (err.response.status === 500) {
-                    message = "בעיה במערכת";
-                }
-                else
-                    message = err.response.data;
+                let message = handleError(err);
                 dispatch({ type: EMPLOYEES_DATA, isSuccess: false, errorMessage: message });
             });
     }
@@ -128,17 +148,12 @@ export const checkProgress = (employerId) => {
                     });
                 }
                 else {
-                    let errorMessage = "בעיה במערכת, תשובה מהשרת לא תקינה";
-                    dispatch({ type: CHECK_PROGRESS_ERROR, error: errorMessage });
+                    let message = "בעיה במערכת, תשובה מהשרת לא תקינה";
+                    dispatch({ type: CHECK_PROGRESS_ERROR, errorMessage: message, employerID: employerId });
                 }
             }).catch(err => {
-                let errorMessage = "";
-                if (err.response.status === 500) {
-                    errorMessage = "בעיה במערכת";
-                }
-                else
-                    errorMessage = err.response.data;
-                dispatch({ type: CHECK_PROGRESS_ERROR, error: errorMessage, employerID: employerId });
+                let message = handleError(err);
+                dispatch({ type: CHECK_PROGRESS_ERROR, errorMessage: message, employerID: employerId });
             });
     }
 };

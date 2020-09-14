@@ -52,9 +52,9 @@ class CompanyTable extends Component {
                     }
                 ]}
                 components={{
-                    Action: props => (
+                    Action: row => (
                       <DownloadButton
-                        csvData={props.data} fileName={props.data.NAME} callFail={props.callFail}
+                        csvData={row.data} fileName={row.data.NAME} callFail={this.props.callFail}
                       />
                     )
                 }}

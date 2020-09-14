@@ -19,7 +19,10 @@ class LoadStatusSnackBar extends Component {
   };
 
   showSnackBar(show, message) {
-      this.setState( {open: show, text: message});
+      if (message)
+			this.setState( {open: show, text: message});
+		else
+		this.setState( {open: show, text: "שגיאה לא ידועה"});
   }
 
   render() {
@@ -30,7 +33,7 @@ class LoadStatusSnackBar extends Component {
             horizontal: 'left',
             }}
             open={this.state.open}
-            autoHideDuration={10000}
+            autoHideDuration={2000}
             onClose={this.handleClose}
             message={this.state.text}
             action={

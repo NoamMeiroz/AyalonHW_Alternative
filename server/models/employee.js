@@ -28,6 +28,14 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
             allowNull: false,
         },
+        X: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
+        Y: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
         WORK_SITE: {
             type: Sequelize.INTEGER,
             allowNull: false,

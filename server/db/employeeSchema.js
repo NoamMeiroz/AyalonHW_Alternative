@@ -1,7 +1,9 @@
 const db = require("./database");
 const {getMessage} = require("./errorCode");
-const employee = require("../models/employee");
+const { isFinishedWithEmployees } = require("./employerSchema");
 const Employee = db.employee;
+const EmployerSites = db.employerSites;
+
 
 /**
  * Insert employee object
@@ -82,7 +84,8 @@ const insertEmployees = (employerId, employees, callback) => {
       Employee.findAll({
         where: {
           employer_id: employerId
-        }
+        },
+        include:[{ model: EmployerSites, as: "Site"}]
       }).then(data=>{callback(null, data)})
         .catch(err=>{callback(err, getMessage(err));});
   }
@@ -95,7 +98,13 @@ const insertEmployees = (employerId, employees, callback) => {
   const getPrecentFinished = (employerID, callback) => {
     let countFinished = 0;
     let total = 0;
-    console.log(employerID);
+    isFinishedWithEmployees(employerID, (err, data) => {
+      if (err)
+        callback(err, getMessage(err));
+      else if (data)
+        callback(null, 100);
+    });
+       
     Employee.count({
         where: {
           EMPLOYER_ID: employerID,

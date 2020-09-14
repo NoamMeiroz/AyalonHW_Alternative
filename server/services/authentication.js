@@ -17,7 +17,7 @@ const singup = function(req, res, next) {
    let user = req.fields.userId;
    let password = req.fields.password;
    if (!user || !password) {
-       return res.status(422).send("userId or password are missing\n");
+       return res.status(401).send("userId or password are missing\n");
    }
    userSchema.insertUser(user, password, function(isValid, data) {
       let result = {}

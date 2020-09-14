@@ -29,6 +29,8 @@ db.employerSites.belongsTo(db.employer, { foreignKey: "EMPLOYER_ID", as: 'employ
 
 db.employer.hasMany(db.employee, {foreignKey: "EMPLOYER_ID", as: "Employees"});
 db.employee.belongsTo(db.employer, { foreignKey: "EMPLOYER_ID", as: 'employer' });
+db.employee.belongsTo(db.employerSites, { foreignKey: "WORK_SITE", as: 'Site' });
+
 
 module.exports = db;
 

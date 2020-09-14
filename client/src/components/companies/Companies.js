@@ -42,11 +42,15 @@ class Companies extends Component {
         this.props.getData();
     }
 
+    showMessage = (message) => {
+        this.snackBarElement.current.showSnackBar(true, message);
+    }
+
     componentDidUpdate(prevProps, prevState, snapshot) {
         // check if to handle uploadFile results
         if (this.props.uploadFile.timestamp !== prevProps.uploadFile.timestamp) {
             if (this.props.uploadFile.isSuccess) {
-                this.snackBarElement.current.showSnackBar(true, "נתוני חברה בתהליך טעינה...");
+                this.showMessage("נתוני חברה בתהליך טעינה...");
                 // start check if finished uploading 
                 let employerID = this.props.uploadFile.newCompany.id;
                 // delete old process interval if exists
@@ -60,20 +64,21 @@ class Companies extends Component {
                 sessionStorage.setItem(employerID, processID);
             }
             else
-                this.snackBarElement.current.showSnackBar(true, this.props.uploadFile.errorMessage);
+                this.showMessage(this.props.uploadFile.errorMessage);
         }
+        console.log(this.props.loadData);
         // check if to show load initial employers data error message
         if (this.props.loadData.timestamp !== prevProps.loadData.timestamp) {
             if (!this.props.loadData.isSuccess)
-                this.snackBarElement.current.showSnackBar(true, this.props.loadData.errorMessage);
+                this.showMessage(this.props.loadData.errorMessage);
         }
         // check if to show check employees loading progress error message
         if (this.props.employeesData.timestamp !== prevProps.employeesData.timestamp) {
-            if (this.props.employeesData.errorMessage!=="" || this.props.employeesData.uploadProgess === 100)  {
+            if (this.props.employeesData.errorMessage !== "" || this.props.employeesData.uploadProgess === 100) {
                 clearInterval(sessionStorage.getItem(this.props.employeesData.employerID));
                 sessionStorage.removeItem(this.props.employeesData.employerID);
                 if (this.props.employeesData.errorMessage !== "")
-                    this.snackBarElement.current.showSnackBar(true, this.props.employeesData.errorMessage);
+                    this.showMessage(this.props.employeesData.errorMessage);
             }
         }
 
@@ -110,7 +115,8 @@ class Companies extends Component {
                 <Grid item xs={10}>
                     <CompanyTable
                         data={this.props.loadData.companyList}
-                        sectors={this.props.loadData.sectorList} />
+                        sectors={this.props.loadData.sectorList}
+                        callFail={this.showMessage} />
                 </Grid>
             </Grid>
             <LoadStatusSnackBar ref={this.snackBarElement} />
