@@ -34,11 +34,11 @@ router.post("/signup/", authenticationService.singup);
    Sheet number 1 is contains employer information.
    Sheet number 2 is holds employees information.
 */
-router.post("/upload/", (req, res, next) => {
+router.post("/upload/", async (req, res, next) => {
    let url = URL.parse(req.url, true);
    let xlsxSheets;
    let result;
-   xlsxSheets = excel.post_file(req, res, url.query.f);
+   xlsxSheets = await excel.post_file(req, res, url.query.f);
    if (xlsxSheets) {
       companyData.readSheet(xlsxSheets).then(data => {
          res.status(200).json(data);

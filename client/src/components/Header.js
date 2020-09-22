@@ -31,7 +31,7 @@ class Header extends Component {
                         : null
                     }
                     <Typography variant="h6" className="title">
-                        אלטרנתיב
+                        נתיב לעסקים
                     </Typography>
                     {(!this.props.auth) ? 
                         <Button component={Link} to="/signin" color="inherit">כניסה</Button> : 

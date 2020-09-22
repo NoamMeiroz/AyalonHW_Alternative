@@ -102,7 +102,7 @@ const isFinishedWithEmployees = (employerId, callback) => {
   }).then(data => {
     result = false;
     if (data.length > 0)
-      if (data[0].dataValues.EMPLOYEES_READY == -1)
+      if (data[0].dataValues.EMPLOYEES_READY === 1)
         result = true;
     callback(null, result)
   })

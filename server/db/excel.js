@@ -1,4 +1,5 @@
-var XLSX = require('xlsx');
+//var XLSX = require('xlsx');
+var ExcelJS = require('exceljs');
 const { logger, ServerError } = require('../log');
 
 /**
@@ -6,7 +7,34 @@ const { logger, ServerError } = require('../log');
  *	each sheet is a property
  * @param {*} file - xlsx file
  */
-const load_data = (file) => {
+const load_data = async (file) => {
+	const workbook = new ExcelJS.Workbook();
+	let wb = await workbook.xlsx.readFile(file);
+	let data = {};
+
+	wb.eachSheet(function(worksheet, sheetId) {
+		//let sheet = worksheet.name;
+		//let temp = XLSX.utils.sheet_to_json(sheet);
+		let keys = [];
+		let sheet = [];
+		worksheet.eachRow((row, rowNumber) => {
+			let currRow = {};
+			if (rowNumber===1) {
+				sheet = [];
+				keys = row.values
+			}
+			else {
+				keys.forEach((key, index, array)=>{
+					currRow[key]=row.values[index];
+				});
+				sheet.push(currRow);
+			}
+		});
+		data[worksheet.name] = sheet;
+	  });
+	return data;
+}
+/*const load_data = (file) => {
 	let workbook = XLSX.readFile(file);
 	let data = {};
 
@@ -16,7 +44,7 @@ const load_data = (file) => {
 		data[workbook.SheetNames[i]] = temp;
 	}
 	return data;
-}
+}*/
 
 const post_data = (req, res) => {
 	let files = {};
