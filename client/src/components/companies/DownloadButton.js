@@ -31,9 +31,24 @@ class DownloadButton extends Component {
     * @param {string} str 
     */
    translate = (str) => {
-      return str.replace(/km/g, 'ק"\מ')
+      return str.replace(/km/g, 'ק"מ')
          .replace(/mins/g, 'דקות')
-         .replace(/Bus/g, "אוטובוס");
+         .replace(/Bus/g, "אוטובוס")
+         .replace(/hours/g, "שעות")
+         .replace(/hour/g, "שעה");
+   }
+
+   /**
+    * return the fastest routes
+    * @param {array of routes} route 
+    */
+   findFastestRoute = (route) => {
+      let bestRoute = route[0];
+      for(let i=1; i<route.length; i++) {
+         if ( route[i].legs[0].duration.value < bestRoute.legs[0].duration.value )
+            bestRoute = route[i];
+      }
+      return bestRoute;
    }
 
    /**
@@ -43,7 +58,8 @@ class DownloadButton extends Component {
    getTransitDescription = (transitDescription) => {
       if (transitDescription.error)
          return transitDescription.error;
-      const steps = transitDescription[0].legs[0].steps;
+      let bestRoute = this.findFastestRoute(transitDescription);
+      const steps = bestRoute.legs[0].steps;
       let walkingDuration = 0;
       let transit = [];
       let description = "";
@@ -69,16 +85,16 @@ class DownloadButton extends Component {
          return "";
       // add all public transportation
       transit.forEach((currentTranit, index, array) => {
-         description = description + " " + currentTranit.line + " במשך " +
-            timeConvert(currentTranit.duration) + ".";
+         description = description + " " + currentTranit.line + " במשך כ- " +
+            timeConvert(currentTranit.duration, "שניות", true) + ".\n";
       });
       // add walking duration
       if (walkingDuration > 0) {
-         walkingDuration = timeConvert(walkingDuration);
-         description = description + `\nמרחק הליכה כולל ${walkingDuration} דקות.`;
+         walkingDuration = timeConvert(walkingDuration, "שניות", true);
+         description = description + `\nמרחק הליכה כולל הינו כ- ${walkingDuration}.`;
       }
       // add total length and length
-      description = description + `\nסה"כ ${transitDescription[0].legs[0].duration.text} למרחק של ${transitDescription[0].legs[0].distance.text}`;
+      description = description + `\nסה"כ ${bestRoute.legs[0].duration.text} למרחק של ${bestRoute.legs[0].distance.text}`;
       description = this.translate(description);
       return description
    }
@@ -150,7 +166,7 @@ class DownloadButton extends Component {
       if (walking.length === 0)
          return "";
 
-      // 90 minute ride is not recommended
+      // 60 minute walking is not recommended
       if ((walkingDescription[0].legs[0].duration.value / 60) > 60)
          return "";
 
@@ -166,16 +182,57 @@ class DownloadButton extends Component {
    }
 
 
+      /**
+    * convert google driving route recommendation to meaningful string
+    * @param {json} bicycleDescription 
+    */
+   getDrivingDescription = (drivingDescription) => {
+      if (drivingDescription.error)
+         return drivingDescription.error;
+      let bestRoute = this.findFastestRoute(drivingDescription);
+      const steps = bestRoute.legs[0].steps;
+      let driving = [];
+      let description = "";
+      steps.forEach((step, index, array) => {
+         switch (step.travel_mode) {
+            case 'DRIVING':
+               let details = step.html_instructions;
+               details = details.replace(/(<([^>]+)>)/gi, "");
+               driving.push(details);
+               break;
+            default:
+               break;
+         }
+      });
+
+      // no bicycle ride is suggested
+      if (driving.length === 0)
+         return "";
+
+      // add total length and length
+      description = `סה"כ ${bestRoute.legs[0].duration.text} למרחק של ${bestRoute.legs[0].distance.text}\n`;
+
+      // add all streets
+      /*driving.forEach((currentStep, index, array) => {
+         description = description + currentStep + '\n';
+      });*/
+      description = this.translate(description);
+      return description
+   }
+
    saveEmployeesList = (employerId, fileName) => {
-      axios.get(`${SERVER}/api/employer/${employerId}/employee`)
+      axios.get(`${SERVER}/api/employer/${employerId}/employee`, {headers:
+         { 'authorization': localStorage.getItem('token') }})
          .then(payload => {
             let employeeList = payload.data;
+            console.log(employeeList);
             if (employeeList && !(typeof employeeList === "string")) {
                employeeList.forEach((emp) => {
                   if (!emp.BEST_ROUTE.error) {
                      emp.transit = this.getTransitDescription(emp.BEST_ROUTE.transit);
                      emp.bicycling = this.getBicycleDescription(emp.BEST_ROUTE.bicycling);
                      emp.walking = this.getWalkingDescription(emp.BEST_ROUTE.walking);
+                     emp.driving = this.getDrivingDescription(emp.BEST_ROUTE.driving);
                   }
                   else {
                      emp.ERROR = emp.BEST_ROUTE.error;
@@ -185,6 +242,7 @@ class DownloadButton extends Component {
                this.exportToCSV(employeeList, fileName);
             }
          }).catch(err => {
+            console.log(err);
             let message = actions.handleError(err);
             this.props.callFail(message);
          });
@@ -203,11 +261,13 @@ class DownloadButton extends Component {
       { header: 'תחבורה ציבורית מומלצת', key: 'transit', width: 50 },
       { header: 'מסלול אופניים מומלץ', key: 'bicycling', width: 50 },
       { header: 'מסלול הליכה מומלץ', key: 'walking', width: 50 },
+      { header: 'מסלול לנהיגה עצמית מומלץ', key: 'driving', width: 50 },
       { header: 'שגיאות ברשומה', key: 'ERROR', width: 50 }];
 
       ws.getColumn('transit').alignment = { vertical: 'top', horizontal: 'right', wrapText: true, readingOrder: 'rtl' };
       ws.getColumn('bicycling').alignment = { vertical: 'top', horizontal: 'right', wrapText: true, readingOrder: 'rtl' };
       ws.getColumn('walking').alignment = { vertical: 'top', horizontal: 'right', wrapText: true, readingOrder: 'rtl' };
+      ws.getColumn('driving').alignment = { vertical: 'top', horizontal: 'right', wrapText: true, readingOrder: 'rtl' };
       ws.getColumn('ERROR').alignment = { vertical: 'top', horizontal: 'right', wrapText: true, readingOrder: 'rtl' };
       // make header bold
       ws.getRow(1).font = { bold: true }
@@ -224,7 +284,7 @@ class DownloadButton extends Component {
             rules: [
                {
                   type: 'expression',
-                  formulae: [`IF($I$${rowNumber}<>"", 1, 0)`],
+                  formulae: [`IF($J$${rowNumber}<>"", 1, 0)`],
                   style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFF0000' } } },
                }
             ]

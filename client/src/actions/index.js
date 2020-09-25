@@ -8,6 +8,10 @@ import { SERVER } from '../utils/config';
 
 const MAJOR_FAILURE = "בעיה במערכת. נא לנסות מאוחר יותר";
 
+const getAxiosHeader = () => {
+    return { headers : { 'authorization': localStorage.getItem('token') }};
+}
+
 const handleErrorResponse = (response) => {
     switch (response.status) {
         case 400:
@@ -94,7 +98,8 @@ export const upload = (file, callback) => {
             form,
             {
                 headers: {
-                    'Content-Type': `multipart/form-data; boundary=${form._boundary}`
+                    'Content-Type': `multipart/form-data; boundary=${form._boundary}`,
+                    'authorization': localStorage.getItem('token')
                 }
             }).then(data => {
                 dispatch({ type: FILE_UPLOAD, isSuccess: true, data: data.data });
@@ -111,7 +116,7 @@ export const upload = (file, callback) => {
  */
 export const getData = () => {
     return (dispatch) => {
-        axios.get(`${SERVER}/api/employer/`)
+        axios.get(`${SERVER}/api/employer/`, getAxiosHeader())
             .then(payload => {
                 dispatch({ type: LOAD_DATA, isSuccess: true, sectorList: payload.data.sectors, companyList: payload.data.companies });
             }).catch(err => {
@@ -126,7 +131,7 @@ export const getData = () => {
  */
 export const getEmployeesOfEmployer = (employerId) => {
     return (dispatch) => {
-        axios.get(`${SERVER}/api/employer/${employerId}/employee`)
+        axios.get(`${SERVER}/api/employer/${employerId}/employee`, getAxiosHeader())
             .then(payload => {
                 dispatch({ type: EMPLOYEES_DATA, isSuccess: true, employeesList: payload.data });
             }).catch(err => {
@@ -138,7 +143,7 @@ export const getEmployeesOfEmployer = (employerId) => {
 
 export const checkProgress = (employerId) => {
     return (dispatch) => {
-        axios.get(`${SERVER}/api/employer/${employerId}/employee/precentReady`)
+        axios.get(`${SERVER}/api/employer/${employerId}/employee/precentReady`, getAxiosHeader())
             .then(payload => {
                 if (payload.data.precent || payload.data.precent >= 0) {
                     dispatch({

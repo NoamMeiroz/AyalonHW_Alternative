@@ -158,8 +158,7 @@ const test = function suite() {
             });
         });
 
-
-        describe("Check insert", function () {
+        /**        describe("Check insert", function () {
 
             it("Check employer", function (done) {
                 let sql1 = "select count(*) as 'exists' from employers e where e.name = 'חברת בדיקות'";
@@ -201,6 +200,7 @@ const test = function suite() {
             });
 
         });
+        */
     });
 }
 module.exports = test;

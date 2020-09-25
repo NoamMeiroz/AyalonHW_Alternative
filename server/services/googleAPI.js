@@ -2,6 +2,7 @@ const axios = require('axios');
 const proj4 = require('proj4');
 const { ServerError, logger } = require('../log');
 const tools = require('../tools');
+const { debug } = require('winston');
 
 const ERRORS = {
    INVALID_ADDRESS_CODE: 1000,
@@ -11,6 +12,8 @@ const ERRORS = {
    MISSING_ORIGIN_CODE: 1004,
    MISSING_DESTINATION_CODE: 1005
 };
+
+const LOCATION_TYPE = ["street_address","route", "establishment", "hospital"];
 
 
 function convertCoordinate(location) {
@@ -46,7 +49,7 @@ getCoordinates = (payload) => {
    let result = {};
    if (payload.results) {
       if ((payload.results.length > 0) &&
-         (payload.results[0].types[0] === "street_address"))
+         (LOCATION_TYPE.some((value => payload.results[0].types.includes(value)))))
          if (payload.results[0].geometry) {
             location = payload.results[0].geometry.location;
             if (location) {
@@ -71,7 +74,7 @@ getCoordinates = (payload) => {
  * @param {String} street 
  * @param {int} buildingNumber 
  */
-const convertLocation = (city, street, buildingNumber) => {
+const convertLocation = async (city, street, buildingNumber) => {
    return new Promise(function (resolve, reject) {
       if (!city) {
          return resolve(new ServerError(ERRORS.MISSING_CITY_CODE, "missing city"));
@@ -83,7 +86,7 @@ const convertLocation = (city, street, buildingNumber) => {
          return resolve(new ServerError(ERRORS.MISSING_BUILDING_NUMBER_CODE, "missing building number"));
       }
 
-      let address = street + buildingNumber + ", " + city;
+      let address = `${street} ${buildingNumber}, ${city}`;
       address = encodeURI(address);
       let key = process.env.GOOGLE_API_KEY;
       url = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&language=iw&key=${key}`;
@@ -125,7 +128,7 @@ const checkRouteResults = (payload) => {
    return result;
 }
 
-const getRoutes = (origin, destination) => {
+const getRoutes = async (origin, destination) => {
    return new Promise(function (resolve, reject) {
 
       if (!origin) {
@@ -158,12 +161,12 @@ const getRoutes = (origin, destination) => {
       destinationAddr = encodeURI(destinationAddr);
 
       let key = process.env.GOOGLE_API_KEY;
-      let modeList = ['transit', 'bicycling', 'walking'];
+      let modeList = ['transit', 'bicycling', 'walking', 'driving'];
       let promiseList = [];
       let time = tools.getNearestWorkDay(new Date());
       modeList.forEach((mode, index, array) => {
 
-         params = `origin=${originAddr}&destination=${destinationAddr}&mode=${mode}&language=iw&departure_time=${time}&key=${key}`
+         params = `origin=${originAddr}&destination=${destinationAddr}&mode=${mode}&language=iw&departure_time=${time}&alternatives=true&key=${key}`
          url = `https://maps.googleapis.com/maps/api/directions/json?${params}`;
          promiseList.push(axios.get(url));
       });

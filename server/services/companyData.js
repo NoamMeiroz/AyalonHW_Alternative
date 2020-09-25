@@ -137,27 +137,36 @@ const readSheet = (company_sheets) => {
                                 }
                             })
                             .catch((error) => {
-                                logger.error(error);
-                                if (error instanceof ServerError)
+                                if (error instanceof ServerError) {
+                                    logger.info(error.stack);
                                     reject(error);
-                                else
+                                }
+                                else {
+                                    logger.error(error.stack);
                                     reject(new ServerError(500, error));
+                                }
                             });
                     })
                     .catch((error) => {
-                        logger.error(error);
-                        if (error instanceof ServerError)
+                        if (error instanceof ServerError) {
+                            logger.info(error.stack);
                             reject(error);
-                        else
+                        }
+                        else {
+                            logger.error(error.stack);
                             reject(new ServerError(500, error));
+                        }
                     });
             })
             .catch((error) => {
-                logger.error(error.stack);
-                if (error instanceof ServerError)
+                if (error instanceof ServerError) {
+                    logger.info(error.stack);
                     reject(error);
-                else
+                }
+                else {
+                    logger.error(error.stack);
                     reject(new ServerError(500, error));
+                }
             });
 
     });

@@ -1,6 +1,5 @@
 const { Worker } = require('worker_threads');
 const { logger, ServerError } = require('../log');
-
 const employeeSchema = require("../db/employeeSchema");
 const employerSchema = require("../db/employerSchema");
 
@@ -19,15 +18,21 @@ function employeesService(workerData) {
 async function run(employer, employees) {
 	logger.info(employer.NAME + ": Computing employees information...");
 	//await employeesService({ employer, employees })
-	result = await employeesService({ employer, employees });
-	if (!result.Employees) {
-		logger.error(result.message);
+	try{
+		result = await employeesService({ employer, employees });
+		if (!result.Employees) {
+			logger.error(result.message);
+		}
 	}
+	catch(error) {
+		logger.error(error.stack);
+	}
+	
 	// finish working on employees
 	employerSchema.setEmploeeReady(employer.id, true,
 		(err, result) => {
 			if (result)
-				logger.debug(result);
+				logger.debug(JSON.stringify(result));
 			else {
 				logger.error(err.stack)
 			}

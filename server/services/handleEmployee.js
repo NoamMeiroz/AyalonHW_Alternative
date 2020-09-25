@@ -2,6 +2,7 @@ const { workerData, parentPort } = require('worker_threads')
 const employeeSchema = require('../db/employeeSchema');
 const empFields = require("../config/config").employeeFieldsName;
 const siteFields = require("../config/config").sitesFieldsName;
+const { getFirstNumberInString, sleep } = require('../tools');
 const googleAPI = require("./googleAPI");
 const { ServerError, logger } = require('../log');
 
@@ -13,7 +14,7 @@ function save(employeeList) {
       // save all employees in the db
       employeeSchema.insertBulk(employeeList, (err, data) => {
          if (err) {
-            reject(err);
+            return reject(err);
          }
          let empList = data.map((employee) => {
             return employee.dataValues;
@@ -30,12 +31,13 @@ function save(employeeList) {
  * If no exception then save to db.
  * return results. 
  */
-calculateEmployee = (employeeList) => {
+calculateEmployee = async (employeeList) => {
    return new Promise(function (resolve, reject) {
       // calculate coordination
       let convertPromise = [];
       employeeList.forEach((employee, index, array) => {
-         convertPromise.push(googleAPI.convertLocation(employee.CITY, employee.STREET, employee.BUILDING_NUMBER));
+         p = await googleAPI.convertLocation(employee.CITY, employee.STREET, employee.BUILDING_NUMBER)
+         convertPromise.push(p);
       });
 
       // wait to finish with all employees and then save
@@ -88,7 +90,7 @@ let empList = employeeList.map((emp) => {
       WORKER_ID: emp[empFields.WORKER_ID],
       CITY: emp[empFields.CITY],
       STREET: emp[empFields.STREET],
-      BUILDING_NUMBER: emp[empFields.BUILDING_NUMBER],
+      BUILDING_NUMBER: (getFirstNumberInString(emp[empFields.BUILDING_NUMBER])||0),
       BEST_ROUTE: null
    }
    site = employer.Sites.filter((site) => {
@@ -135,11 +137,12 @@ const findRoutes = (employeeList, sites) => {
                         logger.error(error.stack);
                   });
                }
+               
             });
             resolve;
          })
          .catch(error => {
-            logger.error(error);
+            logger.error(error.stack);
             resolve;
          });
    });
@@ -147,7 +150,7 @@ const findRoutes = (employeeList, sites) => {
 
 
 logger.info(`employer ${employer.NAME}: calculation employees coordinates`)
-let chunk = 50;
+let chunk = 5;
 let promiseList = [];
 // work on chunck of 50 employees to avoid huge bulk insert
 for (i = 0, j = empList.length; i < j; i += chunk) {
@@ -164,7 +167,7 @@ Promise.all(promiseList)
          empList = empList.concat(emplyees);
          // calculate routes
          logger.info(`employer ${employer.NAME}: calculation employees group #${index + 1} routes`);
-         findRoutes(emplyees, employer.Sites)
+         await findRoutes(emplyees, employer.Sites)
             .then(parentPort.postMessage({ Employees: empList }))
             .catch(error => {
                logger.error(error.stack);

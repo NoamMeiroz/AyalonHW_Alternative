@@ -39,15 +39,12 @@ const localLogin = new LocalStrategy(localOptions, function(userId, password, do
     // verify userId and password match a saved user and then send done.
     // else send done with false
     userSchema.findById(userId, function(err, user){
-        logger.debug(user);
         if ( err ) {
             logger.error(err);
             return done(err,false);
         }
         if ( user && user.length>0 ) {
-            logger.debug("before validPassowrd");
             user[0].validPassword(password, function(err, isMatch){
-                logger.debug("in valid password callback");
                 if ( err ) {
                     logger.error(err);
                     return done(err,false);

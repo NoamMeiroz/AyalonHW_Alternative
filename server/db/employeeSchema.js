@@ -15,6 +15,7 @@ const insert = (employee, callback) => {
    Employee.create(employee)
       .then(data => { callback(null, data) })
       .catch(err => {
+         console.log(err);
          callback(err, getMessage(err));
       });
 }
@@ -88,6 +89,7 @@ const updateRoute = (employee, route, callback) => {
  * @param {*} callback 
  */
 const getEmployeesOfEmployer = (employerId, callback) => {
+   console.log("in getEmployeesOfEmployer")
    Employee.findAll({
       where: {
          employer_id: employerId
@@ -132,8 +134,9 @@ const getPrecentFinished = (employerID, callback) => {
             if (countFinished === 0)
                precent = 0;
             else {
-               precent = parseInt((countFinished / total) * 100);
+               precent = Math.ceil((countFinished / total) * 100);
             }
+            console.log(precent);
             return callback(null, precent);
          })
          .catch(err => {

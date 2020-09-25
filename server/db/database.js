@@ -5,6 +5,7 @@ const MYSQL_SERVER = process.env.mysql_server || dbConfig.HOST;
 const sequelize = new Sequelize('alternative', process.env.DB_USER, process.env.DB_PASSWORD, {
   host: MYSQL_SERVER,
   dialect: dbConfig.dialect,
+  logging: false,
   pool: {
     max: dbConfig.pool.max,
     min: dbConfig.pool.min,
