@@ -3,6 +3,7 @@ const employerSchema = require("../db/employerSchema");
 const empFields = require("../config/config").employerFieldsName;
 const siteData = require("./siteData");
 const employeesData = require("./employeesData");
+const employer = require('../models/employer');
 
 
 /**
@@ -22,7 +23,22 @@ function defined_structure(obj, attrs) {
 }
 
 /**
- * Check the data of the employer and then insert it to the database
+ * save employer object in the db
+ */
+saveEmployer = (employer) => {
+    return new Promise(function (resolve, reject) {
+        employerSchema.insertEmployer(employer, (err, data) => {
+            if (!err)
+                return resolve(data.dataValues);
+            else {
+                return reject(new ServerError(500, data));
+            }
+        });
+    });
+}
+
+/**
+ * Check the data of the employer and then return valid employer object;
  * if data is not valid then reject.
  * @param {} data 
  */
@@ -49,16 +65,16 @@ const handleEmployerData = (data) => {
             // get sectorlist
             employerSchema.getAllSectors((err, sectorData) => {
                 if (err) {
-                    logger.error(err);
-                    return reject(new ServerError(500, sectorData));
+                    logger.error(err.stack);
+                    return reject(new ServerError(500, err));
                 }
                 // create valid employer entity
                 currSector = sectorData.find(sector => sector.dataValues.SECTOR == data[empFields.SECTOR]);
-                if (currSector==null) {
+                if (currSector == null) {
                     logger.info("incorrect sector");
                     return reject(new ServerError(400, "סקטור לא תקין או לא קיים במערכת."));
                 }
-                employer = {
+                let employer = {
                     NAME: data[empFields.NAME],
                     SECTOR: currSector.dataValues.id,
                     PRIVATE_CAR_SOLUTION: BOOL[data[empFields.PRIVATE_CAR]],
@@ -68,15 +84,7 @@ const handleEmployerData = (data) => {
                     WORK_FROM_HOME_SOLUTION: BOOL[data[empFields.WORK_FROM_HOME]],
                     EMPLOYER_ID: 0
                 };
-                employerSchema.insertEmployer(employer, (err, data) => {
-                    if (!err)
-                        resolve(data);
-                    else {
-                        logger.error(err);
-                        return reject(new ServerError(500, data));
-                    }
-                });
-
+                return resolve(employer);
             });
         }
     });
@@ -105,31 +113,61 @@ const readSheet = (company_sheets) => {
         if (!result.valid) {
             return reject(new ServerError(status = 400, message = `פרטי עובדים לא כוללים  ${result.attribute}`));
         }
-        //
-        handleEmployerData(employerData)
-            .then((data) => {
-                siteData.handleSiteData(data.id, employees)
-                    .then((siteData) => {
-                        let employer = data.dataValues
-                        employer.Sites = siteData;
-                        try {
-                            employeesData.run(employer, employees);
-                            resolve(employer);
-                        }
-                        catch (error) {
-                            logger.error(err);
-                            return reject(new ServerError(500, error));
-                        }
+        // check and create valid employerObject and siteList
+        Promise.all([handleEmployerData(employerData), siteData.handleSiteData(employees)])
+            .then(result => {
+                let employer = result[0];
+                let siteList = result[1];
+                // save employer
+                saveEmployer(employer)
+                    .then(data => {
+                        let employer = data;
+                        // if employer is succeccfully saved the save siteList
+                        siteData.saveSites(employer.id, siteList)
+                            .then(data => {
+                                employer.Sites = data;
+                                try {
+                                    // handle employees
+                                    employeesData.run(employer, employees);
+                                    resolve(employer);
+                                }
+                                catch (error) {
+                                    logger.error(error.stack);
+                                    return reject(new ServerError(500, error));
+                                }
+                            })
+                            .catch((error) => {
+                                if (error instanceof ServerError) {
+                                    logger.info(error.stack);
+                                    reject(error);
+                                }
+                                else {
+                                    logger.error(error.stack);
+                                    reject(new ServerError(500, error));
+                                }
+                            });
                     })
-                    .catch((err) => {
-                        logger.error(err);
-                        return reject(new ServerError(500, err));
-                    })
+                    .catch((error) => {
+                        if (error instanceof ServerError) {
+                            logger.info(error.stack);
+                            reject(error);
+                        }
+                        else {
+                            logger.error(error.stack);
+                            reject(new ServerError(500, error));
+                        }
+                    });
             })
-            .catch((err) => {
-                return reject(err);
+            .catch((error) => {
+                if (error instanceof ServerError) {
+                    logger.info(error.stack);
+                    reject(error);
+                }
+                else {
+                    logger.error(error.stack);
+                    reject(new ServerError(500, error));
+                }
             });
-
 
     });
 }

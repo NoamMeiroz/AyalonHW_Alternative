@@ -4,39 +4,45 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import { styled } from '@material-ui/core/styles';
+
 
 import * as actions from '../../actions';
 import './SignIn.css';
 
-
 const validate = values => {
     const errors = {}
     const requiredFields = [
-      'userId',
-      'password'
+        'userId',
+        'password'
     ]
     requiredFields.forEach(field => {
-      if (!values[field]) {
-        errors[field] = 'Required'
-      }
+        if (!values[field]) {
+            errors[field] = 'שדה חובה'
+        }
     })
     return errors
-  }
+}
 
-  const renderTextField = ({
-    input,
+const renderTextField = ({
     label,
-    meta: { touched, error },
+    input,
+    meta: { touched, invalid, error },
     ...custom
-  }) => (
-     (<TextField
-      hintText={label}
-      floatingLabelText={label}
-      errorText={touched && error}
-      {...input}
-      {...custom}
-    />)
-  );
+}) => (
+        (<TextField
+            label={label}
+            placeholder={label}
+            error={touched && invalid}
+            helperText={touched && error}
+            {...input}
+            {...custom}
+        />)
+    );
+
+const MyButton = styled(Button)({
+    margin: '30px',
+});
 
 class SignIn extends Component {
     onSubmit = (formProps) => {
@@ -47,20 +53,20 @@ class SignIn extends Component {
     }
 
     render() {
-        const { handleSubmit } = this.props;
+        const { handleSubmit, pristine, submitting } = this.props;
 
         return (
             <form onSubmit={handleSubmit(this.onSubmit)} autoComplete="off">
                 <div>
-                    <label for="userId">שם משתמש</label>
-                    <Field name="userId"  class="signinField"
+                    <Field name="userId" className="signinField"
                         component={renderTextField}
                         label="שם משתמש"
                         type="text"
                         required>
                     </Field>
-                    <label for="password">סיסמה</label>
-                    <Field class="signinField"
+                </div>
+                <div>
+                    <Field className="signinField"
                         name="password"
                         type="password"
                         label="סיסמה"
@@ -71,8 +77,11 @@ class SignIn extends Component {
                 <div>
                     {this.props.errorMessage}
                 </div>
-                <Button
-                    variant="contained" color="primary" type="submit">אישור</Button>
+                <div>
+                    <MyButton className="Button" disabled={pristine || submitting}
+                        variant="contained" color="primary" type="submit">אישור
+                    </MyButton>
+                </div>
             </form>
         );
     }
@@ -84,6 +93,6 @@ function mapStateToProps(state) {
 
 export default compose(
     connect(mapStateToProps, actions),
-    reduxForm( { form: 'signup', validate    } )
-)( SignIn );
+    reduxForm({ form: 'signup', validate })
+)(SignIn);
 

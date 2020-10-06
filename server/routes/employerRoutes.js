@@ -10,35 +10,19 @@ const companyData = require("../services/companyData");
 const loadData = require("../services/loadData");
 const employeesData = require("../services/employeesData");
 const { isInteger } = require("../tools");
+const { response } = require('express');
 
 /**
  * session: false means do not create session after authentication.
  * (Session are used for cookies but we use tokens)
  */
 const requireAuth = passport.authenticate('jwt', { session: false });
-const requireSignin = passport.authenticate('local', { session: false });
 
-
-/* router.get("/", requireAuth, function (req, res) {
-   res.send("success");
-});
-router.post("/signin/", function (req, res, next) {
-   req.query = req.fields;
-   next();
-}, requireSignin, authenticationService.signin);
-
-router.post("/signup/", authenticationService.singup);
- */
-/*
-   Read a xlsx file with 2 sheets. 
-   Sheet number 1 is contains employer information.
-   Sheet number 2 is holds employees information.
-*/
-router.post("/upload/", (req, res, next) => {
+router.post("/upload/", requireAuth, async (req, res, next) => {
    let url = URL.parse(req.url, true);
    let xlsxSheets;
    let result;
-   xlsxSheets = excel.post_file(req, res, url.query.f);
+   xlsxSheets = await excel.post_file(req, res, url.query.f);
    if (xlsxSheets) {
       companyData.readSheet(xlsxSheets).then(data => {
          res.status(200).json(data);
@@ -61,7 +45,7 @@ router.post("/upload/", (req, res, next) => {
 /*
   get companies data
 */
-router.get("/", (req, res, next) => {
+router.get("/", requireAuth, (req, res, next) => {
    loadData.getData().then((payload) => {
       res.status(200).json(payload)
    }).catch(error => {
@@ -77,7 +61,7 @@ router.get("/", (req, res, next) => {
 /**
  * get all employees of specific employer
  */
-router.get("/:employerId/employee", (req, res, next) => {
+router.get("/:employerId/employee", requireAuth, (req, res, next) => {
    let errorMessage = "employer id is missing or incorrect";
    let isError = false;
    if (req.params) {
@@ -86,6 +70,7 @@ router.get("/:employerId/employee", (req, res, next) => {
          employeesData.getEmployeesOfEmployer(empId).then((payload) => {
             res.status(200).json(payload);
          }).catch(error => {
+            console.log(error);
             if (error.status)
                res.status(error.status).send(error.message);
             else {
@@ -111,7 +96,7 @@ router.get("/:employerId/employee", (req, res, next) => {
 /**
  * return the precent of employees finished to upload
  */
-router.get("/:employerId/employee/precentReady", (req, res, next) => {
+router.get("/:employerId/employee/precentReady", requireAuth, (req, res, next) => {
    let errorMessage = "employer id is missing or incorrect";
    let isError = false;
    if (req.params) {

@@ -66,7 +66,6 @@ class Companies extends Component {
             else
                 this.showMessage(this.props.uploadFile.errorMessage);
         }
-        console.log(this.props.loadData);
         // check if to show load initial employers data error message
         if (this.props.loadData.timestamp !== prevProps.loadData.timestamp) {
             if (!this.props.loadData.isSuccess)

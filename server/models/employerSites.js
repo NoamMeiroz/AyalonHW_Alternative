@@ -31,7 +31,15 @@ module.exports = (sequelize, Sequelize) => {
         ADDRESS_BUILDING_NUMBER: {
             type: Sequelize.INTEGER,
             allowNull: false,
-        },      
+        },
+        X: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
+        Y: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },    
         NUM_OF_EMPLOYEES: {
             type: Sequelize.INTEGER,
             allowNull: false,

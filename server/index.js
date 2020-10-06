@@ -5,7 +5,7 @@ const bodyParser = require("body-parser");
 const authRoutes = require("./routes/authRoutes");
 const employerRoutes = require("./routes/employerRoutes");
 const db = require("./db/database");
-const {logger} = require('./log');
+const {logger, ServerError} = require('./log');
 const cors = require("cors");
 const formidableMiddleware = require('express-formidable');
 var server_app = express();
@@ -40,11 +40,20 @@ server_app.use("/api/employer", employerRoutes);
 // error handling. must be last call 
 server_app.use(function(err, req, res, next) {
   // set locals, only providing error in development
-  res.locals.message = err.message;
+  if (err.message)
+    if (err.message instanceof ServerError )
+      res.locals.message = err.message.message;
+    else
+      res.locals.message = err.message;
+  else
+    res.locals.message = err;
+
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // add this line to include winston logging
-  logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+  if (err.message)
+    logger.error(`${err.status || 500} - ${res.locals.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+
 
   // render the error page
   res.status(err.status || 500);
