@@ -132,7 +132,7 @@ const readSheet = (company_sheets) => {
                                     resolve(employer);
                                 }
                                 catch (error) {
-                                    logger.error(error);
+                                    logger.error(error.stack);
                                     return reject(new ServerError(500, error));
                                 }
                             })

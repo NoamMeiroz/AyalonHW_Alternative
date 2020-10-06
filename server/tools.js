@@ -1,17 +1,14 @@
 /**
- * If input is integer return true
+ * If input string or number is integer return true
  * @param {*} id 
  */
 function isInteger(id) {
-   if (parseInt(id))
-      return true;
-   else
+   if (!id)
       return false;
+   if (Number.isInteger(id))
+      return true;
+   return Number.isInteger(Number(id));
 };
-
-function sleep(ms) {
-   return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 /**
  * return the closest work day for a given date.
@@ -40,24 +37,35 @@ function getNearestWorkDay(date) {
 function getFirstNumberInString(alphanum) {
    //firstChar=alphanum.match(/[a-zA-Z]/).pop();
    let numbers = null;
-   if (!alphanum || isInteger(alphanum))
-      return numbers;
+   if (!alphanum)
+      return alphanum;
 
-   firstChar = (alphanum.match(/[^0-9]/) || []).pop();
-   if (!firstChar)
+   if (!(typeof alphanum === 'string' || alphanum instanceof String)) {
       if (isInteger(alphanum))
-         numbers = alphanum;
+         return (alphanum)
       else
-         numbers = null;
+         return null;
+   }
+   firstChar = (alphanum.match(/[^0-9]/) || []).pop();
+   if (!firstChar) {
+      numbers = Number(alphanum);
+      if (!isInteger(numbers))
+            numbers = null;
+   }
    else {
-      if ( alphanum.search(firstChar) === 0 )
+      if (alphanum.search(firstChar) === 0)
          numbers = null;
       else {
          numsLetters = alphanum.split(firstChar);
-         numbers = numsLetters[0];
+         numbers = Number(numsLetters[0]);
       }
    }
    return numbers;
 }
 
-module.exports = { isInteger, sleep, getNearestWorkDay, getFirstNumberInString }; 
+function sleep(ms) {
+   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+ 
+
+module.exports = { isInteger, getNearestWorkDay, getFirstNumberInString, sleep }; 

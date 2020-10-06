@@ -35,7 +35,8 @@ class DownloadButton extends Component {
          .replace(/mins/g, 'דקות')
          .replace(/Bus/g, "אוטובוס")
          .replace(/hours/g, "שעות")
-         .replace(/hour/g, "שעה");
+         .replace(/hour/g, "שעה")
+         .replace(/train/g, "רכבת");
    }
 
    /**
@@ -298,13 +299,13 @@ class DownloadButton extends Component {
 
    render() {
       let jsx = {};
-      if (this.props.csvData.EMPLOYEES_READY || this.props.uploadProgess === 100)
+      if (this.props.csvData.EMPLOYEES_READY === 1 || this.props.uploadProgess === 100)
          jsx = <IconButton color="primary" aria-label="upload picture" component="span"
             onClick={(e) => { this.saveEmployeesList(this.props.csvData.id, this.props.fileName) }}>
             <SaveRoundedIcon />
             {this.state.count}
          </IconButton>;
-      else {
+      else if (this.props.csvData.EMPLOYEES_READY === 0) {
          jsx = <div>
             <Typography variant="caption" color="textSecondary">טעינת עובדים</Typography>
             <Box position="relative" display="inline-flex">
@@ -323,6 +324,11 @@ class DownloadButton extends Component {
                </Box>
             </Box>
          </div>
+      }
+      // error in loading employees 
+      else  {
+         jsx = <Typography variant="caption" color="textSecondary">טעינת עובדים נכשלה</Typography>
+
       }
       return jsx;
    }

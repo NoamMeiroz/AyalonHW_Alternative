@@ -15,7 +15,6 @@ const insert = (employee, callback) => {
    Employee.create(employee)
       .then(data => { callback(null, data) })
       .catch(err => {
-         console.log(err);
          callback(err, getMessage(err));
       });
 }
@@ -52,22 +51,6 @@ const deleteEmployees = (employerID, callback) => {
 }
 
 /**
-* insert list of employees. if exists then first delete the old employees data and then insert.
-* @param {*} employerId
-* @param {*} sites
-* @param {*} callback (err, result)
-*/
-const insertEmployees = (employerId, employees, callback) => {
-   // Save in the database
-   deleteEmployees(employerId, (err, data) => {
-      if (!err)
-         insertBulk(employees, callback);
-      else
-         callback(err, data);
-   });
-};
-
-/**
  * Update a given employee with best route. 
  * @param {*} employee 
  * @param {*} route - json object representing best route
@@ -75,10 +58,11 @@ const insertEmployees = (employerId, employees, callback) => {
  */
 const updateRoute = (employee, route, callback) => {
    Employee.update({ BEST_ROUTE: route }, { where: { id: employee.id } })
-      .then(function (rowsUpdate) {
+      .then(rowsUpdate => {
          callback(null, rowsUpdate);
       })
       .catch(err => {
+         console.log(err);
          callback(err, getMessage(err));
       });
 }
@@ -89,7 +73,6 @@ const updateRoute = (employee, route, callback) => {
  * @param {*} callback 
  */
 const getEmployeesOfEmployer = (employerId, callback) => {
-   console.log("in getEmployeesOfEmployer")
    Employee.findAll({
       where: {
          employer_id: employerId
@@ -136,7 +119,6 @@ const getPrecentFinished = (employerID, callback) => {
             else {
                precent = Math.ceil((countFinished / total) * 100);
             }
-            console.log(precent);
             return callback(null, precent);
          })
          .catch(err => {

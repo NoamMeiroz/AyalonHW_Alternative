@@ -74,7 +74,7 @@ getCoordinates = (payload) => {
  * @param {String} street 
  * @param {int} buildingNumber 
  */
-const convertLocation = async (city, street, buildingNumber) => {
+ const convertLocation = async (city, street, buildingNumber) => {
    return new Promise(function (resolve, reject) {
       if (!city) {
          return resolve(new ServerError(ERRORS.MISSING_CITY_CODE, "missing city"));
@@ -82,7 +82,7 @@ const convertLocation = async (city, street, buildingNumber) => {
       if (!street) {
          return resolve(new ServerError(ERRORS.MISSING_STREET_CODE, "missing street"));
       }
-      if (buildingNumber === undefined) {
+      if (buildingNumber === null) {
          return resolve(new ServerError(ERRORS.MISSING_BUILDING_NUMBER_CODE, "missing building number"));
       }
 
@@ -143,7 +143,7 @@ const getRoutes = async (origin, destination) => {
       if (!origin.street) {
          return resolve(new ServerError(ERRORS.MISSING_STREET_CODE, "missing street"));
       }
-      if (origin.buildingNumber === undefined) {
+      if (origin.buildingNumber === null) {
          return resolve(new ServerError(ERRORS.MISSING_BUILDING_NUMBER_CODE, "missing building number"));
       }
       if (!destination.city) {
@@ -152,7 +152,7 @@ const getRoutes = async (origin, destination) => {
       if (!destination.street) {
          return resolve(new ServerError(ERRORS.MISSING_STREET_CODE, "missing street"));
       }
-      if (destination.buildingNumber === undefined) {
+      if (destination.buildingNumber === null) {
          return resolve(new ServerError(ERRORS.MISSING_BUILDING_NUMBER_CODE, "missing building number"));
       }
       let originAddr = origin.street + origin.buildingNumber + ", " + origin.city;
@@ -176,16 +176,17 @@ const getRoutes = async (origin, destination) => {
             suggestedRoutes = {};
             routesResponeList.forEach((res, index, array) => {
                error = checkRouteResults(res.data);
-               if (!error)
+               if (!error) {
                   suggestedRoutes[modeList[index]] = res.data.routes;
+               }
                else if (error === {})
                   suggestedRoutes[modeList[index]] = { error: "לא נמצא מסלול" };
                else {
                   suggestedRoutes[modeList[index]] = { error: "שגיאה במערכת. לא ניתן לחשב מסלול" };
-                  logger.error(error);
+                  logger.error(error.stack);
                }
             });
-            resolve(suggestedRoutes);
+            return resolve(suggestedRoutes);
 
          }).catch((error) => {
             logger.error(error.stack);

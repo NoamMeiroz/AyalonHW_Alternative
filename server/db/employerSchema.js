@@ -6,6 +6,9 @@ const Sector = db.sector;
 const EmployerSites = db.employerSites;
 const getMessage = require("./errorCode").getMessage;
 
+
+const STATE = { READY: 1, NOT_READY:0, ERROR: -1};
+
 /**
  * Insert an employer
  * @param {*} employer 
@@ -81,9 +84,9 @@ const getAllComapnies = (callback) => {
  * @param {integer} employerId
  * @param {boolean} isReady
  */
-const setEmploeeReady = (employerId, isReady, callback) => {
+const setEmploeeState = (employerId, state, callback) => {
   // Save Tutorial in the database
-  Employer.update({ 'EMPLOYEES_READY': isReady },
+  Employer.update({ 'EMPLOYEES_READY': state },
     { where: { id: employerId } }).then(data => { callback(null, data) })
     .catch(err => { callback(err, getMessage(err)); });
 };
@@ -102,7 +105,7 @@ const isFinishedWithEmployees = (employerId, callback) => {
   }).then(data => {
     result = false;
     if (data.length > 0)
-      if (data[0].dataValues.EMPLOYEES_READY === 1)
+      if (data[0].dataValues.EMPLOYEES_READY === STATE.READY)
         result = true;
     callback(null, result)
   })
@@ -123,5 +126,5 @@ const getAllSectors = (callback) => {
 
 module.exports = {
   insertEmployer, deleteEmployer, findByName,
-  getAllSectors, getAllComapnies, setEmploeeReady, isFinishedWithEmployees
+  getAllSectors, getAllComapnies, setEmploeeState, isFinishedWithEmployees, STATE
 };
