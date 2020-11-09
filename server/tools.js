@@ -50,7 +50,7 @@ function getFirstNumberInString(alphanum) {
    if (!firstChar) {
       numbers = Number(alphanum);
       if (!isInteger(numbers))
-            numbers = null;
+         numbers = null;
    }
    else {
       if (alphanum.search(firstChar) === 0)
@@ -66,6 +66,25 @@ function getFirstNumberInString(alphanum) {
 function sleep(ms) {
    return new Promise((resolve) => setTimeout(resolve, ms));
 }
- 
 
-module.exports = { isInteger, getNearestWorkDay, getFirstNumberInString, sleep }; 
+/**
+ * Return list of string from a given string with dalimiter ','.
+ * If input in null or not string or empty string then return null.
+ * @param {} str 
+ */
+function convertStringToArray(str) {
+   let result = null;
+   if (str && str !== '' && str!=='null') {
+      try {
+         result = str.split(",");
+      }
+      catch (error) {
+         console.debug(error);
+         result = null;
+      }
+   }
+   return result;
+}
+
+
+module.exports = { isInteger, getNearestWorkDay, getFirstNumberInString, sleep, convertStringToArray }; 

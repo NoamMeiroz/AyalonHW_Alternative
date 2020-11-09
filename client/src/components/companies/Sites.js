@@ -21,7 +21,7 @@ class Sites extends Component {
                             secondary={`${site.ADDRESS_STREET} ${site.ADDRESS_BUILDING_NUMBER}, ${site.ADDRESS_CITY}`} />
                         <ListItemSecondaryAction>
                             <IconButton edge="end" aria-label="מספר עובדים">
-                                <Badge badgeContent={site.NUM_OF_EMPLOYEES} color="primary">
+                                <Badge badgeContent={site.NUM_OF_EMPLOYEES} max={99999} color="primary">
                                     <PeopleOutlineRoundedIcon />
                                 </Badge>
                             </IconButton>

@@ -18,10 +18,11 @@ const LOCATION_TYPE = ["street_address","route", "establishment", "hospital"];
 
 function convertCoordinate(location) {
    const secondProjection = "+proj=tmerc +lat_0=31.73439361111111 +lon_0=35.20451694444445 +k=1.0000067 +x_0=219529.584 +y_0=626907.39 +ellps=GRS80 +towgs84=-48,55,52,0,0,0,0 +units=m +no_defs";
-   const y = location["lat"];
-   const x = location["lng"];
-   const converted_xy = proj4(proj4.defs["EPSG:4326"], secondProjection, [x, y]);
-   const result = { X: converted_xy[0], Y: converted_xy[1] };
+   const x = location["lat"];
+   const y = location["lng"];
+   const result = { X: x, Y: y };
+   //const converted_xy = proj4(proj4.defs["EPSG:4326"], secondProjection, [x, y]);
+   //const result = { X: converted_xy[0], Y: converted_xy[1] };
    return result;
 }
 

@@ -2,8 +2,9 @@ const db = require("./database");
 const { getMessage } = require("./errorCode");
 const { isFinishedWithEmployees } = require("./employerSchema");
 const Employee = db.employee;
+const Employer = db.employer;
 const EmployerSites = db.employerSites;
-
+const  Op = db.Sequelize.Op;
 
 /**
  * Insert employee object
@@ -72,13 +73,60 @@ const updateRoute = (employee, route, callback) => {
  * @param {int} employerId 
  * @param {*} callback 
  */
-const getEmployeesOfEmployer = (employerId, callback) => {
+/*const getEmployeesOfEmployerk = (employerId, livingCity=[], workingCity=[], callback) => {
    Employee.findAll({
       where: {
          employer_id: employerId
       },
       include: [{ model: EmployerSites, as: "Site" }]
    }).then(data => { callback(null, data) })
+      .catch(err => { callback(err, getMessage(err)); });
+}*/
+
+/**
+ * Return list of employees of specific employer
+ * @param {int} employerId
+ * @param {[]} livingCity  - list of cities names where employees live
+ * @param {[]} workingCity  - list of cities names where employees works
+ * @param {*} callback 
+ */
+const getEmployeesOfEmployer = (employerId, livingCity=[], workingCity=[], callback) => {
+   let whereClause = {where: {
+      employer_id: employerId
+   }};
+   if (livingCity && livingCity.length>0)
+      whereClause.where.CITY = { [Op.in]: livingCity };
+   let include = [{ model: EmployerSites, as: "Site" }, { model: Employer, as: "employer" }];
+   if (workingCity && workingCity.length>0)
+      include[0].where = { ADDRESS_CITY: {[Op.in]: workingCity}};
+   whereClause = {...whereClause,include};
+   Employee.findAll(
+      whereClause
+   ).then(data => { callback(null, data) })
+      .catch(err => { callback(err, getMessage(err)); });
+}
+
+/**
+ * Return any employee working in one of the a given employers
+ * @param {[]]} employerId- list of employer ids.
+ * @param {[]} livingCity  - list of cities names where employees live
+ * @param {[]} workingCity  - list of cities names where employees works
+ * @param {*} callback 
+ */
+const getEmployees = (employerList, livingCity=[], workingCity=[], callback) => {
+   let whereClause = {where: {} };
+   if (employerList && employerList.length>0)
+      whereClause.where.employer_id = { [Op.in]: employerList };
+   if (livingCity && livingCity.length>0)
+      whereClause.where.CITY = { [Op.in]: livingCity };
+   let include = [{ model: EmployerSites, as: "Site" }, { model: Employer, as: "employer" }];
+   if (workingCity && workingCity.length>0)
+      include[0].where = { ADDRESS_CITY: {[Op.in]: workingCity}};
+
+   whereClause = {...whereClause,include};
+   Employee.findAll(
+      whereClause
+   ).then(data => { callback(null, data) })
       .catch(err => { callback(err, getMessage(err)); });
 }
 
@@ -127,4 +175,4 @@ const getPrecentFinished = (employerID, callback) => {
       }
    });
 }
-module.exports = { insertBulk, updateRoute, getEmployeesOfEmployer, getPrecentFinished };
+module.exports = { insertBulk, updateRoute, getEmployeesOfEmployer, getPrecentFinished, getEmployees };

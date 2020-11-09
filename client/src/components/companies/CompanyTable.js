@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import MaterialTable from 'material-table';
 import Sites from './Sites';
 import DownloadButton from './DownloadButton';
+import Table from '../common/Table';
+
+import './CompanyTable.css';
 
 class CompanyTable extends Component {
 
@@ -10,22 +12,14 @@ class CompanyTable extends Component {
         let sectorsList = {};
         if (this.props.data) {
             companyList = this.props.data;
-            for (const company of companyList) {
-                let sum = company.Sites.reduce((sum, site) => {
-                    return (sum + site.NUM_OF_EMPLOYEES);
-                }, 0);
-                company.EMP_COUNT = sum;
-                company.SITE_COUNT = company.Sites.length
-            }
         }
         if (this.props.sectors)
             sectorsList = this.props.sectors;
-        let jsx = <div style={{ maxWidth: '100%' }}>
-            <MaterialTable
+        let jsx = <Table
                 columns={[
                     { title: 'שם חברה', field: 'NAME' },
                     { title: '# סניפים', field: 'SITE_COUNT' },
-                    { title: '# עובדים', field: 'EMP_COUNT'},
+                    { title: '# עובדים', field: 'EMP_COUNT' },
                     { title: 'מגזר', field: 'SECTOR', lookup: sectorsList },
                     { title: 'רכב צמוד', field: 'PRIVATE_CAR_SOLUTION', type: 'boolean' },
                     { title: 'שאטלים', field: 'SHUTTLE_SOLUTION', type: 'boolean' },
@@ -37,10 +31,10 @@ class CompanyTable extends Component {
                 title="רשימת חברות"
                 detailPanel={[
                     {
-                        tooltip: 'Show Name',
+                        tooltip: 'אתרי החברה',
                         render: rowData => {
                             return (
-                                <Sites sites={rowData.Sites}/>)
+                                <Sites sites={rowData.Sites} style={{padding: 0}}/>)
                         },
                     }
                 ]}
@@ -53,27 +47,15 @@ class CompanyTable extends Component {
                 ]}
                 components={{
                     Action: row => (
-                      <DownloadButton
-                        csvData={row.data} fileName={row.data.NAME} callFail={this.props.callFail}
-                      />
+                        <DownloadButton fontSize = "small"
+                            csvData={row.data} fileName={row.data.NAME}
+                        />
                     )
                 }}
                 options={{
                     actionsColumnIndex: -1
                 }}
-                localization={{
-                    header: {
-                        actions: ''
-                    },
-                    body: {
-                        emptyDataSourceMessage: 'אין נתונים להצגה',
-                        filterRow: {
-                            filterTooltip: 'סינון'
-                        }
-                    }
-                }}
-             />
-            </div>;
+            />;
         return jsx;
     }
 }

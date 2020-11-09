@@ -1,0 +1,13 @@
+.MuiListItemText-root {
+    font-size: x-small;
+    text-align: right;
+}
+
+.MuiSvgIcon-fontSizeSmall {
+    font-size: 0.8rem;
+}
+
+.MuiListItemIcon-root {
+    min-width: 20px;
+}
+

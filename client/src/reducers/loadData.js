@@ -11,10 +11,18 @@ const INITIAL_STATE = {
 export default function(state = INITIAL_STATE, action) {
     switch (action.type) {
         case LOAD_DATA:
+            let companyList = action.companyList;
+            for (let company of companyList) {
+                let sum = company.Sites.reduce((sum, site) => {
+                    return (sum + site.NUM_OF_EMPLOYEES);
+                }, 0);
+                company.EMP_COUNT = sum;
+                company.SITE_COUNT = company.Sites.length
+            }
             return {...state, 
                 isSuccess: action.isSuccess, 
                 sectorList: action.sectorList,
-                companyList: action.companyList,
+                companyList: companyList,
                 errorMessage: action.errorMessage,
                 timestamp: new Date()
             };

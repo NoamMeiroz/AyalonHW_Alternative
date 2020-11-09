@@ -1,5 +1,5 @@
 
-import { EMPLOYEES_DATA, CHECK_PROGRESS, CHECK_PROGRESS_ERROR } from '../actions/types';
+import { EMPLOYEES_DATA, CHECK_PROGRESS } from '../actions/types';
 
 const INITIAL_STATE = {
     isSuccess: false,
@@ -17,7 +17,6 @@ export default function (state = INITIAL_STATE, action) {
                 ...state,
                 isSuccess: action.isSuccess,
                 employeesList: action.employeesList,
-                errorMessage: action.errorMessage,
                 timestamp: new Date()
             };
         case CHECK_PROGRESS:
@@ -25,15 +24,6 @@ export default function (state = INITIAL_STATE, action) {
                 ...state,
                 employerID: action.employerID,
                 uploadProgess: action.uploadProgess,
-                errorMessage: "",
-                timestamp: new Date()
-            }
-        case CHECK_PROGRESS_ERROR:
-            return {
-                ...state,
-                employerID: action.employerID,
-                uploadProgess: 100,
-                errorMessage: action.errorMessage,
                 timestamp: new Date()
             }
         default:

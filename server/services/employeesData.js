@@ -49,7 +49,7 @@ async function run(employer, employees) {
  */
 const getEmployeesOfEmployer = (empId) => {
 	return new Promise(function (resolve, reject) {
-		employeeSchema.getEmployeesOfEmployer(empId, (err, payload) => {
+		employeeSchema.getEmployeesOfEmployer(empId, [], [], (err, payload) => {
 			if (err) {
 				logger.error(err.stack);
 				return reject(new ServerError(500, "internal error"))

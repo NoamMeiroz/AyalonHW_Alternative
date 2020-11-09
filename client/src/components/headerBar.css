@@ -1,0 +1,9 @@
+.headerBar .MuiAppBar-root {
+    width: calc(100% - 214px);
+    background-color: white;
+}
+
+.title {
+    flex-direction: row;
+    justify-content: space-between;
+}

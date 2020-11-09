@@ -1,0 +1,26 @@
+
+.sidebar {
+    position: relative;
+    z-index: 2;
+    width: 300px;;
+} 
+
+.sidebar-right {
+    right: 0;
+}
+
+.Button {
+    width: 80%;
+}
+
+.sidebar .MuiTypography-h6 {
+    padding-right: 24px;
+    padding-top: 12px;
+}
+
+.flexContainer {
+    display: flex;
+    height: inherit;
+    padding-bottom: 24px;
+}
+
