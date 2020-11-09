@@ -14,6 +14,14 @@ services:
       - '3306:3306'
     volumes:
       - db-data:/var/lib/mysql  
+  gdal:
+    image: osgeo/gdal:alpine-normal-latest
+    depends_on:
+      - mysql
+    stdin_open: true
+    tty: true
+    volumes:
+      - ../../files/TAZ:/data
   node_server:
     build:
       context: ./server

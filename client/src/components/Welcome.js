@@ -12,9 +12,10 @@ const getCard = (img, title) => {
       boxShadow: "none"
    }} >
       <CardActionArea style={{
-             display: "flex",
-             flexDirection: "column",
-             justifyContent: "center"}}>
+         display: "flex",
+         flexDirection: "column",
+         justifyContent: "center"
+      }}>
          <CardMedia
             component="img"
             style={{
@@ -23,7 +24,7 @@ const getCard = (img, title) => {
             }}
             image={img}
          />
-         <CardContent style={{justify: "center"}}>
+         <CardContent style={{ justify: "center" }}>
             <Typography variant="subtitle1">
                {title}
             </Typography>
@@ -35,14 +36,13 @@ const getCard = (img, title) => {
 export default class Welcome extends Component {
    render() {
       return <div>
-         <Grid container spacing={2}>
-            <Grid item xs={12}>
+         <Grid container direction="column" spacing={2} alignItems="center" alignContent="center">
+            <Grid item >
                <Typography variant="h4">תוכנית מעסיקים</Typography>
             </Grid>
-            <Grid item xs={12}>
+            <Grid item>
                <Typography variant="h6">
-                  גיבוש והנגשת סל פתרונות למעסיקים ולעובדים לשיפור דרכי ההגעה אל העבודה וממנה
-            </Typography>
+                  גיבוש והנגשת סל פתרונות למעסיקים ולעובדים לשיפור דרכי ההגעה אל העבודה וממנה</Typography>
             </Grid>
             <Grid item xs={12}>
                <Grid container justify="center" spacing={5}>

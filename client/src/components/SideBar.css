@@ -1,0 +1,42 @@
+.SideBar .active .MuiIconButton-label{
+    color: #ffffff;
+}
+
+.SideBar .report .MuiIconButton-label{
+    font: normal normal normal 14px/24px Segoe UI;
+    width: 144px;
+    text-align: right;
+}
+
+.SideBar .not-active-report .MuiIconButton-label {
+    color: #FFFFFF;
+    opacity: 43%;
+}
+
+.SideBar .active-report .MuiIconButton-label {
+    color: #08F57F;
+}
+
+.menu-bar .MuiIconButton-label{
+    padding-right: 13px;
+}
+
+.SideBar .MuiPaper-root {
+    background-color: #242736;
+    width: 214px;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.SideBar .MuiIconButton-root {
+    font: normal normal normal 18px/24px Segoe UI;
+    letter-spacing: 0px;
+    color: #9F9F9F;
+}
+
+.SideBar .MuiIconButton-label {
+    font: normal normal normal 18px/24px Segoe UI;
+    letter-spacing: 0px;
+    color: #9F9F9F;
+}

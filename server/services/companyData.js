@@ -1,9 +1,12 @@
 const { ServerError, logger } = require('../log');
 const employerSchema = require("../db/employerSchema");
 const empFields = require("../config/config").employerFieldsName;
+const siteFields = require("../config/config").sitesFieldsName;
+const employeeFields = require("../config/config").employeeFieldsName;
 const siteData = require("./siteData");
 const employeesData = require("./employeesData");
 const employer = require('../models/employer');
+const { employeeFieldsName, sitesFieldsName } = require('../config/config');
 
 
 /**
@@ -16,7 +19,7 @@ function defined_structure(obj, attrs) {
         return { valid: false, attribute: "רשימת עובדים" };
     var tmp = obj;
     for (i = 0; i < attrs.length; ++i) {
-        if (tmp[attrs[i]] == undefined)
+        if (!tmp.hasOwnProperty(attrs[i]))
             return { valid: false, attribute: attrs[i] };
     }
     return { valid: true };
@@ -48,15 +51,7 @@ const handleEmployerData = (data) => {
             "כן": 1,
             "לא": 0
         };
-        result = defined_structure(data, [
-            empFields.NAME,
-            empFields.SECTOR,
-            empFields.PRIVATE_CAR,
-            empFields.SHUTTLE,
-            empFields.MASS_TRANSPORTATION,
-            empFields.CAR_POOL,
-            empFields.WORK_FROM_HOME
-        ]);
+        result = defined_structure(data, Object.values(empFields));
         if (!result.valid) {
             return reject(new ServerError(status = 400,
                 message = `פרטי החברה לא כוללים נתוני ${result.attribute}`));
@@ -109,7 +104,15 @@ const readSheet = (company_sheets) => {
         else if (employees[0] === undefined)
             return reject(new ServerError(status = 400, message = "חוצץ פרטי עובדים אינו מכיל מידע על העובדים"));
 
-        result = defined_structure(employees[0], ["שם אתר", "מזהה עובד", "עיר מגורים", "רחוב", "מספר בניין", "כתובת עבודה-עיר", "כתובת עבודה-רחוב", "כתובת עבודה-מספר בניין"]);
+        // check if employees fields exists
+        fields = Object.values(employeeFieldsName);
+        //fields = fields.concat(Object.values(sitesFieldsName));
+        //index = fields.indexOf(sitesFieldsName.NUM_OF_EMPLOYEES);
+        //if (index > -1) {
+        //    fields.splice(index, 1);
+       // }
+        //console.log(employees[0]);
+        result = defined_structure(employees[0], fields);
         if (!result.valid) {
             return reject(new ServerError(status = 400, message = `פרטי עובדים לא כוללים  ${result.attribute}`));
         }

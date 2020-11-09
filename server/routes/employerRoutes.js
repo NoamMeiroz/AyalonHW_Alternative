@@ -1,16 +1,13 @@
 const URL = require('url');
 const express = require('express');
 const passport = require('passport');
-const passoptService = require('../services/passport');
 const router = express.Router();
-const authenticationService = require('../services/authentication');
-const { ServerError, logger } = require("../log");
+const { logger } = require("../log");
 const excel = require("../db/excel");
 const companyData = require("../services/companyData");
 const loadData = require("../services/loadData");
 const employeesData = require("../services/employeesData");
 const { isInteger } = require("../tools");
-const { response } = require('express');
 
 /**
  * session: false means do not create session after authentication.

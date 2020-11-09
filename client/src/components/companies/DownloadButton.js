@@ -5,6 +5,7 @@ import ExcelJS from 'exceljs';
 import axios from 'axios';
 
 import * as actions from '../../actions';
+import * as actionsUtil from '../../utils/actionsUtil';
 import { timeConvert } from '../../utils/time';
 
 import IconButton from '@material-ui/core/IconButton';
@@ -226,7 +227,6 @@ class DownloadButton extends Component {
          { 'authorization': localStorage.getItem('token') }})
          .then(payload => {
             let employeeList = payload.data;
-            console.log(employeeList);
             if (employeeList && !(typeof employeeList === "string")) {
                employeeList.forEach((emp) => {
                   if (!emp.BEST_ROUTE.error) {
@@ -244,8 +244,8 @@ class DownloadButton extends Component {
             }
          }).catch(err => {
             console.log(err);
-            let message = actions.handleError(err);
-            this.props.callFail(message);
+            let message = actionsUtil.handleError(err);
+            this.props.showMessage(message);
          });
    }
 
@@ -337,8 +337,10 @@ class DownloadButton extends Component {
 const mapStateToProps = (state, ownProps) => {
    if (state.employeesData.employerID === ownProps.csvData.id)
       return { uploadProgess: state.employeesData.uploadProgess };
+   else if (ownProps.uploadProgess)
+      return { uploadProgess: ownProps.uploadProgess };
    else
-      return { uploadProgess: 0 };
+      return { uploadProgess: 100 };
 };
 
 export default connect(mapStateToProps, actions)(DownloadButton);

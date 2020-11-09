@@ -1,55 +1,13 @@
 import axios from 'axios';
 import {
     AUTH_USER, AUTH_ERROR, FILE_UPLOAD,
-    FILE_ERROR, LOAD_DATA, EMPLOYEES_DATA,
-    CHECK_PROGRESS_ERROR, CHECK_PROGRESS
+    LOAD_DATA, EMPLOYEES_DATA,
+    CHECK_PROGRESS, ERROR, MESSAGE
 } from './types';
 import { SERVER } from '../utils/config';
+import * as actionUtils from '../utils/actionsUtil';
 
-const MAJOR_FAILURE = "בעיה במערכת. נא לנסות מאוחר יותר";
-
-const getAxiosHeader = () => {
-    return { headers : { 'authorization': localStorage.getItem('token') }};
-}
-
-const handleErrorResponse = (response) => {
-    switch (response.status) {
-        case 400:
-            return response.data;
-        case 401:
-            return "שם משתמש או סיסמה שגויים";
-        case 422:
-            return "המערכת לא הצליחה ליצור משתמש חדש.";
-        case 500:
-            return MAJOR_FAILURE;
-        default:
-            return MAJOR_FAILURE;
-    }
-};
-
-/**
- * Convert error to meaningfull message
- * @param {Error} error 
- */
-export const handleError = (error) => {
-    let errorMessage = "";
-    if (!error.response) {
-        if (error.message)
-            if (error.message === "Network Error")
-                errorMessage = "קיימת בעיית תקשורת עם השרת";
-            else
-                errorMessage = error.message;
-        else
-            errorMessage = "בעיה במערכת";
-    }
-    else if (error.response.status) {
-        errorMessage = handleErrorResponse(error.response);
-    }
-    else
-        errorMessage = MAJOR_FAILURE;
-    return errorMessage;
-}
-
+export * from './report';
 /**
  * Signin method.If success then store user token localy
  * @param {*} formProps 
@@ -71,7 +29,7 @@ export const signin = (formProps, callback) => {
                 localStorage.setItem('token', data.data.token); // save token use for later
                 callback();
             }).catch(err => {
-                let message = handleError(err);
+                let message = actionUtils.handleError(err);
                 dispatch({ type: AUTH_ERROR, payload: message })
             });
     }
@@ -83,6 +41,13 @@ export const signin = (formProps, callback) => {
 export const signOut = () => {
     localStorage.removeItem('token');
     return { type: AUTH_USER, payload: '' };
+}
+
+/**
+* used to show snakbarMessage
+*/
+export const showMessage = (message) => {
+    return { type: MESSAGE, message: message };
 }
 
 /**
@@ -105,8 +70,8 @@ export const upload = (file, callback) => {
                 dispatch({ type: FILE_UPLOAD, isSuccess: true, data: data.data });
                 dispatch(checkProgress(data.data.id));
             }).catch(err => {
-                let message = handleError(err);
-                dispatch({ type: FILE_ERROR, isSuccess: false, errorMessage: message })
+                let message = actionUtils.handleError(err);
+                dispatch({ type: ERROR, errorMessage: message })
             });
     }
 };
@@ -116,12 +81,12 @@ export const upload = (file, callback) => {
  */
 export const getData = () => {
     return (dispatch) => {
-        axios.get(`${SERVER}/api/employer/`, getAxiosHeader())
+        axios.get(`${SERVER}/api/employer/`, actionUtils.getAxiosHeader())
             .then(payload => {
                 dispatch({ type: LOAD_DATA, isSuccess: true, sectorList: payload.data.sectors, companyList: payload.data.companies });
             }).catch(err => {
-                let message = handleError(err);
-                dispatch({ type: LOAD_DATA, isSuccess: false, errorMessage: message, sectorList: {}, companyList: [] });
+                let message = actionUtils.handleError(err);
+                dispatch({ type: ERROR, errorMessage: message, sectorList: {}, companyList: [] });
             });
     }
 };
@@ -131,19 +96,19 @@ export const getData = () => {
  */
 export const getEmployeesOfEmployer = (employerId) => {
     return (dispatch) => {
-        axios.get(`${SERVER}/api/employer/${employerId}/employee`, getAxiosHeader())
+        axios.get(`${SERVER}/api/employer/${employerId}/employee`, actionUtils.getAxiosHeader())
             .then(payload => {
                 dispatch({ type: EMPLOYEES_DATA, isSuccess: true, employeesList: payload.data });
             }).catch(err => {
-                let message = handleError(err);
-                dispatch({ type: EMPLOYEES_DATA, isSuccess: false, errorMessage: message });
+                let message = actionUtils.handleError(err);
+                dispatch({ type: ERROR, errorMessage: message });
             });
     }
 };
 
 export const checkProgress = (employerId) => {
     return (dispatch) => {
-        axios.get(`${SERVER}/api/employer/${employerId}/employee/precentReady`, getAxiosHeader())
+        axios.get(`${SERVER}/api/employer/${employerId}/employee/precentReady`, actionUtils.getAxiosHeader())
             .then(payload => {
                 if (payload.data.precent || payload.data.precent >= 0) {
                     dispatch({
@@ -154,11 +119,21 @@ export const checkProgress = (employerId) => {
                 }
                 else {
                     let message = "בעיה במערכת, תשובה מהשרת לא תקינה";
-                    dispatch({ type: CHECK_PROGRESS_ERROR, errorMessage: message, employerID: employerId });
+                    dispatch({ type: ERROR, errorMessage: message, employerID: employerId });
+                    dispatch({
+                        type: CHECK_PROGRESS,
+                        employerID: payload.data.employerID,
+                        uploadProgess: 100
+                    });
                 }
             }).catch(err => {
-                let message = handleError(err);
-                dispatch({ type: CHECK_PROGRESS_ERROR, errorMessage: message, employerID: employerId });
+                let message = actionUtils.handleError(err);
+                dispatch({ type: ERROR, errorMessage: message, employerID: employerId });
+                dispatch({
+                    type: CHECK_PROGRESS,
+                    employerID: employerId,
+                    uploadProgess: 100
+                });
             });
     }
 };

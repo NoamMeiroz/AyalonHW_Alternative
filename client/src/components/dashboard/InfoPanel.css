@@ -1,0 +1,16 @@
+.info-card {
+    width: 6vmax;
+    height: 6vmax;
+    min-width: 50px;
+    min-width: 50px;
+}
+
+.info-card .MuiCardContent-root {
+    position: relative;
+    top: 1%;
+    padding: 1vw;
+}
+
+.info-card .MuiCardContent-root .MuiTypography-caption {
+    color: #9f9f9f;
+}

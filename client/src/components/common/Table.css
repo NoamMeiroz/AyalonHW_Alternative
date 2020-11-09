@@ -1,0 +1,8 @@
+[class*="horizontalScrollContainer"] {
+    height: 300px;
+    direction: ltr;
+}
+
+[class*="horizontalScrollContainer"] table {
+    direction: rtl;
+}

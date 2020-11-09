@@ -48,6 +48,62 @@ module.exports = (sequelize, Sequelize) => {
         },
         BEST_ROUTE: {
             type: Sequelize.JSON
+        },
+        SHORT_HOURS_GRADE: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
+        SHIFTING_HOURS_GRADE: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
+        BICYCLE_GRADE: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
+        SCOOTER_GRADE: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
+        PERSONALIZED_SHUTTLE_GRADE: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
+        WORK_SHUTTLE_GRADE: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
+        CARSHARE_GRADE: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
+        CARPOOL_GRADE: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
+        CABSHARE_GRADE: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
+        PUBLIC_TRANSPORT_GRADE: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
+        WALKING_GRADE: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
+        WORKING_FROM_HOME_GRADE: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
+        SHARED_WORKSPACE_GRADE: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
+        },
+        SHIFTING_WORKING_DAYS_GRADE: {
+            type: Sequelize.DECIMAL(9,3),
+            allowNull: true,
         }
     });
     return Employee;

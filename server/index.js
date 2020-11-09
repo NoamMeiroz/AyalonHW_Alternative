@@ -4,6 +4,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const authRoutes = require("./routes/authRoutes");
 const employerRoutes = require("./routes/employerRoutes");
+const reportsRoutes = require("./routes/reportsRoutes");
 const db = require("./db/database");
 const {logger, ServerError} = require('./log');
 const cors = require("cors");
@@ -35,6 +36,8 @@ server_app.use(cors());
 server_app.use(formidableMiddleware());
 server_app.use("/api", authRoutes);
 server_app.use("/api/employer", employerRoutes);
+server_app.use("/api/reports", reportsRoutes);
+
 
 
 // error handling. must be last call 

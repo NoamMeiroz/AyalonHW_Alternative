@@ -11,7 +11,6 @@ import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
-import LoadStatusSnackBar from './LoadStatusSnackBar';
 
 const labelText = "טעינת נתוני חברה";
 const acceptFiles = ".xlsx, .xls";
@@ -19,14 +18,11 @@ const acceptFiles = ".xlsx, .xls";
 class Companies extends Component {
 
     state = {
-        showSnackBar: false,
-        snackBarMessage: "",
         companyList: [],
     };
 
     constructor(props) {
         super(props);
-        this.snackBarElement = React.createRef();
         this.fileInput = React.createRef();
     }
 
@@ -42,42 +38,42 @@ class Companies extends Component {
         this.props.getData();
     }
 
-    showMessage = (message) => {
-        this.snackBarElement.current.showSnackBar(true, message);
-    }
-
     componentDidUpdate(prevProps, prevState, snapshot) {
+        let tempList = [];
+
+        if (this.props.loadData.timestamp !== prevProps.loadData.timestamp) {
+            this.setState({companyList: this.props.loadData.companyList});
+        }
+
         // check if to handle uploadFile results
         if (this.props.uploadFile.timestamp !== prevProps.uploadFile.timestamp) {
-            if (this.props.uploadFile.isSuccess) {
-                this.showMessage("נתוני חברה בתהליך טעינה...");
-                // start check if finished uploading 
-                let employerID = this.props.uploadFile.newCompany.id;
-                // delete old process interval if exists
-                if (sessionStorage.getItem(employerID)) {
-                    clearInterval(sessionStorage.getItem(employerID));
-                    sessionStorage.removeItem(employerID)
-                }
-                //let processID = setInterval(this.props.checkProgress(employerID), 3000);
-                let processID = setInterval(() => { this.props.checkProgress(employerID) }, 3000);
-                // save process id
-                sessionStorage.setItem(employerID, processID);
+            this.props.showMessage("נתוני חברה בתהליך טעינה...");
+
+            // remove old company if exists
+            tempList = this.state.companyList;
+            tempList = tempList.filter(company => {
+                return (company.NAME !== this.props.uploadFile.newCompany.NAME);
+            });
+            tempList = [...tempList, this.props.uploadFile.newCompany];
+            this.setState({companyList: tempList});
+
+            // start check if finished uploading 
+            let employerID = this.props.uploadFile.newCompany.id;
+            // delete old process interval if exists
+            if (sessionStorage.getItem(employerID)) {
+                clearInterval(sessionStorage.getItem(employerID));
+                sessionStorage.removeItem(employerID)
             }
-            else
-                this.showMessage(this.props.uploadFile.errorMessage);
-        }
-        // check if to show load initial employers data error message
-        if (this.props.loadData.timestamp !== prevProps.loadData.timestamp) {
-            if (!this.props.loadData.isSuccess)
-                this.showMessage(this.props.loadData.errorMessage);
+            //let processID = setInterval(this.props.checkProgress(employerID), 3000);
+            let processID = setInterval(() => { this.props.checkProgress(employerID) }, 3000);
+            // save process id
+            sessionStorage.setItem(employerID, processID);
         }
         // check if to show check employees loading progress error message
         if (this.props.employeesData.timestamp !== prevProps.employeesData.timestamp) {
-            if (this.props.employeesData.errorMessage !== "" || this.props.employeesData.uploadProgess === 100) {
+            if (this.props.employeesData.uploadProgess === 100) {
                 clearInterval(sessionStorage.getItem(this.props.employeesData.employerID));
                 sessionStorage.removeItem(this.props.employeesData.employerID);
-                if (this.props.employeesData.errorMessage !== "")
-                    this.showMessage(this.props.employeesData.errorMessage);
             }
         }
 
@@ -87,11 +83,11 @@ class Companies extends Component {
     render() {
         return <div className="root">
             <Grid
-                spacing={3}
                 container
+                spacing={3}
                 direction="row"
                 justify="space-around">
-                <Grid container item sm={10} justify="flex-end">
+                <Grid container item justify="flex-end">
                     <div>
                         <input
                             accept={acceptFiles}
@@ -111,14 +107,13 @@ class Companies extends Component {
                         </label>
                     </div>
                 </Grid>
-                <Grid item xs={10}>
+                <Grid item xs={12}>
                     <CompanyTable
-                        data={this.props.loadData.companyList}
+                        data={this.state.companyList}
                         sectors={this.props.loadData.sectorList}
-                        callFail={this.showMessage} />
+                    />
                 </Grid>
             </Grid>
-            <LoadStatusSnackBar ref={this.snackBarElement} />
         </div>
     }
 }
@@ -127,33 +122,22 @@ function mapStateToProps(state) {
     let tempList = []
     if (state.loadData.companyList)
         tempList = state.loadData.companyList;
-    // add new company to tempList which will be the new updated companyList
-    if (state.uploadFile.data) {
-        // remove old company if exists
-        tempList = tempList.filter(company => {
-            return (company.NAME !== state.uploadFile.data.NAME);
-        });
-        tempList = [...tempList, state.uploadFile.data];
-    }
 
     return {
         uploadFile: {
             newCompany: state.uploadFile.data,
             isSuccess: state.uploadFile.isSuccess,
-            errorMessage: state.uploadFile.errorMessage,
             timestamp: state.uploadFile.timestamp
         },
         loadData: {
             sectorList: state.loadData.sectorList,
             isSuccess: state.loadData.isSuccess,
-            errorMessage: state.loadData.errorMessage,
             companyList: tempList,
             timestamp: state.loadData.timestamp
         },
         employeesData: {
             employerID: state.employeesData.employerID,
             uploadProgess: state.employeesData.uploadProgess,
-            errorMessage: state.employeesData.errorMessage,
             timestamp: state.employeesData.timestamp
         }
     };

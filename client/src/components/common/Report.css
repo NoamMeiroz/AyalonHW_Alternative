@@ -1,0 +1,32 @@
+@page {
+    size: A4;
+    margin: 16mm;
+  }
+
+
+
+.report {
+    overflow: hidden;
+}
+
+.report * [class*="MTableToolbar-root"] {
+    direction: rtl;
+    align-items: center;
+}
+
+.report * [class*="MTableToolbar-title"] {
+    align-items: center  ;
+    align-content: center;
+    position: fixed
+}
+
+.report * [class*="horizontalScrollContainer"] {
+    height: auto;
+}
+
+.report * [class*="horizontalScrollContainer"] table {
+    direction: lrt;
+    border-collapse: separate;
+    border-spacing: 2px;
+}
+
