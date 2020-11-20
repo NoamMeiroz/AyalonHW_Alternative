@@ -14,9 +14,6 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import SaveRoundedIcon from '@material-ui/icons/SaveRounded';
 
-import { SERVER } from '../../utils/config';
-
-
 class DownloadButton extends Component {
 
    constructor() {
@@ -223,7 +220,7 @@ class DownloadButton extends Component {
    }
 
    saveEmployeesList = (employerId, fileName) => {
-      axios.get(`${SERVER}/api/employer/${employerId}/employee`, {headers:
+      axios.get(`/api/employer/${employerId}/employee`, {headers:
          { 'authorization': localStorage.getItem('token') }})
          .then(payload => {
             let employeeList = payload.data;

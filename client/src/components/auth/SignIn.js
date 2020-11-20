@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { reduxForm, Field } from 'redux-form';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
+import Container from '@material-ui/core/Container';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import { styled } from '@material-ui/core/styles';
@@ -41,7 +42,7 @@ const renderTextField = ({
     );
 
 const MyButton = styled(Button)({
-    margin: '30px',
+    marginTop: '30px',
 });
 
 class SignIn extends Component {
@@ -56,7 +57,9 @@ class SignIn extends Component {
         const { handleSubmit, pristine, submitting } = this.props;
 
         return (
-            <form onSubmit={handleSubmit(this.onSubmit)} autoComplete="off">
+            <Container maxWidth="xs">
+            <form className="root" 
+                onSubmit={handleSubmit(this.onSubmit)} autoComplete="off">
                 <div>
                     <Field name="userId" className="signinField"
                         component={renderTextField}
@@ -78,11 +81,12 @@ class SignIn extends Component {
                     {this.props.errorMessage}
                 </div>
                 <div>
-                    <MyButton className="Button" disabled={pristine || submitting}
+                    <MyButton className="loginButton" disabled={pristine || submitting}
                         variant="contained" color="primary" type="submit">אישור
                     </MyButton>
                 </div>
             </form>
+            </Container>
         );
     }
 }

@@ -9,6 +9,7 @@ const db = require("./db/database");
 const {logger, ServerError} = require('./log');
 const cors = require("cors");
 const formidableMiddleware = require('express-formidable');
+
 var server_app = express();
 
 // synchronize with database
@@ -63,6 +64,7 @@ server_app.use(function(err, req, res, next) {
   res.json({ message: err.message });
 });
   
+
 server_app.listen(5000, () => {
   logger.info('Node api server is running 5000!')
 });

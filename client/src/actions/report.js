@@ -2,7 +2,6 @@ import axios from 'axios';
 import {
     QUERY_COMPANY, SETTLEMENT_LIST, SHARE_POTENTIAL, ERROR
 } from './types';
-import { SERVER } from '../utils/config';
 import * as actionUtils from '../utils/actionsUtil';
 
 /**
@@ -23,7 +22,7 @@ export const getEmployees = (employers=[], livingCity=[], workingCity=[]) => {
     let headers = actionUtils.getAxiosHeader().headers;
     requestConfig = {...requestConfig, headers}
     return (dispatch) => {
-        axios.get(`${SERVER}/api/reports/employee`, requestConfig)
+        axios.get(`/api/reports/employee`, requestConfig)
             .then(payload => {
                 dispatch({ type: QUERY_COMPANY, employeesList: payload.data });
             }).catch(err => {
@@ -53,7 +52,7 @@ export const getSettlementList = () => {
  */
 export const getSharePotential = (employerId) => {
     return (dispatch) => {
-        axios.get(`${SERVER}/api/reports/share_potential/employer/${employerId}`,  actionUtils.getAxiosHeader() )
+        axios.get(`/api/reports/share_potential/employer/${employerId}`,  actionUtils.getAxiosHeader() )
             .then(payload => {
                 dispatch({ type: SHARE_POTENTIAL, isSuccess: true, report: payload.data });
             }).catch(err => {

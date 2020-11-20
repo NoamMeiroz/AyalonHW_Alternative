@@ -4,7 +4,6 @@ import {
     LOAD_DATA, EMPLOYEES_DATA,
     CHECK_PROGRESS, ERROR, MESSAGE
 } from './types';
-import { SERVER } from '../utils/config';
 import * as actionUtils from '../utils/actionsUtil';
 
 export * from './report';
@@ -18,7 +17,7 @@ export const signin = (formProps, callback) => {
     form.append("userId", formProps.userId);
     form.append("password", formProps.password);
     return (dispatch) => {
-        axios.post(`${SERVER}/api/signin/`,
+        axios.post(`/api/signin/`,
             form,
             {
                 headers: {
@@ -59,7 +58,7 @@ export const upload = (file, callback) => {
     const form = new FormData();
     form.append("file", file);
     return (dispatch) => {
-        axios.post(`${SERVER}/api/employer/upload/`,
+        axios.post(`/api/employer/upload/`,
             form,
             {
                 headers: {
@@ -81,7 +80,7 @@ export const upload = (file, callback) => {
  */
 export const getData = () => {
     return (dispatch) => {
-        axios.get(`${SERVER}/api/employer/`, actionUtils.getAxiosHeader())
+        axios.get(`/api/employer/`, actionUtils.getAxiosHeader())
             .then(payload => {
                 dispatch({ type: LOAD_DATA, isSuccess: true, sectorList: payload.data.sectors, companyList: payload.data.companies });
             }).catch(err => {
@@ -96,7 +95,7 @@ export const getData = () => {
  */
 export const getEmployeesOfEmployer = (employerId) => {
     return (dispatch) => {
-        axios.get(`${SERVER}/api/employer/${employerId}/employee`, actionUtils.getAxiosHeader())
+        axios.get(`/api/employer/${employerId}/employee`, actionUtils.getAxiosHeader())
             .then(payload => {
                 dispatch({ type: EMPLOYEES_DATA, isSuccess: true, employeesList: payload.data });
             }).catch(err => {
@@ -108,7 +107,7 @@ export const getEmployeesOfEmployer = (employerId) => {
 
 export const checkProgress = (employerId) => {
     return (dispatch) => {
-        axios.get(`${SERVER}/api/employer/${employerId}/employee/precentReady`, actionUtils.getAxiosHeader())
+        axios.get(`/api/employer/${employerId}/employee/precentReady`, actionUtils.getAxiosHeader())
             .then(payload => {
                 if (payload.data.precent || payload.data.precent >= 0) {
                     dispatch({

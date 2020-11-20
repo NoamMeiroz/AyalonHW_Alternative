@@ -10,7 +10,7 @@
 
 .SideBar .not-active-report .MuiIconButton-label {
     color: #FFFFFF;
-    opacity: 43%;
+    opacity: 0.43;
 }
 
 .SideBar .active-report .MuiIconButton-label {

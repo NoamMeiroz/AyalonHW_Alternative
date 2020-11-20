@@ -46,12 +46,12 @@ class SideBar extends Component {
 
     setActiveReport = (component) => {
 
-        let activeState = this.state.reports;
-        Object.keys(activeState).forEach(v => activeState[v] = false);
-        if (activeState[component] !== undefined ) {
-            activeState[component] = true;
+        let ractiveState = this.state.reports;
+        Object.keys(ractiveState).forEach(v => ractiveState[v] = false);
+        if (ractiveState[component] !== undefined ) {
+            ractiveState[component] = true;
             this.setState({
-                reports: activeState
+                reports: ractiveState
             });
         }
     }
@@ -116,7 +116,7 @@ class SideBar extends Component {
                                     component={Link} to="/reports/share_potential">
                                     איתור עובדים קרובים מבחינה פיסית
                                 </IconButton>
-                                : null
+                                : <div></div>
                             }
                         </div>
                     </div>
