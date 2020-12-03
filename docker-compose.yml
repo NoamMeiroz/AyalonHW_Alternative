@@ -18,9 +18,9 @@ services:
     build:
       context: ./server
       dockerfile: dockerfile_server.dev
-    volumes:
-      - /server/node_modules
-      - ./server:/server
+#    volumes:
+#      - /server/node_modules
+#      - ./server:/server
     environment: 
       - mysql_server=mysql
       - NODE_ENV=development
@@ -49,9 +49,9 @@ services:
     build:
       context: ./client
       dockerfile: dockerfile_app.dev
-#    volumes:
-      # - /app/node_modules
-      # - ./client:/client
+    volumes:
+       - ./client/node_modules:/app/node_modules
+       - ./client:/client
     stdin_open: true
     tty: true
     depends_on:

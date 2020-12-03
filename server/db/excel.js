@@ -13,8 +13,6 @@ const load_data = async (file) => {
 	let data = {};
 
 	wb.eachSheet(function(worksheet, sheetId) {
-		//let sheet = worksheet.name;
-		//let temp = XLSX.utils.sheet_to_json(sheet);
 		let keys = [];
 		let sheet = [];
 		worksheet.eachRow((row, rowNumber) => {
@@ -34,17 +32,6 @@ const load_data = async (file) => {
 	  });
 	return data;
 }
-/*const load_data = (file) => {
-	let workbook = XLSX.readFile(file);
-	let data = {};
-
-	for (let i = 0; i < workbook.SheetNames.length; ++i) {
-		let sheet = workbook.Sheets[workbook.SheetNames[i]];
-		let temp = XLSX.utils.sheet_to_json(sheet);
-		data[workbook.SheetNames[i]] = temp;
-	}
-	return data;
-}*/
 
 const post_data = (req, res) => {
 	let files = {};

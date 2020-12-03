@@ -35,11 +35,23 @@ export const getEmployees = (employers=[], livingCity=[], workingCity=[]) => {
 /**
  * return list of israel settlements
  */
+/*
 export const getSettlementList = () => {
     return (dispatch) => {
-        axios.get("https://data.gov.il/api/3/action/datastore_search?resource_id=d4901968-dad3-4845-a9b0-a57d027f11ab&limit=3000&fields=%22%D7%A9%D7%9D_%D7%99%D7%A9%D7%95%D7%91%22")
+        axios.get("https://data.gov.il/api/3/action/datastore_search?resource_id=5c78e9fa-c2e2-4771-93ff-7f400a12f7ba&limit=3000&fields=%22%D7%A9%D7%9D_%D7%99%D7%A9%D7%95%D7%91%22")
             .then(payload => {
                 dispatch({ type: SETTLEMENT_LIST, settlementList: payload.data.result.records });
+            }).catch(err => {
+                let message = actionUtils.handleError(err);
+                dispatch({ type: ERROR, errorMessage: message });
+            });
+    }
+}*/
+export const getSettlementList = () => {
+    return (dispatch) => {
+        axios.get("/api/const/locality", actionUtils.getAxiosHeader() )
+            .then(payload => {
+                dispatch({ type: SETTLEMENT_LIST, settlementList: payload.data });
             }).catch(err => {
                 let message = actionUtils.handleError(err);
                 dispatch({ type: ERROR, errorMessage: message });

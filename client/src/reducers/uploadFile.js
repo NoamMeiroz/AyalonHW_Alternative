@@ -10,7 +10,13 @@ const INITIAL_STATE = {
 export default function(state = INITIAL_STATE, action) {
     switch (action.type) {
         case FILE_UPLOAD:
-            return {...state, timestamp: new Date(), isSuccess: true, data: action.data };
+            let company = action.data;
+            let sum = company.Sites.reduce((sum, site) => {
+                return (sum + site.NUM_OF_EMPLOYEES);
+            }, 0);
+            company.EMP_COUNT = sum;
+            company.SITE_COUNT = company.Sites.length
+            return {...state, timestamp: new Date(), isSuccess: true, data: company};
         default:
             return state;
     }

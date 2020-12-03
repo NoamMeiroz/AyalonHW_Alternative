@@ -240,7 +240,6 @@ class DownloadButton extends Component {
                this.exportToCSV(employeeList, fileName);
             }
          }).catch(err => {
-            console.log(err);
             let message = actionsUtil.handleError(err);
             this.props.showMessage(message);
          });

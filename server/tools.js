@@ -1,4 +1,18 @@
 /**
+ * Check if a given string is in hebrew and contains only alphabet letters
+ * and the letters: _,-, ,(,),",'
+ * @param {string} s 
+ */
+function isHebrewLetter(s)
+{
+   let result =  s.match("^([א-ת]+(?:(\. )|-| |'|\"))*[א-ת]*$");    
+   if (result)
+      return true;
+   else
+      return false;
+}
+
+/**
  * If input string or number is integer return true
  * @param {*} id 
  */
@@ -79,7 +93,6 @@ function convertStringToArray(str) {
          result = str.split(",");
       }
       catch (error) {
-         console.debug(error);
          result = null;
       }
    }
@@ -87,4 +100,5 @@ function convertStringToArray(str) {
 }
 
 
-module.exports = { isInteger, getNearestWorkDay, getFirstNumberInString, sleep, convertStringToArray }; 
+module.exports = { isInteger, getNearestWorkDay, getFirstNumberInString, isHebrewLetter,
+   sleep, convertStringToArray }; 

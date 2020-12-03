@@ -24,8 +24,9 @@ export const signin = (formProps, callback) => {
                     'Content-Type': `multipart/form-data; boundary=${form._boundary}`
                 }
             }).then(data => {
-                dispatch({ type: AUTH_USER, payload: data.data.token });
+                dispatch({ type: AUTH_USER, payload: data.data.token, userName: formProps.userId });
                 localStorage.setItem('token', data.data.token); // save token use for later
+                localStorage.setItem('userName', formProps.userId); // save userName use for later
                 callback();
             }).catch(err => {
                 let message = actionUtils.handleError(err);
@@ -39,7 +40,8 @@ export const signin = (formProps, callback) => {
  */
 export const signOut = () => {
     localStorage.removeItem('token');
-    return { type: AUTH_USER, payload: '' };
+    localStorage.removeItem('userName');
+    return { type: AUTH_USER, payload: '', userName: '' };
 }
 
 /**

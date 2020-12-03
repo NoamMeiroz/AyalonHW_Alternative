@@ -20,10 +20,6 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
             allowNull: false
         },      
-        SHUTTLE_SOLUTION: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-        },      
         MASS_TRANSPORTATION_SOLUTION: {
             type: Sequelize.INTEGER,
             allowNull: false,
@@ -40,6 +36,14 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
             defaultValue: 0,
             allowNull: false
+        },    
+        NUMBER_OF_EMPLOYEES: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+        },    
+        NUMBER_OF_SITES: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
         }
     });
     return Employer;

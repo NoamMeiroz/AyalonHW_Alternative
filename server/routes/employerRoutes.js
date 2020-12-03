@@ -18,7 +18,6 @@ const requireAuth = passport.authenticate('jwt', { session: false });
 router.post("/upload/", requireAuth, async (req, res, next) => {
    let url = URL.parse(req.url, true);
    let xlsxSheets;
-   let result;
    xlsxSheets = await excel.post_file(req, res, url.query.f);
    if (xlsxSheets) {
       companyData.readSheet(xlsxSheets).then(data => {
@@ -67,7 +66,6 @@ router.get("/:employerId/employee", requireAuth, (req, res, next) => {
          employeesData.getEmployeesOfEmployer(empId).then((payload) => {
             res.status(200).json(payload);
          }).catch(error => {
-            console.log(error);
             if (error.status)
                res.status(error.status).send(error.message);
             else {

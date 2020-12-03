@@ -19,7 +19,8 @@ import SignOut from './components/auth/SignOut';
 const store = createStore(
 	reducers,
 	{
-		auth: { authenticated: localStorage.getItem('token') }
+		auth: { authenticated: localStorage.getItem('token'),
+				userName: localStorage.getItem('userName') }
 	},
 	applyMiddleware(reduxThunk)
 );

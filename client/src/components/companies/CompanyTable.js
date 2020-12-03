@@ -18,14 +18,15 @@ class CompanyTable extends Component {
         let jsx = <Table
                 columns={[
                     { title: 'שם חברה', field: 'NAME' },
-                    { title: '# סניפים', field: 'SITE_COUNT' },
-                    { title: '# עובדים', field: 'EMP_COUNT' },
+                    { title: 'סה"כ סניפים', field: 'NUMBER_OF_SITES' },
+                    { title: 'סה"כ עובדים', field: 'NUMBER_OF_EMPLOYEES' },
                     { title: 'מגזר', field: 'SECTOR', lookup: sectorsList },
                     { title: 'רכב צמוד', field: 'PRIVATE_CAR_SOLUTION', type: 'boolean' },
-                    { title: 'שאטלים', field: 'SHUTTLE_SOLUTION', type: 'boolean' },
-                    { title: 'הסעות', field: 'MASS_TRANSPORTATION_SOLUTION', type: 'boolean' },
+                    { title: 'שירותי הסעות', field: 'MASS_TRANSPORTATION_SOLUTION', type: 'boolean' },
                     { title: 'Carpool', field: 'CAR_POOL_SOLUTION', type: 'boolean' },
-                    { title: 'עבודה מהבית', field: 'WORK_FROM_HOME_SOLUTION', type: 'boolean' }
+                    { title: 'עבודה מהבית', field: 'WORK_FROM_HOME_SOLUTION', type: 'boolean' },
+                    { title: '# אתרים שנקלטו', field: 'SITE_COUNT' },
+                    { title: '# עובדים שנקלטו', field: 'EMP_COUNT' }
                 ]}
                 data={companyList}
                 title="רשימת חברות"

@@ -9,7 +9,7 @@ import * as actions from '../../actions';
 import requireAuth from '../requireAuth'; //used to check if login successfull
 import './HeatmapQueryPanel.css';
 
-const CITY = "שם_ישוב";
+const CITY = "NAME";
 
 class HeatmapQueryPanel extends Component {
 

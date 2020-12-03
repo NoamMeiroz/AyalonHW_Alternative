@@ -63,25 +63,9 @@ const updateRoute = (employee, route, callback) => {
          callback(null, rowsUpdate);
       })
       .catch(err => {
-         console.log(err);
          callback(err, getMessage(err));
       });
 }
-
-/**
- * Return list of employees of specific employer
- * @param {int} employerId 
- * @param {*} callback 
- */
-/*const getEmployeesOfEmployerk = (employerId, livingCity=[], workingCity=[], callback) => {
-   Employee.findAll({
-      where: {
-         employer_id: employerId
-      },
-      include: [{ model: EmployerSites, as: "Site" }]
-   }).then(data => { callback(null, data) })
-      .catch(err => { callback(err, getMessage(err)); });
-}*/
 
 /**
  * Return list of employees of specific employer
