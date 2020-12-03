@@ -25,7 +25,6 @@ router.get("/share_potential/employer/:employerId", requireAuth, (req, res, next
             reports.getSharePotential(empId).then((payload) => {
                 res.status(200).json(payload);
             }).catch(error => {
-                console.log(error);
                 if (error.status)
                     res.status(error.status).send(error.message);
                 else {
@@ -73,7 +72,6 @@ router.get("/employee", requireAuth, (req, res, next) => {
             reports.getEmployeesOfEmployer(companies, livingCity, workingCity).then((payload) => {
                 res.status(200).json(payload);
             }).catch(error => {
-                console.log(error);
                 if (error.status)
                     res.status(error.status).send(error.message);
                 else {

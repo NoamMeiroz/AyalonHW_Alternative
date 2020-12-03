@@ -1,22 +1,22 @@
 const { ServerError, logger } = require('../log');
 const employerSitesSchema = require("../db/employerSitesSchema");
-const siteFields = require("../config/config").sitesFieldsName;
+const { branchesFieldsName, employeeFieldsName } = require("../config/config");
 const googleAPI = require('./googleAPI');
 
 /**
  * Convert all sites address to X,Y coordinates.
  * If one address is invalid then reject all.
- * @param {*} siteList 
+ * @param {*} branchList 
  */
-const convertAddress = (siteList) => {
+const convertAddress = (branchList) => {
     return new Promise(function (resolve, reject) {
 
         // calculate coordination using google api
         let convertPromise = [];
-        siteList.forEach((site, index, array) => {
-            convertPromise.push(googleAPI.convertLocation(site.ADDRESS_CITY,
-                site.ADDRESS_STREET,
-                site.ADDRESS_BUILDING_NUMBER));
+        branchList.forEach((branch, index, array) => {
+            convertPromise.push(googleAPI.convertLocation(branch.ADDRESS_CITY,
+                branch.ADDRESS_STREET,
+                branch.ADDRESS_BUILDING_NUMBER));
         });
 
         // wait to finish with all employees and then save
@@ -27,16 +27,19 @@ const convertAddress = (siteList) => {
                     if (value instanceof ServerError) {
                         switch (value.status) {
                             case googleAPI.ERRORS.INVALID_ADDRESS_CODE:
-                                error = new ServerError(400, `כתובת אתר ${siteList[index].NAME} לא חוקית.`);
+                                error = new ServerError(400, `כתובת סניף ${branchList[index].NAME} לא תקינה.`);
                                 break;
                             case googleAPI.ERRORS.MISSING_CITY_CODE:
-                                error = new ServerError(400, `לאתר ${siteList[index].NAME} חסר עיר מגורים.`);
+                                error = new ServerError(400, `לסניף ${branchList[index].NAME} חסר עיר.`);
                                 break;
                             case googleAPI.ERRORS.MISSING_STREET_CODE:
-                                error = new ServerError(400, `לאתר ${siteList[index].NAME} חסר שם רחוב.`);
+                                error = new ServerError(400, `לסניף ${branchList[index].NAME} חסר שם רחוב.`);
                                 break;
                             case googleAPI.ERRORS.MISSING_BUILDING_NUMBER_CODE:
-                                error = new ServerError(400, `לאתר ${siteList[index].NAME} חסר מספר בניין.`);
+                                error = new ServerError(400, `לסניף ${branchList[index].NAME} חסר מספר בניין.`);
+                                break;
+                            case 500:
+                                error = value;
                                 break;
                             default:
                                 error = new ServerError(500, "שגיאה לא ידועה");
@@ -45,11 +48,12 @@ const convertAddress = (siteList) => {
                         return reject(error);
                     }
                     else {
-                        siteList[index].X = value.X;
-                        siteList[index].Y = value.Y;
+                        branchList[index].X = value.X;
+                        branchList[index].Y = value.Y;
+                        branchList[index].ADDRESS_CITY = value.CITY;
                     }
                 })
-                resolve(siteList);
+                resolve(branchList);
             })
             .catch(error => {
                 logger.error(error.stack);
@@ -86,47 +90,40 @@ saveSites = (employerId, siteList) => {
  * if data is not valid then reject.
  * @param {} data 
  */
-const handleSiteData = (data) => {
+const handleBranchData = (branches, emploeesList) => {
     return new Promise(function (resolve, reject) {
         // create a site object for each record
-        let siteList = data.map(employee => {
-            site = {
-                NAME: employee[siteFields.NAME],
-                ADDRESS_CITY: employee[siteFields.ADDRESS_CITY],
-                ADDRESS_STREET: employee[siteFields.ADDRESS_STREET],
-                ADDRESS_BUILDING_NUMBER: employee[siteFields.ADDRESS_BUILDING_NUMBER],
+        let uniqueBranch = new Map();
+        for (branchItem of branches ) {
+            let branch = {
+                SITE_ID: branchItem[branchesFieldsName.SITE_ID],
+                NAME: branchItem[branchesFieldsName.NAME],
+                ADDRESS_CITY: branchItem[branchesFieldsName.ADDRESS_CITY],
+                ADDRESS_STREET: branchItem[branchesFieldsName.ADDRESS_STREET],
+                ADDRESS_BUILDING_NUMBER: branchItem[branchesFieldsName.ADDRESS_BUILDING_NUMBER],
                 NUM_OF_EMPLOYEES: 0
             }
-            return site;
-        });
-
-        // create a unique list of sites from all records
-        // count number of emplyees in each unqiue site
-        // save unique sites
-        let uniqueSite = new Map();
-        for (i in siteList) {
-            let site = undefined;
-            if (!uniqueSite.has(siteList[i].NAME)) {
-                siteList[i].SITE_ID = i;
-                siteList[i].NUM_OF_EMPLOYEES = 1;
-                site = siteList[i];
-            }
-            else {
-                let site = uniqueSite.get(siteList[i].NAME);
-                site.NUM_OF_EMPLOYEES = site.NUM_OF_EMPLOYEES + 1;
-            }
-            if (site)
-                uniqueSite.set(site.NAME, site);
+            uniqueBranch.set(branch.SITE_ID, branch);
         }
-        uniqueSite = Array.from(uniqueSite.values());
-
-        convertAddress(uniqueSite)
-            .then(siteList => {
-                resolve(siteList);
+        // count number of emplyees in each unqiue site
+        for (employee of emploeesList) {
+            if (!uniqueBranch.has(employee[employeeFieldsName.BRANCH_ID])) {
+                return reject(new ServerError(400, `מספר סניף של עובד  ${employee[employeeFieldsName.EMPLOYER_ID]} שגוי או סניף לא קיים`));
+            }
+            let branch = uniqueBranch.get(employee[employeeFieldsName.BRANCH_ID]);
+            branch.NUM_OF_EMPLOYEES = branch.NUM_OF_EMPLOYEES + 1;
+            uniqueBranch.set(branch.SITE_ID, branch);
+        }
+        
+        uniqueBranch = Array.from(uniqueBranch.values());
+        // convert address of each branch to X, Y and find the correct city name.
+        convertAddress(uniqueBranch)
+            .then(branchList => {
+                resolve(branchList);
             })
             .catch(error => {
                 reject(error);
             });
     });
 }
-module.exports = { handleSiteData, saveSites };
+module.exports = { handleBranchData, saveSites };

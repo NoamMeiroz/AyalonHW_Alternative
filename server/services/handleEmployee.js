@@ -129,7 +129,7 @@ const findRoutes = (employeeList, sites) => {
          .then(results => {
             results.forEach((routeResult, index, array) => {
                if (routeResult instanceof ServerError) {
-                  logger.error(error);
+                  logger.error(routeResult);
                }
                else {
                   employeeSchema.updateRoute(employeeList[index], routeResult, (error, data) => {
@@ -142,6 +142,7 @@ const findRoutes = (employeeList, sites) => {
             resolve;
          })
          .catch(error => {
+            console.log(error);
             logger.error(error.stack);
             resolve;
          });
@@ -176,6 +177,7 @@ Promise.all(promiseList)
       });
    })
    .catch(error => {
+      console.log(error);
       logger.error(error.stack);
       // return result to main thread
       parentPort.postMessage({ Employees: null, message: error.stack });

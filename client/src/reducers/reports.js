@@ -26,13 +26,7 @@ export default function (state = INITIAL_STATE, action) {
             
             return {
                 ...state,
-                settlementList: action.settlementList.map(settlement => {
-                    let settlementName = settlement["שם_ישוב"].trim();
-                    settlementName = settlementName.replace(/\(/, ')');
-                    settlementName = settlementName.replace(/\)/, '(');
-                    settlement["שם_ישוב"]= settlementName;
-                    return settlement;
-                }),
+                settlementList: action.settlementList,
                 timestamp: new Date()
             };
         default:

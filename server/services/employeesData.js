@@ -16,28 +16,27 @@ function employeesService(workerData) {
 }
 
 async function run(employer, employees) {
-	logger.info(employer.NAME + ": Computing employees information...");
+	logger.info(employer.NAME + ": saving employees information...");
 	let state = employerSchema.STATE.READY;
-	//await employeesService({ employer, employees })
 	try {
 		result = await employeesService({ employer, employees });
+		logger.debug(employer.NAME + ": saving employees result is " + result);
 		if (!result.Employees) {
-			logger.error(result.message);
 			state = employerSchema.STATE.ERROR;
 		}
 	}
 	catch (error) {
-		logger.error(error.stack);
+		logger.error(employer.NAME + ": saving employees information failed." + error.stack);
 		state = employerSchema.STATE.ERROR;
 	}
-
 	// finish working on employees
 	employerSchema.setEmploeeState(employer.id, state,
 		(err, result) => {
 			if (result)
-				logger.debug(JSON.stringify(result));
+				logger.debug("employee state is " + JSON.stringify(result));
 			else {
-				logger.error(err.stack)
+				
+				logger.error(err)
 			}
 		});
 };

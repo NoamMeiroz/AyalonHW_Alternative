@@ -76,8 +76,6 @@ const useStyles = makeStyles((theme) => ({
 
 function App({ children }) {
 	const classes = useStyles();
-	console.log(children);
-
 	return (
 		<RTL>
 			<ThemeProvider theme={theme}>

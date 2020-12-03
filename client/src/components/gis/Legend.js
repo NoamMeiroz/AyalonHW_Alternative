@@ -19,8 +19,8 @@ class Legend extends Component {
     componentDidUpdate(prevProps) {
         let companyList = {};
         if (prevProps.data !== this.props.data) {
-            for (let company in this.props.colors) {
-                companyList[company] = { color: this.props.colors[company], count: 0 };
+            for (let company in this.props.companies) {
+                companyList[company] = { color: this.props.companies[company].color, count: 0 };
             }
             for (let employee of this.props.data) {
                 companyList[employee.EMPLOYER_ID].count = companyList[employee.EMPLOYER_ID].count + 1;

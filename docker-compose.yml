@@ -14,23 +14,13 @@ services:
       - '3306:3306'
     volumes:
       - db-data:/var/lib/mysql  
-  gdal:
-    image: osgeo/gdal:alpine-normal-latest
-    depends_on:
-      - mysql
-    stdin_open: true
-    tty: true
-    volumes:
-      - ../../files/TAZ:/data
   node_server:
     build:
       context: ./server
       dockerfile: dockerfile_server.dev
-    ports:
-      - 5000:5000
-    volumes:
-      - /server/node_modules
-      - ./server:/server
+#    volumes:
+#      - /server/node_modules
+#      - ./server:/server
     environment: 
       - mysql_server=mysql
       - NODE_ENV=development
@@ -47,38 +37,63 @@ services:
     volumes:
       - /app/node_modules
       - ./server:/app
-    ports:
-      - 5050:5000
+#    ports:
+#      - 5050:5000
     environment: 
       - mysql_server=mysql
       - NODE_ENV=test
     stdin_open: true
     tty: true
     command: ["npm", "test"]
-  alternative:
+  native_laasakim_dev:
     build:
       context: ./client
       dockerfile: dockerfile_app.dev
-    ports: 
-      - "3000:3000"
     volumes:
-      # - /app/node_modules
-      - ./client:/client
+       - ./client/node_modules:/app/node_modules
+       - ./client:/client
     stdin_open: true
     tty: true
     depends_on:
       - node_server
     command: ["npm", "start"]
+  native_laasakim:
+    build:
+      context: ./client
+      dockerfile: .dockerfile
+    stdin_open: true
+    tty: true
+    depends_on:
+      - node_server
+  nginx_dev:
+    build:
+      dockerfile: dockerfile_nginx.dev
+      context: ./nginx
+    ports:
+      - "8080:80"
+      - "443:443"
+    depends_on:
+      - native_laasakim_dev
+      - node_server
+    volumes: 
+      - ./secret:/etc/nginx/certs
   nginx:
     build:
       dockerfile: dockerfile_nginx.dev
       context: ./nginx
     ports:
       - "8080:80"
+      - "443:443"
     depends_on:
-      - alternative
+      - native_laasakim
       - node_server
+    volumes: 
+      - ./secret:/etc/nginx/certs
 volumes:
   db-data:
     driver: local
+    driver_opts:
+      o: bind
+      type: None
+      device: /home/amit/workspace/employers_program/db-data
   

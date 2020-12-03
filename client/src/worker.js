@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { SERVER } from './utils/config';
 
 
 export default function checkProgress() {
@@ -7,7 +6,7 @@ export default function checkProgress() {
     var employerId = -1;
 
     const addProgress = () => {
-        axios.get(`${SERVER}/api/employer/${employerId}/employee/precentReady`)
+        axios.get(`/api/employer/${employerId}/employee/precentReady`)
             .then(payload => {
                 if (payload.precent) {
                     if (payload.precent === 100) {

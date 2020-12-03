@@ -5,10 +5,12 @@ const bodyParser = require("body-parser");
 const authRoutes = require("./routes/authRoutes");
 const employerRoutes = require("./routes/employerRoutes");
 const reportsRoutes = require("./routes/reportsRoutes");
+const constRoutes = require("./routes/constRoutes");
 const db = require("./db/database");
 const {logger, ServerError} = require('./log');
 const cors = require("cors");
 const formidableMiddleware = require('express-formidable');
+
 var server_app = express();
 
 // synchronize with database
@@ -37,6 +39,8 @@ server_app.use(formidableMiddleware());
 server_app.use("/api", authRoutes);
 server_app.use("/api/employer", employerRoutes);
 server_app.use("/api/reports", reportsRoutes);
+server_app.use("/api/const", constRoutes);
+
 
 
 
@@ -49,20 +53,24 @@ server_app.use(function(err, req, res, next) {
     else
       res.locals.message = err.message;
   else
-    res.locals.message = err;
+    res.locals.message = JSON.stringify(err);
 
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
   // add this line to include winston logging
   if (err.message)
     logger.error(`${err.status || 500} - ${res.locals.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
-
+  else {
+    logger.error(JSON.stringify(err));
+    console.log(err.stack)
+  }
 
   // render the error page
   res.status(err.status || 500);
   res.json({ message: err.message });
 });
   
+
 server_app.listen(5000, () => {
   logger.info('Node api server is running 5000!')
 });

@@ -1,0 +1,156 @@
+// Install NativeLaasakim02VM
+// Prequisits: linux (ubuntu ) vm on the azure
+
+// -------------------- step 1 ----------------------------------
+// install Docker env
+// User to login: NativeLaasakimAH (or what you have)
+// SSH to the VM
+
+
+// Fallow instractions from https://docs.docker.com/engine/install/ubuntu/
+
+// remove older docker version
+sudo apt-get remove docker docker-engine docker.io containerd runc
+
+// SET UP THE REPOSITORY
+sudo apt-get update
+
+sudo apt-get install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg-agent \
+    software-properties-common
+
+// Add Docker’s official GPG key:
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+// check the vm machine architecture
+dpkg --print-architecture
+
+// azure use amd64
+
+// set up stable repository
+sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   $(lsb_release -cs) \
+   stable"
+   
+// INSTALL DOCKER ENGINE
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io
+
+// add user to docker usergroup
+// relogin after this command
+sudo usermod -aG docker ${USER}
+
+// install DOCKER-COMPOSE
+sudo curl -L "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+
+//------------------------- step 2 -----------------------------
+// attach the external disk to the vm server
+// find which disk is the external
+lsblk -o NAME,HCTL,SIZE,MOUNTPOINT | grep -i "sd"
+// format the disk (/dev/sda is the new disk) replace it
+sudo parted /dev/sda --script mklabel gpt mkpart xfspart xfs 0% 100%
+sudo mkfs.xfs /dev/sda1
+sudo partprobe /dev/sda1
+// create folder and mount
+sudo mkdir datadrive
+// find filesystem type
+sudo mount /dev/sda1 datadrive
+df	 -Th
+sudo umount datadrive
+
+// find UUID
+ls -al /dev/disk/by-uuid/
+
+// add the following line to the /etc/fstab
+sudo nano /etc/fstab
+//UUID=e3220ba1-cad0-48c0-8441-033c5af34d2b       /home/NativeLaasakimAH/datadrive        xfs     defaults,nofail 0       0
+sudo mount -a
+
+// make a folder for the db data (mysql db files) in the datadrive
+cd datadrive
+sudo mkdir db-data
+sudo chown NativeLaasakimAH: db-data
+
+//------------------------- step 3 -----------------------------
+// Prequisits: NativeLaasakimCR Container Registry on the azure
+// Prequisits: Azure cli installed in the development environment
+//             as  described in https://docs.microsoft.com/en-us/cli/azure/install-azure-cli
+// create docker images and upload to container registry
+// this is done in the development environment
+docker-compose build node_server
+docker-compose build alternative
+docker-compose build nginx
+
+// connect to azure NativeLaasakimCR Container Registry
+// container registry name is allways in small letters! 
+az login
+az acr login --name nativelaasakimcr
+
+docker tag mysql nativelaasakimcr.azurecr.io/mysql
+docker push nativelaasakimcr.azurecr.io/mysql
+
+docker tag node_server nativelaasakimcr.azurecr.io/node_server
+docker push nativelaasakimcr.azurecr.io/node_server
+
+docker tag native_laasakim nativelaasakimcr.azurecr.io/native_laasakim
+docker push nativelaasakimcr.azurecr.io/native_laasakim
+
+docker tag nginx nativelaasakimcr.azurecr.io/nginx
+docker push nativelaasakimcr.azurecr.io/nginx
+
+//------------------------- step 4 -----------------------------
+// connect to vm and pull the images
+// Prequisits: Azure cli installed in the vm 
+// Prequisits: the vm has access to the nativelaasakimcr 
+//         https://docs.microsoft.com/en-us/azure/container-registry/container-registry-authentication-managed-identity
+// connect to azure NativeLaasakimCR Container Registry
+// container registry name is allways in small letters! 
+az login --identity
+az acr login --name nativelaasakimcr
+docker pull nativelaasakimcr.azurecr.io/mysql
+docker pull nativelaasakimcr.azurecr.io/node_server
+docker pull nativelaasakimcr.azurecr.io/native_laasakim
+docker pull nativelaasakimcr.azurecr.io/nginx
+
+//------------------------- step 5 -----------------------------
+//use private signed cartificate. If not exists then
+//create self-signed cartificate for the ssl 
+cd ~
+mkdir native_laasakim
+cd native_laasakim
+mkdir secert
+
+sudo openssl genrsa -out native_CA.key 2048
+sudo openssl req -x509 -new -key native_CA.key -sha256 -days 365 -out native_CA.pem
+sudo openssl genrsa -out native.key 2048
+openssl req -new -key native.key -out native.csr
+sudo nano native.ext 
+// write the following lines to the file without the remarks signs...
+// authorityKeyIdentifier=keyid,issuer
+// basicConstraints=CA:FALSE
+// keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+// subjectAltName = @alt_names
+// [alt_names]
+// IP.1 = 20.56.105.178
+
+sudo openssl x509 -req -in native.csr -CA native_CA.pem -CAkey native_CA.key -CAcreateserial -out native.crt -days 825 -sha256 -extfile native.ext
+
+
+// make sure to change password for user alternative in the db 
+// to be the same in file and db
+
+// run mysql and create schema
+docker compose up -d mysql
+
+// run application
+docker-compose up -d nginx
+
+
+
+

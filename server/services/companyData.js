@@ -1,12 +1,10 @@
 const { ServerError, logger } = require('../log');
 const employerSchema = require("../db/employerSchema");
 const empFields = require("../config/config").employerFieldsName;
-const siteFields = require("../config/config").sitesFieldsName;
-const employeeFields = require("../config/config").employeeFieldsName;
 const siteData = require("./siteData");
 const employeesData = require("./employeesData");
 const employer = require('../models/employer');
-const { employeeFieldsName, sitesFieldsName } = require('../config/config');
+const { branchesFieldsName, employeeFieldsName } = require('../config/config');
 
 
 /**
@@ -16,7 +14,7 @@ const { employeeFieldsName, sitesFieldsName } = require('../config/config');
  */
 function defined_structure(obj, attrs) {
     if (!obj)
-        return { valid: false, attribute: "רשימת עובדים" };
+        return { valid: false, attribute: "נתונים" };
     var tmp = obj;
     for (i = 0; i < attrs.length; ++i) {
         if (!tmp.hasOwnProperty(attrs[i]))
@@ -72,8 +70,9 @@ const handleEmployerData = (data) => {
                 let employer = {
                     NAME: data[empFields.NAME],
                     SECTOR: currSector.dataValues.id,
+                    NUMBER_OF_EMPLOYEES: data[empFields.NUMBER_OF_EMPLOYEES],
+                    NUMBER_OF_SITES: data[empFields.NUMBER_OF_SITES],
                     PRIVATE_CAR_SOLUTION: BOOL[data[empFields.PRIVATE_CAR]],
-                    SHUTTLE_SOLUTION: BOOL[data[empFields.SHUTTLE]],
                     MASS_TRANSPORTATION_SOLUTION: BOOL[data[empFields.MASS_TRANSPORTATION]],
                     CAR_POOL_SOLUTION: BOOL[data[empFields.CAR_POOL]],
                     WORK_FROM_HOME_SOLUTION: BOOL[data[empFields.WORK_FROM_HOME]],
@@ -90,34 +89,41 @@ const readSheet = (company_sheets) => {
         if (company_sheets == undefined) {
             return reject(new ServerError(status = 400, message = "קובץ אקסל לא תקין"));
         }
-        if (company_sheets["פרטי חברה"] == null) {
+        if (company_sheets["מעסיקים"] == null) {
             return reject(new ServerError(status = 400, message = "חוצץ פרטי חברה חסר"));
         }
-        let employerData = company_sheets["פרטי חברה"][0];
+        let employerData = company_sheets["מעסיקים"][0];
         if (employerData == undefined) {
             return reject(new ServerError(status = 400, message = "פרטי החברה חסרים"));
         }
 
-        let employees = company_sheets["פרטי עובדים"];
+        let branches = company_sheets["סניפים"];
+        if (branches == undefined)
+            return reject(new ServerError(status = 400, message = "חוצץ פרטי סניפים חסר"));
+        else if (branches[0] === undefined)
+            return reject(new ServerError(status = 400, message = "חוצץ פרטי סניפים אינו מכיל מידע על הסניפים"));
+
+        let employees = company_sheets["עובדים"];
         if (employees == undefined)
             return reject(new ServerError(status = 400, message = "חוצץ פרטי עובדים חסר"));
         else if (employees[0] === undefined)
             return reject(new ServerError(status = 400, message = "חוצץ פרטי עובדים אינו מכיל מידע על העובדים"));
 
+        // check if sites fields exists
+        fields = Object.values(branchesFieldsName);
+        result = defined_structure(branches[0], fields);
+        if (!result.valid) {
+            return reject(new ServerError(status = 400, message = `פרטי סניפים לא כוללים  ${result.attribute}`));
+        }
+
         // check if employees fields exists
         fields = Object.values(employeeFieldsName);
-        //fields = fields.concat(Object.values(sitesFieldsName));
-        //index = fields.indexOf(sitesFieldsName.NUM_OF_EMPLOYEES);
-        //if (index > -1) {
-        //    fields.splice(index, 1);
-       // }
-        //console.log(employees[0]);
         result = defined_structure(employees[0], fields);
         if (!result.valid) {
             return reject(new ServerError(status = 400, message = `פרטי עובדים לא כוללים  ${result.attribute}`));
         }
         // check and create valid employerObject and siteList
-        Promise.all([handleEmployerData(employerData), siteData.handleSiteData(employees)])
+        Promise.all([handleEmployerData(employerData), siteData.handleBranchData(branches, employees)])
             .then(result => {
                 let employer = result[0];
                 let siteList = result[1];

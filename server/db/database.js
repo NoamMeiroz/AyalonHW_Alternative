@@ -22,6 +22,7 @@ db.sequelize = sequelize;
 db.user = require("../models/user.js")(sequelize, Sequelize);
 db.employer = require("../models/employer.js")(sequelize, Sequelize);
 db.sector = require("../models/sector.js")(sequelize, Sequelize);
+db.locality = require("../models/locality.js")(sequelize, Sequelize);
 db.employerSites = require("../models/employerSites.js")(sequelize, Sequelize);
 db.employee = require("../models/employee.js")(sequelize, Sequelize);
 

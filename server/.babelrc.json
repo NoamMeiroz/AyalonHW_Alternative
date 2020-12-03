@@ -1,0 +1,16 @@
+{
+    "presets": [
+      ["@babel/preset-env", {
+        "debug": true,
+        "targets": {
+          "node": "current"
+        }
+      }]
+    ],
+    "highlightCode": false,
+    "ignore": [
+      "**/__test__",
+      "**/__node_modules__",
+      "**/__logs__"
+    ]
+  }
