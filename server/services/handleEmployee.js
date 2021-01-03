@@ -142,7 +142,6 @@ const findRoutes = (employeeList, sites) => {
             resolve;
          })
          .catch(error => {
-            console.log(error);
             logger.error(error.stack);
             resolve;
          });
@@ -177,7 +176,6 @@ Promise.all(promiseList)
       });
    })
    .catch(error => {
-      console.log(error);
       logger.error(error.stack);
       // return result to main thread
       parentPort.postMessage({ Employees: null, message: error.stack });

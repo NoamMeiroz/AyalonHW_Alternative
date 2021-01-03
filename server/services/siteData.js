@@ -25,9 +25,10 @@ const convertAddress = (branchList) => {
                 result.forEach((value, index, array) => {
                     let error = null;
                     if (value instanceof ServerError) {
+                        logger.info(value);
                         switch (value.status) {
                             case googleAPI.ERRORS.INVALID_ADDRESS_CODE:
-                                error = new ServerError(400, `כתובת סניף ${branchList[index].NAME} לא תקינה.`);
+                                error = new ServerError(400, `כתובת סניף ${branchList[index].NAME} לא תקינה.` );
                                 break;
                             case googleAPI.ERRORS.MISSING_CITY_CODE:
                                 error = new ServerError(400, `לסניף ${branchList[index].NAME} חסר עיר.`);
@@ -106,9 +107,12 @@ const handleBranchData = (branches, emploeesList) => {
             uniqueBranch.set(branch.SITE_ID, branch);
         }
         // count number of emplyees in each unqiue site
-        for (employee of emploeesList) {
+        for (const [index, employee] of emploeesList.entries()) {
             if (!uniqueBranch.has(employee[employeeFieldsName.BRANCH_ID])) {
-                return reject(new ServerError(400, `מספר סניף של עובד  ${employee[employeeFieldsName.EMPLOYER_ID]} שגוי או סניף לא קיים`));
+                let employeeID = `בשורה ${index + 1}`;
+                if (employee[employeeFieldsName.WORKER_ID])
+                    employeeId = employee[employeeFieldsName.WORKER_ID];
+                return reject(new ServerError(400, `מספר סניף של עובד  ${employeeID} שגוי או סניף לא קיים`));
             }
             let branch = uniqueBranch.get(employee[employeeFieldsName.BRANCH_ID]);
             branch.NUM_OF_EMPLOYEES = branch.NUM_OF_EMPLOYEES + 1;

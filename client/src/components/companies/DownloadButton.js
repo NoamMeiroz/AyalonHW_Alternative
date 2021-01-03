@@ -14,6 +14,9 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import SaveRoundedIcon from '@material-ui/icons/SaveRounded';
 
+const MAX_WALK_TIME = 30;
+const MAX_BICYCLE_TIME = 60;
+
 class DownloadButton extends Component {
 
    constructor() {
@@ -56,7 +59,7 @@ class DownloadButton extends Component {
     */
    getTransitDescription = (transitDescription) => {
       if (transitDescription.error)
-         return transitDescription.error;
+         return {description: transitDescription.error};
       let bestRoute = this.findFastestRoute(transitDescription);
       const steps = bestRoute.legs[0].steps;
       let walkingDuration = 0;
@@ -95,7 +98,8 @@ class DownloadButton extends Component {
       // add total length and length
       description = description + `\nסה"כ ${bestRoute.legs[0].duration.text} למרחק של ${bestRoute.legs[0].distance.text}`;
       description = this.translate(description);
-      return description
+      let result = {description: description, duration: bestRoute.legs[0].duration.value, distance: bestRoute.legs[0].distance.value};
+      return result;
    }
 
    /**
@@ -104,7 +108,7 @@ class DownloadButton extends Component {
     */
    getBicycleDescription = (bicycleDescription) => {
       if (bicycleDescription.error)
-         return bicycleDescription.error;
+         return {description: bicycleDescription.error};
       const steps = bicycleDescription[0].legs[0].steps;
       let bicycle = [];
       let description = "";
@@ -125,18 +129,14 @@ class DownloadButton extends Component {
          return "";
 
       // 90 minute ride is not recommended
-      if ((bicycleDescription[0].legs[0].duration.value / 60) > 90)
+      if ((bicycleDescription[0].legs[0].duration.value / 60) > MAX_BICYCLE_TIME)
          return "";
 
       // add total length and length
       description = `סה"כ ${bicycleDescription[0].legs[0].duration.text} למרחק של ${bicycleDescription[0].legs[0].distance.text}\n`;
-
-      // add all streets
-      /*bicycle.forEach((currentStep, index, array) => {
-         description = description + currentStep + '\n';
-      });*/
       description = this.translate(description);
-      return description
+      let result = {description: description, duration: bicycleDescription[0].legs[0].duration.value, distance: bicycleDescription[0].legs[0].distance.value};
+      return result;
    }
 
    /**
@@ -145,7 +145,7 @@ class DownloadButton extends Component {
     */
    getWalkingDescription = (walkingDescription) => {
       if (walkingDescription.error)
-         return walkingDescription.error;
+         return {description: walkingDescription.error};
       const steps = walkingDescription[0].legs[0].steps;
       let walking = [];
       let description = "";
@@ -166,18 +166,14 @@ class DownloadButton extends Component {
          return "";
 
       // 60 minute walking is not recommended
-      if ((walkingDescription[0].legs[0].duration.value / 60) > 60)
+      if ((walkingDescription[0].legs[0].duration.value / 60) > MAX_WALK_TIME)
          return "";
 
       // add total length and length
       description = `סה"כ ${walkingDescription[0].legs[0].duration.text} למרחק של ${walkingDescription[0].legs[0].distance.text}\n`;
-
-      // add all streets
-      /*walking.forEach((currentStep, index, array) => {
-         description = description + currentStep + '\n';
-      });*/
       description = this.translate(description);
-      return description
+      let result = {description: description, duration: walkingDescription[0].legs[0].duration.value, distance: walkingDescription[0].legs[0].distance.value};
+      return result;
    }
 
 
@@ -187,7 +183,7 @@ class DownloadButton extends Component {
     */
    getDrivingDescription = (drivingDescription) => {
       if (drivingDescription.error)
-         return drivingDescription.error;
+         return {description: drivingDescription.error};
       let bestRoute = this.findFastestRoute(drivingDescription);
       const steps = bestRoute.legs[0].steps;
       let driving = [];
@@ -204,19 +200,15 @@ class DownloadButton extends Component {
          }
       });
 
-      // no bicycle ride is suggested
+      // no driving ride is suggested
       if (driving.length === 0)
          return "";
 
       // add total length and length
       description = `סה"כ ${bestRoute.legs[0].duration.text} למרחק של ${bestRoute.legs[0].distance.text}\n`;
-
-      // add all streets
-      /*driving.forEach((currentStep, index, array) => {
-         description = description + currentStep + '\n';
-      });*/
       description = this.translate(description);
-      return description
+      let result = {description: description, duration: bestRoute.legs[0].duration.value, distance: bestRoute.legs[0].distance.value};
+      return result;
    }
 
    saveEmployeesList = (employerId, fileName) => {
@@ -226,14 +218,42 @@ class DownloadButton extends Component {
             let employeeList = payload.data;
             if (employeeList && !(typeof employeeList === "string")) {
                employeeList.forEach((emp) => {
+                  emp.ERROR = "";
+                  let temp = {};
                   if (!emp.BEST_ROUTE.error) {
-                     emp.transit = this.getTransitDescription(emp.BEST_ROUTE.transit);
-                     emp.bicycling = this.getBicycleDescription(emp.BEST_ROUTE.bicycling);
-                     emp.walking = this.getWalkingDescription(emp.BEST_ROUTE.walking);
-                     emp.driving = this.getDrivingDescription(emp.BEST_ROUTE.driving);
+                     temp = this.getTransitDescription(emp.BEST_ROUTE.transit);
+                     emp.transit = temp.description;
+                     emp.transit_duration = temp.duration;
+                     emp.transit_distance = temp.distance;
+                     temp = this.getBicycleDescription(emp.BEST_ROUTE.bicycling);
+                     emp.bicycling = temp.description;;
+                     emp.bicycling_duration = temp.duration;
+                     emp.bicycling_distance = temp.distance;
+                     temp = this.getWalkingDescription(emp.BEST_ROUTE.walking);
+                     emp.walking = temp.description;
+                     emp.walking_duration = temp.duration;
+                     emp.walking_distance = temp.distance;
+                     temp = this.getDrivingDescription(emp.BEST_ROUTE.driving);
+                     emp.driving = temp.description;
+                     emp.driving_duration = temp.duration;
+                     emp.driving_distance = temp.distance;
                   }
                   else {
                      emp.ERROR = emp.BEST_ROUTE.error;
+                  }
+                  try{
+                  if (emp.transit!==undefined && emp.transit.includes("שגיאה"))
+                     emp.ERROR = emp.ERROR + "\nחישוב מסלול תחבורה ציבורית נכשל.";
+                  if (emp.bicycling!==undefined && emp.bicycling.includes("שגיאה"))
+                     emp.ERROR = emp.ERROR + "\nחישוב מסלול רכיבה נכשל.";
+                  if (emp.walking!==undefined && emp.walking.includes("שגיאה"))
+                     emp.ERROR = emp.ERROR + "\nחישוב מסלול הליכה נכשל.";
+                  if (emp.driving!==undefined && emp.driving.includes("שגיאה"))
+                     emp.ERROR = emp.ERROR + "\nחישוב מסלול נהיגה עצמית נכשל.";
+                  }
+                  catch(error) {
+                     console.log(error);
+                     console.log(emp);
                   }
                   delete emp.BEST_ROUTE;
                });
@@ -256,9 +276,17 @@ class DownloadButton extends Component {
       { header: 'מספר בניין', key: 'BUILDING_NUMBER', width: 12 },
       { header: 'כתובת מקום העבודה', key: 'WORK_SITE', width: 50 },
       { header: 'תחבורה ציבורית מומלצת', key: 'transit', width: 50 },
+      { header: 'תחבורה ציבורית-משך בשניות', key: 'transit_duration', width: 50 },
+      { header: 'תחבורה ציבורית-מרחק במטרים', key: 'transit_distance', width: 50 },
       { header: 'מסלול אופניים מומלץ', key: 'bicycling', width: 50 },
+      { header: 'אופניים-משך בשניות', key: 'bicycling_duration', width: 50 },
+      { header: 'אופניים-מרחק במטרים', key: 'bicycling_distance', width: 50 },
       { header: 'מסלול הליכה מומלץ', key: 'walking', width: 50 },
+      { header: 'הליכה-משך בשניות', key: 'walking_duration', width: 50 },
+      { header: 'הליכה-מרחק במטרים', key: 'walking_distance', width: 50 },
       { header: 'מסלול לנהיגה עצמית מומלץ', key: 'driving', width: 50 },
+      { header: 'נהיגה-משך בשניות', key: 'driving_duration', width: 50 },
+      { header: 'נהיגה-מרחק במטרים', key: 'driving_distance', width: 50 },
       { header: 'שגיאות ברשומה', key: 'ERROR', width: 50 }];
 
       ws.getColumn('transit').alignment = { vertical: 'top', horizontal: 'right', wrapText: true, readingOrder: 'rtl' };
@@ -277,11 +305,11 @@ class DownloadButton extends Component {
             return;
          //apply conditional formatting
          ws.addConditionalFormatting({
-            ref: `A${rowNumber}:I${rowNumber}`,
+            ref: `A${rowNumber}:R${rowNumber}`,
             rules: [
                {
                   type: 'expression',
-                  formulae: [`IF($J$${rowNumber}<>"", 1, 0)`],
+                  formulae: [`IF($R$${rowNumber}<>"", 1, 0)`],
                   style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFF0000' } } },
                }
             ]

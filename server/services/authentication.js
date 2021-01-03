@@ -1,4 +1,5 @@
 const jwt = require("jwt-simple");
+const { v4: uuidv4 } = require('uuid');
 const userSchema = require("../db/userSchema");
 const {logger} = require("../log");
 
@@ -34,6 +35,9 @@ const singup = function(req, res, next) {
 }
 
 const signin = function(req, res) {
+  // const id = uuidv4();
+
+ //  req.session.userId = id;
    return res.status(200).send({ token: tokenForUser(req.user.userId)});
 }
 

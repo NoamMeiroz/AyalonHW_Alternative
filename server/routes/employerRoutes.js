@@ -20,7 +20,7 @@ router.post("/upload/", requireAuth, async (req, res, next) => {
    let xlsxSheets;
    xlsxSheets = await excel.post_file(req, res, url.query.f);
    if (xlsxSheets) {
-      companyData.readSheet(xlsxSheets).then(data => {
+      companyData.readSheet(req, xlsxSheets).then(data => {
          res.status(200).json(data);
       }).catch(error => {
          if (error.status)

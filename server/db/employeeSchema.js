@@ -1,6 +1,6 @@
 const db = require("./database");
 const { getMessage } = require("./errorCode");
-const { isFinishedWithEmployees } = require("./employerSchema");
+const { loadingStatus } = require("./employerSchema");
 const Employee = db.employee;
 const Employer = db.employer;
 const EmployerSites = db.employerSites;
@@ -121,12 +121,12 @@ const getEmployees = (employerList, livingCity=[], workingCity=[], callback) => 
  */
 const getPrecentFinished = (employerID, callback) => {
    // check if finished with employees by checking the status in the employers table
-   isFinishedWithEmployees(employerID, (err, data) => {
+   loadingStatus(employerID, (err, data) => {
       if (err)
          callback(err, getMessage(err));
       // if result is true return 100 precent;
       else if (data) {
-         return callback(null, 100);
+         callback(null, 100);
       }
       // 
       else {
@@ -151,12 +151,15 @@ const getPrecentFinished = (employerID, callback) => {
             else {
                precent = Math.ceil((countFinished / total) * 100);
             }
-            return callback(null, precent);
+            callback(null, precent);
          })
          .catch(err => {
-            return callback(err, getMessage(err));
+            callback(err, getMessage(err));
          });
       }
    });
 }
-module.exports = { insertBulk, updateRoute, getEmployeesOfEmployer, getPrecentFinished, getEmployees };
+
+
+module.exports = { insertBulk, updateRoute, getEmployeesOfEmployer, getPrecentFinished, 
+   getEmployees };

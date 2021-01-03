@@ -6,3 +6,8 @@
 input.hidden {
     display: none
   }
+
+.actionButton {
+      padding-right: 8px;
+      padding-left: 8px;
+}

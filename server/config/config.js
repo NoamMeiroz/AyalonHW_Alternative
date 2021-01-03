@@ -12,11 +12,10 @@ module.exports = {
       SECTOR: "מגזר",
       NUMBER_OF_EMPLOYEES: "מספר עובדים",
       NUMBER_OF_SITES: "מספר סניפים",
-      PRIVATE_CAR: "רכב צמוד",
-//      SHUTTLE: "שאטלים",
-      MASS_TRANSPORTATION: "שירות הסעות",
-      CAR_POOL: "Carpool",
-      WORK_FROM_HOME: "עבודה מהבית"
+      PRIVATE_CAR_SOLUTION: "רכב צמוד",
+      MASS_TRANSPORTATION_SOLUTION: "שירות הסעות",
+      CAR_POOL_SOLUTION: "Carpool",
+      WORK_FROM_HOME_SOLUTION: "עבודה מהבית"
    },
    branchesFieldsName: {
       SITE_ID: "מספר סניף",

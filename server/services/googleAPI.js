@@ -2,7 +2,7 @@ const axios = require('axios');
 const proj4 = require('proj4');
 const { ServerError, logger } = require('../log');
 const tools = require('../tools');
-const { debug } = require('winston');
+const { debug, error } = require('winston');
 const localityService = require('../services/localityData');
 
 const ERRORS = {
@@ -11,7 +11,11 @@ const ERRORS = {
    MISSING_STREET_CODE: 1002,
    MISSING_BUILDING_NUMBER_CODE: 1003,
    MISSING_ORIGIN_CODE: 1004,
-   MISSING_DESTINATION_CODE: 1005
+   MISSING_DESTINATION_CODE: 1005,
+   INVALID_CITY: 1006,
+   INVALID_STREET: 1007,
+   CITY_CODE_NOT_FOUND: 1008,
+   HELKA_NOT_FOUND: 1009
 };
 
 const LOCATION_TYPE = ["street_address", "route", "establishment", "hospital"];
@@ -96,23 +100,27 @@ getCoordinates = (payload, index) => {
  * @param {String} street 
  * @param {int} buildingNumber 
  */
-const convertLocation = async (city, street, buildingNumber) => {
+const convertLocation = async (cityParam, streetParam, buildingNumber) => {
    return new Promise(function (resolve, reject) {
       // check for valid addrees
-      if (!city) {
+      
+      if (!cityParam) {
          return resolve(new ServerError(ERRORS.MISSING_CITY_CODE, "missing city"));
       }
-      if (!street) {
+      if (!streetParam) {
          return resolve(new ServerError(ERRORS.MISSING_STREET_CODE, "missing street"));
       }
       if (buildingNumber === null) {
          return resolve(new ServerError(ERRORS.MISSING_BUILDING_NUMBER_CODE, "missing building number"));
       }
+      let city = cityParam.trim();
       if (!tools.isHebrewLetter(city)) {
-         return resolve(new ServerError(ERRORS.INVALID_ADDRESS_CODE, "City name is incorrect:" + city));
+         return resolve(new ServerError(ERRORS.INVALID_CITY, "City name is incorrect:" + city));
       }
+      let street = tools.removeLastWordWithDigits(streetParam).trim();
+
       if (!tools.isHebrewLetter(street)) {
-         return resolve(new ServerError(ERRORS.INVALID_ADDRESS_CODE, "Street name is incorrect:" + street));
+         return resolve(new ServerError(ERRORS.INVALID_STREET, "Street name is incorrect:" + street));
       }
 
       let address = `${street} ${buildingNumber}, ${city}`;
@@ -134,8 +142,11 @@ const convertLocation = async (city, street, buildingNumber) => {
                else {
                   findLocality(result.X, result.Y)
                      .then(locality => {
-                        if (locality instanceof ServerError)
+                        if (locality instanceof ServerError) {
+                           locality.X = result.X;
+                           locality.Y = result.Y;
                            return resolve(locality);
+                        }
                         else {
                            result.CITY = locality; 
                            return resolve(result);
@@ -168,36 +179,43 @@ const findLocality = async (x, y) => {
       axios.get(url)
          .then(res => {
             if (res.data.features.length > 0) {
-               return localityService.getLocality(res.data.features[0].attributes.LOCALITY_I);
+               if (res.data.features[0].attributes.LOCALITY_I!==0)
+                  return localityService.getLocality(res.data.features[0].attributes.LOCALITY_I);
+               else
+                  return (resolve(new ServerError(ERRORS.HELKA_NOT_FOUND, "location is not mapped in service: "+ address)));
             }
             else
-               return (resolve(new ServerError(ERRORS.INVALID_ADDRESS_CODE, "City name is incorrect")));
+               return (resolve(new ServerError(ERRORS.HELKA_NOT_FOUND, "location is not mapped in service: "+ address)));
          })
          .then(result => {
             if (result instanceof ServerError)
-               resolve(result)
+               return resolve(result)
             else if( result )
-               resolve(result.NAME);
+               return resolve(result.NAME);
             else
-               resolve(new ServerError(ERRORS.INVALID_ADDRESS_CODE, "City name doesn't appear in the db"));
+               return resolve(new ServerError(ERRORS.CITY_CODE_NOT_FOUND, "City name doesn't appear in the db. Adrress:" + address ));
          })
          .catch((err) => {
-            console.log(err);
             return reject(err);
          });
    });
 }
 
-
-
+/**
+ * Return OK if response was good. 
+ * Else if no results return {}
+ * else if error return the error description
+ * @param {google json response} payload 
+ */
 const checkRouteResults = (payload) => {
    let status = payload.status;
-   let result = null;
+   let result = 'OK';
    switch (status) {
       case 'OK':
+         return status
          break;
       case 'REQUEST_DENIED':
-         result = new ServerError(500, "Google api denied the request");
+         result = "Google api denied the request";
          break;
       case 'NOT_FOUND':
          result = {};
@@ -206,7 +224,7 @@ const checkRouteResults = (payload) => {
          result = {};
          break;
       default:
-         result = new ServerError(500, "Google api denied the request: " + status);
+         result = "Google api denied the request: " + JSON.stringify(status);
          break;
    }
    return result;
@@ -258,21 +276,21 @@ const getRoutes = async (origin, destination) => {
          .then((routesResponeList) => {
             suggestedRoutes = {};
             routesResponeList.forEach((res, index, array) => {
-               error = checkRouteResults(res.data);
-               if (!error) {
+               let result = checkRouteResults(res.data);
+               if (result==='OK') {
                   suggestedRoutes[modeList[index]] = res.data.routes;
                }
-               else if (error === {})
+               else if (result === {})
                   suggestedRoutes[modeList[index]] = { error: "לא נמצא מסלול" };
                else {
-                  suggestedRoutes[modeList[index]] = { error: "שגיאה במערכת. לא ניתן לחשב מסלול" };
-                  logger.error(error);
+                  suggestedRoutes[modeList[index]] = { error: "שגיאה במערכת. לא ניתן לחשב מסלול - " + JSON.stringify(result)};
+                  logger.error(JSON.stringify(result));
                }
             });
             return resolve(suggestedRoutes);
 
          }).catch((error) => {
-            logger.error(error);
+            logger.error(error.stack);
             modeList.forEach((mode, index, array) => {
                suggestedRoutes[mode] = { error: "שגיאה במערכת. לא ניתן לחשב מסלול" };
             });

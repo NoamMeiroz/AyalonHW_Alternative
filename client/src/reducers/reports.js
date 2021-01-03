@@ -2,7 +2,6 @@
 import { QUERY_COMPANY, SETTLEMENT_LIST, SHARE_POTENTIAL } from '../actions/types';
 
 const INITIAL_STATE = {
-    errorMessage: '',
     employeesList: [],
     settlementList: [],
     timestamp: new Date()

@@ -1,29 +1,22 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
+import * as actions from '../../actions'; 
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField'
 import Grid from '@material-ui/core/Grid';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 
-import * as actions from '../../actions';
 import requireAuth from '../requireAuth'; //used to check if login successfull
 import './HeatmapQueryPanel.css';
 
 const CITY = "NAME";
 
-class HeatmapQueryPanel extends Component {
+class HeatmapQueryPanel extends PureComponent {
 
     state = {
         company: null,
         livingCity: null,
         workingCity: null
-    }
-    componentDidMount() {
-        this.props.getData();
-        this.props.getSettlementList();
-        this.props.getEmployees(null,
-            null,
-            null);
     }
 
     handleClick = () => {
@@ -140,31 +133,3 @@ function mapStateToProps(state) {
 
 export default requireAuth(
     connect(mapStateToProps, actions)(HeatmapQueryPanel));
-
-/*
-<Autocomplete
-                            id="combo-box-companies"
-                            options={this.props.companies}
-                            getOptionLabel={(option) => option.NAME}
-                            style={{ width: 300 }}
-                            renderInput={(params) => <TextField {...params} label="רשימת חברות" variant="outlined" />}
-                            onChange={(event, value) => { this.setState({ company: value }) }}
-                        />
- <Autocomplete
-                        id="living_city"
-                        options={this.props.settlementList}
-
-                        style={{ width: 300 }}
-                        renderInput={(params) => <TextField {...params} label="ישוב המגורים" variant="outlined" />}
-                        onChange={(event, value) => { this.setState({  livingCity: value }) }}
-                    />
-
-                    <Autocomplete
-                            id="working_city"
-                            options={this.props.settlementList}
-                            getOptionLabel={(option) => option[CITY]}
-                            style={{ width: 300 }}
-                            renderInput={(params) => <TextField {...params} label="ישוב העבודה" variant="outlined" />}
-                            onChange={(event, value) => { this.setState({ workingCity: value }) }}
-                        />
-*/

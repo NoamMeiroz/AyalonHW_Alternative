@@ -3,9 +3,8 @@
  * and the letters: _,-, ,(,),",'
  * @param {string} s 
  */
-function isHebrewLetter(s)
-{
-   let result =  s.match("^([א-ת]+(?:(\. )|-| |'|\"))*[א-ת]*$");    
+function isHebrewLetter(s) {
+   let result = s.match("^([א-ת]+(?:(\. )|- | - | -|-| |'|\"|״|\`))*[א-ת]*$");
    if (result)
       return true;
    else
@@ -88,7 +87,7 @@ function sleep(ms) {
  */
 function convertStringToArray(str) {
    let result = null;
-   if (str && str !== '' && str!=='null') {
+   if (str && str !== '' && str !== 'null') {
       try {
          result = str.split(",");
       }
@@ -99,6 +98,31 @@ function convertStringToArray(str) {
    return result;
 }
 
+/**
+ * if string cotains digits then return true
+ * @param {string} myString 
+ */
+function hasDigits(myString) {
+   return /\d/.test(myString);
+ }
 
-module.exports = { isInteger, getNearestWorkDay, getFirstNumberInString, isHebrewLetter,
-   sleep, convertStringToArray }; 
+/**
+ * Remove the last word from a string if it contains digits.
+ * @param {*string} v 
+ */
+function removeLastWordWithDigits(myString) {
+   let temp = myString.split(" ");
+   if (hasDigits(myString)) {
+      temp = myString.split(" ");
+      building = temp[temp.length - 1];
+      if (hasDigits(building))
+         temp.pop();
+   }
+   return temp.join(" ");
+}
+
+
+module.exports = {
+   isInteger, getNearestWorkDay, getFirstNumberInString, isHebrewLetter,
+   sleep, convertStringToArray, removeLastWordWithDigits, hasDigits
+}; 

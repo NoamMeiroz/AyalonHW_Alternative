@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import {  useDispatch } from "react-redux";
 
+import WebSocketProvider from './webSocket';
 import StatusSnackBar from './common/StatusSnackBar';
 import { makeStyles } from '@material-ui/core/styles';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-
 
 import './App.css';
 import HeaderBar from './HeaderBar';
@@ -76,9 +77,12 @@ const useStyles = makeStyles((theme) => ({
 
 function App({ children }) {
 	const classes = useStyles();
+	const dispatch = useDispatch();
+
 	return (
 		<RTL>
 			<ThemeProvider theme={theme}>
+			<WebSocketProvider>
 				<div className={classes.root} dir="rtl">
 					<HeaderBar />
 					<main>
@@ -87,6 +91,7 @@ function App({ children }) {
 					<SideBar className={classes.drawer} />
 				</div>
 				<StatusSnackBar />
+				</WebSocketProvider>
 			</ThemeProvider >
 		</RTL >
 	);

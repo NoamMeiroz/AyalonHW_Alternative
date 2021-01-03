@@ -1,12 +1,14 @@
 import axios from 'axios';
-import {
-    AUTH_USER, AUTH_ERROR, FILE_UPLOAD,
-    LOAD_DATA, EMPLOYEES_DATA,
-    CHECK_PROGRESS, ERROR, MESSAGE
-} from './types';
+import { AUTH_USER, AUTH_ERROR, MESSAGE, CONNECTED } from './types';
 import * as actionUtils from '../utils/actionsUtil';
+import { getSettlementList, getEmployees} from './report';
+import { getData } from './company';
+
 
 export * from './report';
+export * from './company';
+export * from './notifications';
+
 /**
  * Signin method.If success then store user token localy
  * @param {*} formProps 
@@ -45,96 +47,28 @@ export const signOut = () => {
 }
 
 /**
+ * Signout method. removes token from local store
+ */
+export const connected = (isConnected) => {
+    return (dispatch) => {
+        if (isConnected){
+            dispatch(getData());
+            dispatch(getSettlementList());
+            dispatch(getEmployees(null,
+                null,
+                null));
+        }
+        else 
+            dispatch(showMessage("קיימת בעיית תקשורת עם השרת"));
+        dispatch({ type: CONNECTED, connected: isConnected });
+    }
+}
+
+
+/**
 * used to show snakbarMessage
 */
 export const showMessage = (message) => {
     return { type: MESSAGE, message: message };
 }
 
-/**
- * Upload xlsx file into the server
- * @param {*} file 
- * @param {*} callback 
- */
-export const upload = (file, callback) => {
-    const form = new FormData();
-    form.append("file", file);
-    return (dispatch) => {
-        axios.post(`/api/employer/upload/`,
-            form,
-            {
-                headers: {
-                    'Content-Type': `multipart/form-data; boundary=${form._boundary}`,
-                    'authorization': localStorage.getItem('token')
-                }
-            }).then(data => {
-                dispatch({ type: FILE_UPLOAD, isSuccess: true, data: data.data });
-                dispatch(checkProgress(data.data.id));
-            }).catch(err => {
-                let message = actionUtils.handleError(err);
-                dispatch({ type: ERROR, errorMessage: message })
-            });
-    }
-};
-
-/**
- * return the company list stores in server
- */
-export const getData = () => {
-    return (dispatch) => {
-        axios.get(`/api/employer/`, actionUtils.getAxiosHeader())
-            .then(payload => {
-                dispatch({ type: LOAD_DATA, isSuccess: true, sectorList: payload.data.sectors, companyList: payload.data.companies });
-            }).catch(err => {
-                let message = actionUtils.handleError(err);
-                dispatch({ type: ERROR, errorMessage: message, sectorList: {}, companyList: [] });
-            });
-    }
-};
-
-/**
- * return the company list stores in server
- */
-export const getEmployeesOfEmployer = (employerId) => {
-    return (dispatch) => {
-        axios.get(`/api/employer/${employerId}/employee`, actionUtils.getAxiosHeader())
-            .then(payload => {
-                dispatch({ type: EMPLOYEES_DATA, isSuccess: true, employeesList: payload.data });
-            }).catch(err => {
-                let message = actionUtils.handleError(err);
-                dispatch({ type: ERROR, errorMessage: message });
-            });
-    }
-};
-
-export const checkProgress = (employerId) => {
-    return (dispatch) => {
-        axios.get(`/api/employer/${employerId}/employee/precentReady`, actionUtils.getAxiosHeader())
-            .then(payload => {
-                if (payload.data.precent || payload.data.precent >= 0) {
-                    dispatch({
-                        type: CHECK_PROGRESS,
-                        employerID: payload.data.employerID,
-                        uploadProgess: payload.data.precent
-                    });
-                }
-                else {
-                    let message = "בעיה במערכת, תשובה מהשרת לא תקינה";
-                    dispatch({ type: ERROR, errorMessage: message, employerID: employerId });
-                    dispatch({
-                        type: CHECK_PROGRESS,
-                        employerID: payload.data.employerID,
-                        uploadProgess: 100
-                    });
-                }
-            }).catch(err => {
-                let message = actionUtils.handleError(err);
-                dispatch({ type: ERROR, errorMessage: message, employerID: employerId });
-                dispatch({
-                    type: CHECK_PROGRESS,
-                    employerID: employerId,
-                    uploadProgess: 100
-                });
-            });
-    }
-};

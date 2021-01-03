@@ -84,7 +84,7 @@ class SideBar extends Component {
                                 }}
                                 component={Link} to="/dashboard">
                                 <RoomIcon />
-                                Dashboard
+                                מפת חום
                             </IconButton>
                         </div>
                         <div>
@@ -96,7 +96,7 @@ class SideBar extends Component {
                                 }}
                                 component={Link} to="/companies">
                                 <EmojiTransportationIcon />
-                                קליטת נתונים
+                                רשימת החברות
                             </IconButton>
                         </div>
                         <div>

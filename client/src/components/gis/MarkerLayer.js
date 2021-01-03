@@ -4,16 +4,17 @@ import L from 'leaflet';
 
 import './MarkerLayer.css';
 
-class WokerLayer extends Component {
+class MarkerLayer extends Component {
 
     getIcon(iconName, color) {
         var m;
         if (iconName)
             m = new L.divIcon({
                 className: `custom-div-icon-${iconName}`,
-                html: `<div style="background-color:${color}" class='marker-pin'></div><i/>`,
+                html: `<div style="background-color:${color}" class='shape-marker-pin'></div><i/>`,
                 iconSize: [30, 42],
-                iconAnchor: [15, 42]
+                iconAnchor: [15, 42],
+                popupAnchor:[0, -30]
             });
         else
             m = new L.Icon.Default();
@@ -57,4 +58,4 @@ class WokerLayer extends Component {
 }
 
 
-export default WokerLayer;
+export default MarkerLayer;
