@@ -2,10 +2,18 @@ const { workerData, parentPort } = require('worker_threads')
 const employeeSchema = require('../db/employeeSchema');
 const empFields = require("../config/config").employeeFieldsName;
 
-const { getFirstNumberInString, sleep } = require('../tools');
+const { getFirstNumberInString, sleep, isInteger } = require('../tools');
 const googleAPI = require("./googleAPI");
 const { ServerError, logger } = require('../log');
-const employee = require('../models/employee');
+const { ConsoleTransportOptions } = require('winston/lib/winston/transports');
+
+//const employee = require('../models/employee');
+
+const GRADE_COLUMNS = ["SHORT_HOURS_GRADE", "SHIFTING_HOURS_GRADE",
+   "BICYCLE_GRADE", "SCOOTER_GRADE", "PERSONALIZED_SHUTTLE_GRADE",
+   "WORK_SHUTTLE_GRADE", "CARSHARE_GRADE", "CARPOOL_GRADE",
+   "CABSHARE_GRADE", "PUBLIC_TRANSPORT_GRADE", "WALKING_GRADE",
+   "WORKING_FROM_HOME_GRADE", "SHARED_WORKSPACE_GRADE", "SHIFTING_WORKING_DAYS_GRADE"];
 
 /**----------------------------------------------------------
  * Healper functions
@@ -16,10 +24,9 @@ const save = async function (employee) {
       // save all employees in the db
       employeeSchema.insertBulk(employee, (err, data) => {
          if (err) {
-            console.log(err.stack);
             return reject(err);
          }
-         return resolve(data.dataValues);
+         return resolve(data);
       });
    });
 }
@@ -51,7 +58,7 @@ const findRoutes = async function (employee, sites) {
             return resolve(employee);
          })
          .catch(error => {
-            logger.error(error.stack);
+            logger.error(error);
             return reject(error);
          });
    });
@@ -68,9 +75,10 @@ const findCoordinates = async (employee) => {
          .then(value => {
             // check type of error and set an error message in BEST_ROUTE
             if (value instanceof ServerError) {
+               logger.info(value);
                switch (value.status) {
                   case googleAPI.ERRORS.INVALID_ADDRESS_CODE:
-                     employee.BEST_ROUTE = { error: "כתובת העובד לא חוקית." };
+                     employee.BEST_ROUTE = { error: "כתובת העובד אינה תקינה." };
                      break;
                   case googleAPI.ERRORS.MISSING_CITY_CODE:
                      employee.BEST_ROUTE = { error: "חסר עיר מגורים" };
@@ -84,6 +92,22 @@ const findCoordinates = async (employee) => {
                      employee.BEST_ROUTE = { error: "חסר מספר בניין" };
                      employee.BUILDING_NUMBER = 0;
                      break;
+                  case googleAPI.ERRORS.INVALID_CITY:
+                     employee.BEST_ROUTE = { error: "בעיית איות בשם העיר" };
+                     break;
+                  case googleAPI.ERRORS.INVALID_STREET:
+                     employee.BEST_ROUTE = { error: "בעיית איות בשם הרחוב" };
+                     break;
+                  case googleAPI.ERRORS.MISSING_CITY_CODE:
+                     logger.error(value);
+                     employee.X = value.X;
+                     employee.Y = value.Y;
+                     break;
+                  case googleAPI.ERRORS.HELKA_NOT_FOUND:
+                     logger.error(value);
+                     employee.X = value.X;
+                     employee.Y = value.Y;
+                     break;
                   default:
                      employee.BEST_ROUTE = { error: "שגיאה לא ידועה" };
                      break;
@@ -96,11 +120,11 @@ const findCoordinates = async (employee) => {
                employee.Y = value.Y;
                employee.CITY = value.CITY;
             }
-            resolve(employee);
+            return resolve(employee);
          })
          .catch(error => {
-            console.log(error);
-            reject(error);
+            logger.error(error);
+            return reject(error);
          });
 
    });
@@ -118,7 +142,11 @@ const insertEmployee = async function (employeeList) {
       let promiseList = []
       // calculate coordination
       employeeList.forEach(employee => {
-         promiseList.push(findCoordinates(employee));
+         // find coordinates only if there is no error in the record
+         if (employee.BEST_ROUTE === null)
+            promiseList.push(findCoordinates(employee));
+         else
+            promiseList.push(employee);
       });
       Promise.all(promiseList)
          .then(employees => {
@@ -136,12 +164,10 @@ const insertEmployee = async function (employeeList) {
                   return resolve(data);
                })
                .catch(error => {
-                  console.log(error);
                   return reject(error);
                });
          })
          .catch(error => {
-            console.log(error);
             return reject(error);
          });
 
@@ -171,6 +197,7 @@ const runAndWait = async (waitTime, callback, employeeList) => {
 /**----------------------------------------------------------
  * Main thread
  * -------------------------------------------------------- */
+
 const employer = workerData.employer;
 var employeeList = workerData.employees;
 const sites = employer.Sites;
@@ -199,12 +226,20 @@ let empList = employeeList.map((emp) => {
       SHARED_WORKSPACE_GRADE: emp[empFields.SHARED_WORKSPACE_GRADE],
       SHIFTING_WORKING_DAYS_GRADE: emp[empFields.SHIFTING_WORKING_DAYS_GRADE]
    }
-
+   let error = "";
+   for (column of GRADE_COLUMNS) {
+      if (!isInteger(employee[column])) {
+         employee[column] = null;
+         error = error + `הערך ב-${empFields[column]} אינו חוקי.`;
+      }
+   }
+   if (error !== "")
+      employee.BEST_ROUTE = { error: error };
    return employee;
 });
 logger.info(`employer ${employer.NAME}: calculation employees coordinates`)
 
-let awaitTime = 3000;
+let awaitTime = 5000;
 let chunk = 5;
 let promiseList = [];
 // work on chunck of employees to avoid huge bulk insert and to much requests of the google api at once
@@ -226,7 +261,7 @@ Promise.all(promiseList)
 
    })
    .catch(error => {
-      logger.error(error.stack);
+      logger.error(error);
       // return result to main thread
       parentPort.postMessage({ Employees: null, message: error.stack });
    });

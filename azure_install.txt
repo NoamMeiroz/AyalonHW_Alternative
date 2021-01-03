@@ -75,7 +75,10 @@ sudo mount -a
 // make a folder for the db data (mysql db files) in the datadrive
 cd datadrive
 sudo mkdir db-data
+sudo mkdir logs
 sudo chown NativeLaasakimAH: db-data
+sudo chown NativeLaasakimAH: logs
+
 
 //------------------------- step 3 -----------------------------
 // Prequisits: NativeLaasakimCR Container Registry on the azure

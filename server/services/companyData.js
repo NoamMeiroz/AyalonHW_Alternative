@@ -3,9 +3,15 @@ const employerSchema = require("../db/employerSchema");
 const empFields = require("../config/config").employerFieldsName;
 const siteData = require("./siteData");
 const employeesData = require("./employeesData");
-const employer = require('../models/employer');
 const { branchesFieldsName, employeeFieldsName } = require('../config/config');
+const tools = require("../tools");
 
+const INT_COLUMNS = ["NUMBER_OF_EMPLOYEES",
+    "NUMBER_OF_SITES"];
+const YES_NO_COLUMNS = ["PRIVATE_CAR_SOLUTION",
+    "MASS_TRANSPORTATION_SOLUTION",
+    "CAR_POOL_SOLUTION",
+    "WORK_FROM_HOME_SOLUTION"]
 
 /**
  * Check if sheet has all attributes
@@ -72,19 +78,28 @@ const handleEmployerData = (data) => {
                     SECTOR: currSector.dataValues.id,
                     NUMBER_OF_EMPLOYEES: data[empFields.NUMBER_OF_EMPLOYEES],
                     NUMBER_OF_SITES: data[empFields.NUMBER_OF_SITES],
-                    PRIVATE_CAR_SOLUTION: BOOL[data[empFields.PRIVATE_CAR]],
-                    MASS_TRANSPORTATION_SOLUTION: BOOL[data[empFields.MASS_TRANSPORTATION]],
-                    CAR_POOL_SOLUTION: BOOL[data[empFields.CAR_POOL]],
-                    WORK_FROM_HOME_SOLUTION: BOOL[data[empFields.WORK_FROM_HOME]],
+                    PRIVATE_CAR_SOLUTION: BOOL[data[empFields.PRIVATE_CAR_SOLUTION]],
+                    MASS_TRANSPORTATION_SOLUTION: BOOL[data[empFields.MASS_TRANSPORTATION_SOLUTION]],
+                    CAR_POOL_SOLUTION: BOOL[data[empFields.CAR_POOL_SOLUTION]],
+                    WORK_FROM_HOME_SOLUTION: BOOL[data[empFields.WORK_FROM_HOME_SOLUTION]],
                     EMPLOYER_ID: 0
                 };
+                // check if value in columns is integer.
+                for (let column of INT_COLUMNS) {
+                    if (!tools.isInteger(employer[column]) || employer[column]<-1)
+                        return reject(new ServerError(400, `עמודה ${empFields[column]} חייבת להכיל ערך מספרי חיובי שלם`));
+                }
+                for (let column of YES_NO_COLUMNS) {
+                    if ((employer[column] === null) || (employer[column] === undefined))
+                        return reject(new ServerError(400, `עמודה ${empFields[column]} חייבת להכין ערך 'כן' או 'לא'`));
+                }
                 return resolve(employer);
             });
         }
     });
 }
 
-const readSheet = (company_sheets) => {
+const readSheet = (req, company_sheets) => {
     return new Promise(function (resolve, reject) {
         if (company_sheets == undefined) {
             return reject(new ServerError(status = 400, message = "קובץ אקסל לא תקין"));
@@ -137,7 +152,7 @@ const readSheet = (company_sheets) => {
                                 employer.Sites = data;
                                 try {
                                     // handle employees
-                                    employeesData.run(employer, employees);
+                                    employeesData.run(req, employer, employees);
                                     resolve(employer);
                                 }
                                 catch (error) {

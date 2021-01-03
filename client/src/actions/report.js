@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {
-    QUERY_COMPANY, SETTLEMENT_LIST, SHARE_POTENTIAL, ERROR
+    QUERY_COMPANY, SETTLEMENT_LIST, SHARE_POTENTIAL, ERROR, MESSAGE
 } from './types';
 import * as actionUtils from '../utils/actionsUtil';
 
@@ -25,6 +25,8 @@ export const getEmployees = (employers=[], livingCity=[], workingCity=[]) => {
         axios.get(`/api/reports/employee`, requestConfig)
             .then(payload => {
                 dispatch({ type: QUERY_COMPANY, employeesList: payload.data });
+                if (payload.data.length===0)
+                    dispatch({type: MESSAGE, message: "לא נמצאו נתונים לחתך הנבחר"});
             }).catch(err => {
                 let message = actionUtils.handleError(err);
                 dispatch({ type: ERROR, errorMessage: message });
@@ -35,18 +37,6 @@ export const getEmployees = (employers=[], livingCity=[], workingCity=[]) => {
 /**
  * return list of israel settlements
  */
-/*
-export const getSettlementList = () => {
-    return (dispatch) => {
-        axios.get("https://data.gov.il/api/3/action/datastore_search?resource_id=5c78e9fa-c2e2-4771-93ff-7f400a12f7ba&limit=3000&fields=%22%D7%A9%D7%9D_%D7%99%D7%A9%D7%95%D7%91%22")
-            .then(payload => {
-                dispatch({ type: SETTLEMENT_LIST, settlementList: payload.data.result.records });
-            }).catch(err => {
-                let message = actionUtils.handleError(err);
-                dispatch({ type: ERROR, errorMessage: message });
-            });
-    }
-}*/
 export const getSettlementList = () => {
     return (dispatch) => {
         axios.get("/api/const/locality", actionUtils.getAxiosHeader() )

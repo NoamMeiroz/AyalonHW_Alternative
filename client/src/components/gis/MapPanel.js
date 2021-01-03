@@ -1,4 +1,4 @@
-import React, { createRef, Component } from 'react';
+import React, { createRef, PureComponent } from 'react';
 import { Map, LayerGroup, TileLayer, LayersControl } from 'react-leaflet';
 import HeatmapLayer from 'react-leaflet-heatmap-layer';
 import Control from 'react-leaflet-control';
@@ -7,13 +7,15 @@ import randomColor from 'randomcolor';
 import { connect } from 'react-redux';
 
 import requireAuth from '../requireAuth'; //used to check if login successfull
+import * as actions from '../../actions';
 //import proj4 from 'proj4';
 import MapSidebar from './MapSidebar';
 import MarkerLayer from './MarkerLayer';
 import Legend from './Legend';
 import { template } from '../../utils/string';
 import ShapeLayer from "./ShapeLayer";
-import zipUrl from "./TAZ.zip";
+import tazUrl from "./TAZ.zip";
+import trainStationUrl from "./railstations.zip";
 
 import './MapPanel.css';
 
@@ -47,7 +49,7 @@ const createColorIndex = (employees) => {
 }
 
 
-class MapPanel extends Component {
+class MapPanel extends PureComponent {
     state = {
         position: [32.087934, 34.774547],
         zoom: 7,
@@ -111,9 +113,8 @@ class MapPanel extends Component {
             </MapSidebar>
             <Map center={this.state.position}
                 zoom={this.state.zoom}
-                // maxBounds={this.state.bounds}
                 onzoomend={this.handleZoom}
-                //crs={this.state.crs}
+                maxZoom={14}
                 ref={this.mapRef}>
                 <LayersControl>
                     <LayersControl.BaseLayer name="מפה" checked>
@@ -131,8 +132,11 @@ class MapPanel extends Component {
                         />
                     </LayersControl.Overlay>
                     {this.createDataLayers()}
+                    <LayersControl.Overlay name="תחנות רכבת">
+                        <ShapeLayer zipUrl={trainStationUrl} fieldsName={{STAT_NAMEH:"שם תחנה"}} />
+                    </LayersControl.Overlay>
                     <LayersControl.Overlay name="איזורי תנועה">
-                        <ShapeLayer zipUrl={zipUrl} />
+                        <ShapeLayer zipUrl={tazUrl} />
                     </LayersControl.Overlay>
                 </LayersControl>
                 <Control position="bottomright">
@@ -148,7 +152,7 @@ class MapPanel extends Component {
 function mapStateToProps(state) {
     let data = [];
     let branches = [];
-    if (state.reports.employeesList) {
+    if (state.reports.employeesList) {  
         data = state.reports.employeesList.filter(employee => {
             return parseFloat(employee.X);
         });
@@ -188,4 +192,4 @@ function mapStateToProps(state) {
 };
 
 export default requireAuth(
-    connect(mapStateToProps, null)(MapPanel));
+    connect(mapStateToProps, actions)(MapPanel));

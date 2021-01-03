@@ -1,5 +1,4 @@
 const db = require("./database");
-const employee = require("../models/employee");
 const Employee = db.employee;
 const Employer = db.employer;
 const Sector = db.sector;
@@ -73,18 +72,40 @@ const findByName = (name, callback) => {
 const getAllComapnies = (callback) => {
   // find emp in the database
   Employer.findAll({
+    order: ['NAME'],
     include: [{ model: EmployerSites, as: "Sites" }]
-    //{ model: Employee, as: "Employees" }]
-  }).then(data => { callback(null, data) })
-    .catch(err => { callback(err, getMessage(err)); });
+  }).then(function(data) {
+    countValidEmployees((err, result)=>{
+      if (err)
+        callback(err, result);
+      else {
+        callback(null, { companies: data, countValidEmployees: result})
+      }
+    });
+  })
+  .catch(err => { 
+    callback(err, getMessage(err)); 
+  });
 };
+
+/**
+ * Count for each employer how many employees are in valid status (no error field in the BEST_ROUTE json object);
+ * @param {*} callback 
+ */
+const countValidEmployees = (callback) => {
+  db.sequelize.query("SELECT e.EMPLOYER_ID, count(*) validCount FROM alternative.employees e " +
+     " where JSON_CONTAINS_PATH(e.BEST_ROUTE, 'one', '$.error')=0 group by e.EMployer_id", 
+     { type: db.Sequelize.QueryTypes.SELECT })
+     .then(data => callback( null, data ))
+     .catch( err => callback( err, getMessage(err)));
+}
 
 /**
  * update employer with id equal to employerId with EMPLOYEES_READY = isReady.
  * @param {integer} employerId
  * @param {boolean} isReady
  */
-const setEmploeeState = (employerId, state, callback) => {
+const setEmployeeState = (employerId, state, callback) => {
   // Save Tutorial in the database
   Employer.update({ 'EMPLOYEES_READY': state },
     { where: { id: employerId } }).then(data => { callback(null, data) })
@@ -92,11 +113,11 @@ const setEmploeeState = (employerId, state, callback) => {
 };
 
 /**
- * update employer with id equal to employerId with EMPLOYEES_READY = isReady.
+ * return true if employee upload status is READY (finished)
  * @param {integer} employerId
  * @param {boolean} isReady
  */
-const isFinishedWithEmployees = (employerId, callback) => {
+const loadingStatus = (employerId, callback) => {
   // Save Tutorial in the database
   Employer.findAll({
     where: {
@@ -109,7 +130,7 @@ const isFinishedWithEmployees = (employerId, callback) => {
         result = true;
     callback(null, result)
   })
-    .catch(err => { callback(err, getMessage(err)); });
+  .catch(err => { callback(err, getMessage(err)); });
 };
 
 
@@ -125,6 +146,6 @@ const getAllSectors = (callback) => {
 };
 
 module.exports = {
-  insertEmployer, deleteEmployer, findByName,
-  getAllSectors, getAllComapnies, setEmploeeState, isFinishedWithEmployees, STATE
+  loadingStatus, insertEmployer, deleteEmployer, findByName,
+  getAllSectors, getAllComapnies, setEmployeeState, STATE
 };

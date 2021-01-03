@@ -6,6 +6,8 @@ import uploadFile from './uploadFile';
 import loadData from './loadData';
 import employeesData from './employeesData';
 import reports from './reports';
+import notifications from './notifications';
+
 
 
 export default combineReducers({
@@ -15,5 +17,6 @@ export default combineReducers({
     loadData,
     employeesData,
     reports,
+    notifications,
     form: formReducer
 });

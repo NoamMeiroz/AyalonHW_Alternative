@@ -1,5 +1,4 @@
 getMessage = (err) => {
-    console.log(err);
     message = "";
     if (err.errors)
         message  = err.errors[0].instance + " " + err.errors[0].type + " " + err.errors[0].message;

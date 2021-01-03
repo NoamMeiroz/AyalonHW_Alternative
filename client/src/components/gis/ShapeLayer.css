@@ -1,8 +1,8 @@
-.shape-marker-pin {
+.marker-pin {
     width: 25px;
     height: 25px;
-    border-radius: 50% 50% 50% 0%;
-    background: #c30b82;
+    border-radius: 0% 0% 0% 0%;
+    background: rgba(128, 128, 128, 0.5);
     position: absolute;
     transform: rotate(-45deg);
     left: 50%;
@@ -10,10 +10,11 @@
     margin: -15px 0 0 -15px;
     border-color: black;
     border-style: solid;
+    border-radius: 3%;
     border-width: 1px;
   }
   
-  .custom-div-icon-building .shape-marker-pin::after {
+  .custom-div-icon-train .marker-pin::after {
       content: '';
       width: 20px;
       height: 20px;
@@ -23,14 +24,14 @@
       border-radius: 50%;
    }
    
-.custom-div-icon-building i {
+.custom-div-icon-train i {
    background: transparent;
    border: 0px transparent;
    width:15px;
    height:15px;
    position: absolute;
-   background-image: url(/building.png);
+   background-image: url(/train.png);
    background-size: 15px 15px;
-   margin: 13px 8px 0px 0px;
+   margin: 15px 5px 0px 0px;
 }
   

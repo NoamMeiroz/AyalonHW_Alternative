@@ -1,6 +1,5 @@
-//var XLSX = require('xlsx');
 var ExcelJS = require('exceljs');
-const { logger, ServerError } = require('../log');
+const { ServerError } = require('../log');
 
 /**
  * 	read all sheets and return an object with all data
@@ -35,7 +34,7 @@ const load_data = async (file) => {
 
 const post_data = (req, res) => {
 	let files = {};
-	if (req.files) {
+	if (req.files && req.files !== {} ) {
 		files = req.files;
 	}
 	else if (req.fields) {
