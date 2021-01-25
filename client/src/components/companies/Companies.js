@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import requireAuth from '../requireAuth'; //used to check if login successfull
 import * as actions from '../../actions';
+import {UPLOAD_IN_PROGRESS} from '../../actions/const'
 import CompanyTable from './CompanyTable';
 import OverideAlert from './OverideAlert';
 import * as excelUtil from '../../utils/excelUtil';
@@ -102,7 +103,6 @@ class Companies extends Component {
 
     handleOverideAlert = () => {
         this.setState({ showOverideAlert: false });
-        console.log(this.state.selectedFile);
         this.props.upload(this.state.selectedFile);
     }
 
@@ -127,11 +127,13 @@ class Companies extends Component {
             // save process id
             sessionStorage.setItem(employerID, processID);
         }
-        // check if to show check employees loading progress error message
-        if (this.props.employeesData && (this.props.employeesData.timestamp !== prevProps.employeesData.timestamp)) {
-            if (this.props.employeesData.uploadProgess === 100) {
-                clearInterval(sessionStorage.getItem(this.props.employeesData.employerID));
-                sessionStorage.removeItem(this.props.employeesData.employerID);
+        // check if to show check employees loading progress 
+        if (this.props.loadData && (this.props.loadData.timestamp !== prevProps.loadData.timestamp)) {
+            for (let company of this.props.loadData.companyList) {
+                if (company.EMPLOYEES_READY !== UPLOAD_IN_PROGRESS) {
+                    clearInterval(sessionStorage.getItem(company.id));
+                    sessionStorage.removeItem(company.id);
+                }
             }
         }
     }
@@ -141,7 +143,7 @@ class Companies extends Component {
         return <div className="root">
             <Grid
                 container
-                spacing={3}
+                spacing={1}
                 direction="row"
                 justify="space-around">
                 <Grid container item justify="flex-end">
@@ -155,7 +157,7 @@ class Companies extends Component {
                             ref={this.fileInput}
                         />
                         <label htmlFor="contained-button-file">
-                            <Button color="primary" variant="contained" component="span">
+                            <Button color="primary" variant="contained" component="span" size="small">
                                 <Box display="flex" alignItems="center" flexDirection="column">
                                     <CloudUploadIcon style={{ fontSize: 20 }} />
                                     {labelText}
@@ -164,7 +166,7 @@ class Companies extends Component {
                         </label>
                     </div>
                     <Link className="actionButton" href="/template.xlsx" underline="none">
-                        <Button variant="contained" component="span">
+                        <Button variant="contained" component="span" size="small">
                             <Box display="flex" alignItems="center" flexDirection="column">
                                 <CloudDownload style={{ fontSize: 20 }} />
                                 {templateLabelText}
@@ -199,11 +201,6 @@ function mapStateToProps(state) {
             isSuccess: state.uploadFile.isSuccess,
             timestamp: state.uploadFile.timestamp
         },
-        employeesData: {
-            employerID: state.employeesData.employerID,
-            uploadProgess: state.employeesData.uploadProgess,
-            timestamp: state.employeesData.timestamp
-        }
     };
 }
 

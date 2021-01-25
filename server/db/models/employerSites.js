@@ -1,5 +1,3 @@
-const Employer = require('./employer');
-
 module.exports = (sequelize, Sequelize) => {
     var EmployerSites = sequelize.define("employers_sites", {
         EMPLOYER_ID: {

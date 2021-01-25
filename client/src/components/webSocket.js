@@ -56,7 +56,7 @@ export default ({ children }) => {
 
 	const connect = () => {
 		if (!socket) {
-			let webSocket = new WebSocket(`wss://20.56.105.178/api`);
+			let webSocket = new WebSocket(`wss://${process.env.REACT_APP_SERVER}/api`);
 
 			webSocket.onopen = () => {
 				//setWS( { socket: webSocket, sendMessage });
@@ -85,7 +85,6 @@ export default ({ children }) => {
 				}
 				catch(error){
 				}
-				console.log(data);
 				switch (data.type) {
 					case 'ping':
 						webSocket.send("pong");

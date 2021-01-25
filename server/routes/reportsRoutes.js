@@ -4,7 +4,7 @@ const passport = require('passport');
 const router = express.Router();
 
 const { logger } = require("../log");
-const { isInteger, convertStringToArray } = require("../tools");
+const { isInteger } = require("../tools");
 const reports = require("../services/reports");
 
 /**
@@ -49,11 +49,11 @@ router.get("/share_potential/employer/:employerId", requireAuth, (req, res, next
 /**
  * get all employees of specific employer
  */
-router.get("/employee", requireAuth, (req, res, next) => {
+router.post("/employee", requireAuth, (req, res, next) => {
     let errorMessage = "employer id is missing or incorrect";
     let isError = false;
-    if (req.query) {
-        companies = convertStringToArray(req.query.companies);
+    if (req.body) {
+        companies = req.body.companies; //convertStringToArray(req.body.companies);
         if (companies) {
             try {
                 companies = companies.map((value, index, arr) => {
@@ -67,9 +67,13 @@ router.get("/employee", requireAuth, (req, res, next) => {
             }
         }
         if (!isError) {
-            livingCity = convertStringToArray(req.query.livingCity);
-            workingCity = convertStringToArray(req.query.workingCity);
-            reports.getEmployeesOfEmployer(companies, livingCity, workingCity).then((payload) => {
+            let livingCity = req.body.livingCity;
+            let workingCity = req.body.workingCity;
+            let timeSlotWork =req.body.timeSlotWork;
+            let timeSlotHome = req.body.timeSlotHome;
+            let marks = req.body.marks;
+            reports.getEmployeesOfEmployer(companies, livingCity, workingCity, 
+                timeSlotWork, timeSlotHome, marks).then((payload) => {
                 res.status(200).json(payload);
             }).catch(error => {
                 if (error.status)

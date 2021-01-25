@@ -3,6 +3,20 @@ const employerSitesSchema = require("../db/employerSitesSchema");
 const { branchesFieldsName, employeeFieldsName } = require("../config/config");
 const googleAPI = require('./googleAPI');
 
+const { Column, TYPES } = require('./columns/column');
+const { City } = require('./columns/city');
+const { Street } = require('./columns/street');
+const { BuildingNumber } = require('./columns/buildingNumber');
+
+const SITE_COLUMNS = [
+    new Column("SITE_ID", "מספר סניף", TYPES.INT, 8, false),
+    new Column("NAME", "שם סניף", TYPES.STRING, 50, false),
+    new City("ADDRESS_CITY", "עיר"),
+    new Street("ADDRESS_STREET", "רחוב"),
+    new BuildingNumber("ADDRESS_BUILDING_NUMBER", "מספר"),
+];
+
+
 /**
  * Convert all sites address to X,Y coordinates.
  * If one address is invalid then reject all.
@@ -28,7 +42,7 @@ const convertAddress = (branchList) => {
                         logger.info(value);
                         switch (value.status) {
                             case googleAPI.ERRORS.INVALID_ADDRESS_CODE:
-                                error = new ServerError(400, `כתובת סניף ${branchList[index].NAME} לא תקינה.` );
+                                error = new ServerError(400, `כתובת סניף ${branchList[index].NAME} לא תקינה.`);
                                 break;
                             case googleAPI.ERRORS.MISSING_CITY_CODE:
                                 error = new ServerError(400, `לסניף ${branchList[index].NAME} חסר עיר.`);
@@ -38,6 +52,22 @@ const convertAddress = (branchList) => {
                                 break;
                             case googleAPI.ERRORS.MISSING_BUILDING_NUMBER_CODE:
                                 error = new ServerError(400, `לסניף ${branchList[index].NAME} חסר מספר בניין.`);
+                                break;
+                            case ERRORS.INVALID_CITY:
+                                error = new ServerError(400, `לסניף ${branchList[index].NAME} שם העיר שגוי`);
+                                break;
+                            case ERRORS.INVALID_STREET:
+                                error = new ServerError(400, `לסניף ${branchList[index].NAME} שם הרחוב שגוי`);
+                                break;
+                            case ERRORS.MISSING_CITY_CODE:
+                                logger.error(value);
+                                branchList[index].X = value.X;
+                                branchList[index].Y = value.Y;
+                                break;
+                            case ERRORS.HELKA_NOT_FOUND:
+                                logger.error(value);
+                                branchList[index].X = value.X;
+                                branchList[index].Y = value.Y;
                                 break;
                             case 500:
                                 error = value;
@@ -95,14 +125,18 @@ const handleBranchData = (branches, emploeesList) => {
     return new Promise(function (resolve, reject) {
         // create a site object for each record
         let uniqueBranch = new Map();
-        for (branchItem of branches ) {
+        for (branchItem of branches) {
             let branch = {
-                SITE_ID: branchItem[branchesFieldsName.SITE_ID],
-                NAME: branchItem[branchesFieldsName.NAME],
-                ADDRESS_CITY: branchItem[branchesFieldsName.ADDRESS_CITY],
-                ADDRESS_STREET: branchItem[branchesFieldsName.ADDRESS_STREET],
-                ADDRESS_BUILDING_NUMBER: branchItem[branchesFieldsName.ADDRESS_BUILDING_NUMBER],
                 NUM_OF_EMPLOYEES: 0
+            }
+            // check sites data
+            for (const column of SITE_COLUMNS) {
+                try {
+                    branch[column.name] = column.validityCheck(branchItem[column.title]);
+                }
+                catch (err) {
+                    return reject(new ServerError(400,`סניפים-${err.message}`));
+                }
             }
             uniqueBranch.set(branch.SITE_ID, branch);
         }
@@ -118,7 +152,7 @@ const handleBranchData = (branches, emploeesList) => {
             branch.NUM_OF_EMPLOYEES = branch.NUM_OF_EMPLOYEES + 1;
             uniqueBranch.set(branch.SITE_ID, branch);
         }
-        
+
         uniqueBranch = Array.from(uniqueBranch.values());
         // convert address of each branch to X, Y and find the correct city name.
         convertAddress(uniqueBranch)

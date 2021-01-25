@@ -91,8 +91,6 @@ class ServerError extends Error {
 
 }
 
-format
-
 /**
  * Attempts to add file and line number info to the given log arguments.
  */

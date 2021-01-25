@@ -49,15 +49,14 @@ async function run(req, employer, employees) {
 };
 
 /**
- * Check count employess that have no error in the best_route feature.
+ * Check count employess that have no error in the UPLOAD_ERROR feature.
  * @param {employeesList} employessList 
  */
 const checkResult = (employessList) => {
 	let successCount = 0;
 	let total = employessList.length;
-
 	for ( emp of employessList ) {
-		if (!emp.dataValues.BEST_ROUTE.error) 
+		if (!emp.dataValues.UPLOAD_ERROR) 
 			successCount = successCount + 1;
 	}
 	return { successCount: successCount, total: total};
@@ -82,6 +81,16 @@ const getEmployeesOfEmployer = (empId) => {
 				let workSite = employeesList[i].Site.dataValues
 				employeesList[i].WORK_SITE = workSite.ADDRESS_STREET + " " +
 					workSite.ADDRESS_BUILDING_NUMBER + ", " + workSite.ADDRESS_CITY;
+
+				// translate time slot id to meaningful text
+				let timeSLot = employeesList[i].ExitHourToWork.dataValues;
+				employeesList[i].EXIT_HOUR_TO_WORK = timeSLot.TIME_SLOT;
+
+				// translate time slot id to meaningful text
+				timeSLot = employeesList[i].ReturnHourToHome.dataValues;
+				employeesList[i].RETURN_HOUR_TO_HOME = timeSLot.TIME_SLOT;
+				
+				// remove column the client doesnt need
 				delete employeesList[i].updatedAt;
 				delete employeesList[i].createdAt;
 				delete employeesList[i].EMPLOYER_ID;
@@ -98,7 +107,7 @@ const getPrecentFinished = (empId) => {
 		employeeSchema.getPrecentFinished(empId, (err, payload) => {
 			if (err) {
 				logger.error(err.stack);
-				reject(new ServerError(500, "internal error"))
+				reject(new ServerError(500, err))
 			}
 			resolve({ employerID: empId, precent: payload });
 		});

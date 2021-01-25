@@ -6,12 +6,19 @@ const employeesData = require("./employeesData");
 const { branchesFieldsName, employeeFieldsName } = require('../config/config');
 const tools = require("../tools");
 
-const INT_COLUMNS = ["NUMBER_OF_EMPLOYEES",
-    "NUMBER_OF_SITES"];
-const YES_NO_COLUMNS = ["PRIVATE_CAR_SOLUTION",
-    "MASS_TRANSPORTATION_SOLUTION",
-    "CAR_POOL_SOLUTION",
-    "WORK_FROM_HOME_SOLUTION"]
+const { Column, TYPES } = require('./columns/column');
+const { YesNoColumn } = require('./columns/yesno');
+const { Sector } = require('./columns/sector');
+
+const EMP_COLUMNS = [
+        new Column("NAME", "שם חברה",TYPES.STRING, 50, false),
+        new Column("NUMBER_OF_EMPLOYEES", "מספר עובדים",TYPES.INT, 8, false),
+        new Column("NUMBER_OF_SITES", "מספר סניפים",TYPES.INT, 3, false),
+        new YesNoColumn("PRIVATE_CAR_SOLUTION","רכב צמוד"),
+        new YesNoColumn("MASS_TRANSPORTATION_SOLUTION","שירות הסעות"),
+        new YesNoColumn("CAR_POOL_SOLUTION","Carpool"),
+        new YesNoColumn("WORK_FROM_HOME_SOLUTION","עבודה מהבית")
+];
 
 /**
  * Check if sheet has all attributes
@@ -51,10 +58,6 @@ saveEmployer = (employer) => {
  */
 const handleEmployerData = (data) => {
     return new Promise(function (resolve, reject) {
-        BOOL = {
-            "כן": 1,
-            "לא": 0
-        };
         result = defined_structure(data, Object.values(empFields));
         if (!result.valid) {
             return reject(new ServerError(status = 400,
@@ -67,32 +70,20 @@ const handleEmployerData = (data) => {
                     logger.error(err.stack);
                     return reject(new ServerError(500, err));
                 }
-                // create valid employer entity
-                currSector = sectorData.find(sector => sector.dataValues.SECTOR == data[empFields.SECTOR]);
-                if (currSector == null) {
-                    logger.info("incorrect sector");
-                    return reject(new ServerError(400, "סקטור לא תקין או לא קיים במערכת."));
-                }
+               
                 let employer = {
-                    NAME: data[empFields.NAME],
-                    SECTOR: currSector.dataValues.id,
-                    NUMBER_OF_EMPLOYEES: data[empFields.NUMBER_OF_EMPLOYEES],
-                    NUMBER_OF_SITES: data[empFields.NUMBER_OF_SITES],
-                    PRIVATE_CAR_SOLUTION: BOOL[data[empFields.PRIVATE_CAR_SOLUTION]],
-                    MASS_TRANSPORTATION_SOLUTION: BOOL[data[empFields.MASS_TRANSPORTATION_SOLUTION]],
-                    CAR_POOL_SOLUTION: BOOL[data[empFields.CAR_POOL_SOLUTION]],
-                    WORK_FROM_HOME_SOLUTION: BOOL[data[empFields.WORK_FROM_HOME_SOLUTION]],
                     EMPLOYER_ID: 0
                 };
-                // check if value in columns is integer.
-                for (let column of INT_COLUMNS) {
-                    if (!tools.isInteger(employer[column]) || employer[column]<-1)
-                        return reject(new ServerError(400, `עמודה ${empFields[column]} חייבת להכיל ערך מספרי חיובי שלם`));
-                }
-                for (let column of YES_NO_COLUMNS) {
-                    if ((employer[column] === null) || (employer[column] === undefined))
-                        return reject(new ServerError(400, `עמודה ${empFields[column]} חייבת להכין ערך 'כן' או 'לא'`));
-                }
+                // check employer data
+                let allColumns = EMP_COLUMNS.concat([new Sector("SECTOR", "מגזר", sectorData)])
+                for (const column of allColumns) {
+                    try {
+                        employer[column.name] = column.validityCheck(data[column.title]);
+                    }
+                    catch (err) {
+                        return reject(new ServerError(400, err.message));
+                    }
+                 }
                 return resolve(employer);
             });
         }

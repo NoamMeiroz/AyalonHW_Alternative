@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { AUTH_USER, AUTH_ERROR, MESSAGE, CONNECTED } from './types';
 import * as actionUtils from '../utils/actionsUtil';
-import { getSettlementList, getEmployees} from './report';
+import { getSettlementList, getTimeSlotToWork, getTimeSlotToHome } from './const';
+import { getEmployees} from './report';
 import { getData } from './company';
 
 
@@ -54,9 +55,12 @@ export const connected = (isConnected) => {
         if (isConnected){
             dispatch(getData());
             dispatch(getSettlementList());
+            dispatch(getTimeSlotToHome());
+            dispatch(getTimeSlotToWork());
+            dispatch(getSettlementList());
             dispatch(getEmployees(null,
                 null,
-                null));
+                null, null, null));
         }
         else 
             dispatch(showMessage("קיימת בעיית תקשורת עם השרת"));

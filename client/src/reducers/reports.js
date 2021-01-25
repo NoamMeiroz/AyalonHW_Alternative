@@ -1,5 +1,5 @@
 
-import { QUERY_COMPANY, SETTLEMENT_LIST, SHARE_POTENTIAL } from '../actions/types';
+import { GENERAL_REPORT_RESULT, SETTLEMENT_LIST, SHARE_POTENTIAL } from '../actions/types';
 
 const INITIAL_STATE = {
     employeesList: [],
@@ -9,7 +9,7 @@ const INITIAL_STATE = {
 
 export default function (state = INITIAL_STATE, action) {
     switch (action.type) {
-        case QUERY_COMPANY:
+        case GENERAL_REPORT_RESULT:
             return {
                 ...state,
                 employeesList: action.employeesList,

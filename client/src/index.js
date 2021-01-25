@@ -10,7 +10,7 @@ import App from './components/App';
 import Welcome from './components/Welcome';
 import SignIn from './components/auth/SignIn';
 import Companies from './components/companies/Companies';
-import MapPanel from './components/gis/MapPanel';
+import MapTabsPanel from './components/gis/MapTabsPanel';
 import SharePotential from './components/reports/SharePotential';
 import InfoPanel from './components/dashboard/InfoPanel';
 import reducers from './reducers';
@@ -42,7 +42,7 @@ ReactDOM.render(
 				<Switch>
 					<Route path="/signin" exact component={SignIn} />
 					<Route path="/companies" exact component={getMainComponent(<Companies />)} />
-					<Route path="/dashboard" exact component={getMainComponent(<MapPanel />)} />
+					<Route path="/map" exact component={MapTabsPanel} />
 					<Route path="/reports/share_potential" exact component={getMainComponent(<SharePotential />)} />
 					<Route path="/signout" exact component={SignOut} />
 					<Route path="/" component={Welcome} />

@@ -1,4 +1,4 @@
-import React, { createRef, PureComponent } from 'react';
+import React, { Component, createRef } from 'react';
 import { Map, LayerGroup, TileLayer, LayersControl } from 'react-leaflet';
 import HeatmapLayer from 'react-leaflet-heatmap-layer';
 import Control from 'react-leaflet-control';
@@ -49,7 +49,7 @@ const createColorIndex = (employees) => {
 }
 
 
-class MapPanel extends PureComponent {
+class MapPanel extends Component {
     state = {
         position: [32.087934, 34.774547],
         zoom: 7,
@@ -64,6 +64,10 @@ class MapPanel extends PureComponent {
     handleZoom = (e) => {
         this.setState({ zoom: this.mapRef.current.viewport.zoom });
     };
+
+    shouldComponentUpdate(nextProps, nextState) {
+        return nextProps.timestamp!==this.props.timestamp;
+    }
 
     createCompanyLayer(companyID) {
         let jsx = [];
@@ -149,10 +153,13 @@ class MapPanel extends PureComponent {
 }
 
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
     let data = [];
     let branches = [];
+    let companies = [];
+    let timestamp = new Date();
     if (state.reports.employeesList) {  
+        timestamp = state.reports.timestamp;
         data = state.reports.employeesList.filter(employee => {
             return parseFloat(employee.X);
         });
@@ -186,9 +193,9 @@ function mapStateToProps(state) {
             }
             return employee;
         });
+        companies = createColorIndex(branches);
     }
-    let companies = createColorIndex(branches);
-    return { data: data, branches: branches, companies: companies };
+    return { data: data, branches: branches, companies: companies, timestamp: timestamp };
 };
 
 export default requireAuth(
