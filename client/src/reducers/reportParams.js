@@ -1,7 +1,8 @@
 
 import {
     QUERY_TIME_SLOT_HOME, QUERY_TIME_SLOT_WORK,
-    QUERY_COMPANY, QUERY_LIVING_CITY, QUERY_WORKING_CITY, QUERY_MARK
+    QUERY_COMPANY, QUERY_LIVING_CITY, QUERY_WORKING_CITY, QUERY_MARK,
+    QUERY_STARTING_POLYGON, QUERY_DESTINATION_POLYGON
 } from '../actions/types';
 const MIN_MARK = -1;
 const MAX_MARK = 16;
@@ -27,6 +28,8 @@ const INITIAL_STATE = {
     },
     qLivingCityParams: [],
     qWorkingCityParams: [],
+    qDestinationPolygonParams: {},
+    qStartingPolygonParams: {},
     timestamp: new Date()
 }
 
@@ -68,6 +71,18 @@ export default function (state = INITIAL_STATE, action) {
             return {
                 ...state,
                 qSelectedMarks,
+                timestamp: new Date()
+            }
+        case QUERY_DESTINATION_POLYGON:
+            return {
+                ...state,
+                qDestinationPolygonParams: action.value,
+                timestamp: new Date()
+            }
+        case QUERY_STARTING_POLYGON:
+            return {
+                ...state,
+                qStartingPolygonParams: action.value,
                 timestamp: new Date()
             }
         default:

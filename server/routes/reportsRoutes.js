@@ -71,9 +71,13 @@ router.post("/employee", requireAuth, (req, res, next) => {
             let workingCity = req.body.workingCity;
             let timeSlotWork =req.body.timeSlotWork;
             let timeSlotHome = req.body.timeSlotHome;
+            let destinationPolygon = req.body.destinationPolygon;
+            let startingPolygon = req.body.startingPolygon;
+
             let marks = req.body.marks;
             reports.getEmployeesOfEmployer(companies, livingCity, workingCity, 
-                timeSlotWork, timeSlotHome, marks).then((payload) => {
+                timeSlotWork, timeSlotHome, marks, 
+                destinationPolygon, startingPolygon).then((payload) => {
                 res.status(200).json(payload);
             }).catch(error => {
                 if (error.status)

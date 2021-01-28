@@ -1,0 +1,22 @@
+.leaflet-draw-section { 
+    display:none 
+}
+
+.drawBox {
+    opacity: 0.8;
+    background-color: white;
+    border: 2px solid rgba(0,0,0,0.2);
+    background-clip: padding-box;
+    display: flex;
+    flex-direction: column;
+}
+
+.drawBox button {
+    width: 30px;
+    height: 30px;
+    border-bottom: 1px solid #ccc;
+}
+
+.drawBox .MuiButton-root {
+    min-width: auto;
+}

@@ -11,10 +11,11 @@ const SOLUTIONS_LIST = ["walking", "bicycling", "driving", "transit"];
  * if data is not valid then reject.
  * @param {} data 
  */
-const getEmployeesOfEmployer = (employers, livingCity, workingCity, timeSlotWork, timeSlotHome, marks) => {
+const getEmployeesOfEmployer = (employers, livingCity, workingCity, 
+	timeSlotWork, timeSlotHome, marks, destinationPolygon, startingPolygon) => {
 	return new Promise(function (resolve, reject) {
 		employeeSchema.getEmployees(employers, livingCity, workingCity,
-			timeSlotWork, timeSlotHome, marks, (err, payload) => {
+			timeSlotWork, timeSlotHome, marks, destinationPolygon, startingPolygon, (err, payload) => {
 				if (err) {
 					logger.error(err.stack);
 					return reject(new ServerError(500, "internal error"))

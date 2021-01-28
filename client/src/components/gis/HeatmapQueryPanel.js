@@ -37,7 +37,9 @@ class HeatmapQueryPanel extends PureComponent {
             workingCity,
             this.props.qTimeSlotToWork,
             this.props.qTimeSlotToHome,
-            this.props.qSelectedMarks);
+            this.props.qSelectedMarks,
+            this.props.qDestinationPolygon,
+            this.props.qStartingPolygon);
     }
 
     render() {
@@ -151,6 +153,8 @@ function mapStateToProps(state) {
     let selectedCompnayList = [];
     let selectedLivingCityList = [];
     let selectedWorkingCityList = [];
+    let qStartingPolygon= {};
+    let qDestinationPolygon = {};
     if (state.loadData.companyList) {
         companies = state.loadData.companyList;
     }
@@ -198,13 +202,21 @@ function mapStateToProps(state) {
     if (state.reportParams.qSelectedMarks) {
         qSelectedMarks = state.reportParams.qSelectedMarks;
     }
+    if (state.reportParams.qDestinationPolygonParams) {
+        qDestinationPolygon = state.reportParams.qDestinationPolygonParams.polygon;
+    }
+    if (state.reportParams.qStartingPolygonParams) {
+        qStartingPolygon = state.reportParams.qStartingPolygonParams.polygon;
+    }
     return {
         companies: companies, settlementList: settlementList,
         qTimeSlotToWork: qTimeSlotToWork, qTimeSlotToHome: qTimeSlotToHome,
         qSelectedMarks: qSelectedMarks,
         selectedCompnayList: selectedCompnayList,
         selectedLivingCityList: selectedLivingCityList,
-        selectedWorkingCityList: selectedWorkingCityList
+        selectedWorkingCityList: selectedWorkingCityList,
+        qStartingPolygon: qStartingPolygon,
+        qDestinationPolygon: qDestinationPolygon
     };
 };
 

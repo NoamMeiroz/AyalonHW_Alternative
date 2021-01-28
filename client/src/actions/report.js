@@ -1,9 +1,29 @@
 import axios from 'axios';
 import {
     GENERAL_REPORT_RESULT, SHARE_POTENTIAL, ERROR, MESSAGE, QUERY_TIME_SLOT_WORK, QUERY_TIME_SLOT_HOME,
-    QUERY_LIVING_CITY, QUERY_WORKING_CITY, QUERY_COMPANY, QUERY_MARK, REPORT_SELECTION
+    QUERY_LIVING_CITY, QUERY_WORKING_CITY, QUERY_COMPANY, QUERY_MARK, REPORT_SELECTION, 
+    QUERY_DESTINATION_POLYGON, QUERY_STARTING_POLYGON
 } from './types';
 import * as actionUtils from '../utils/actionsUtil';
+
+
+/**
+ * 
+ */
+export const setDestinationPolygonQuery = (value=[]) => {
+    return (dispatch) => {
+        dispatch({ type: QUERY_DESTINATION_POLYGON, value: value });
+    }
+};
+
+/**
+ * 
+ */
+export const setStartingPolygonQuery = (value=[]) => {
+    return (dispatch) => {
+        dispatch({ type: QUERY_STARTING_POLYGON, value: value });
+    }
+};
 
 /**
  * 
@@ -67,13 +87,16 @@ export const setQueryTimeSlotToHome = (timeSlotList = []) => {
  * return the list of employees for a given comapny.
  */
 export const getEmployees = (employers = [], livingCity = [], workingCity = [], 
-    qTimeSlotWork = [], qTimeSlotHome = [], qSelectedMarks=[]) => {
+    qTimeSlotWork = [], qTimeSlotHome = [], qSelectedMarks=[], 
+    qDestinationPolygon = {}, qStartingPolygon = {}) => {
     let employersList = employers;
     let livingCityList = livingCity;
     let workingCityList = workingCity;
     let qTimeSlotHomeList = qTimeSlotHome;
     let qTimeSlotWorkList = qTimeSlotWork;
     let qSelectedMarksList = qSelectedMarks;
+    let destinationPolygon = qDestinationPolygon;
+    let startingPolygon = qStartingPolygon;
     if (!livingCity)
         livingCityList = [];
     if (!workingCity)
@@ -86,6 +109,10 @@ export const getEmployees = (employers = [], livingCity = [], workingCity = [],
         qTimeSlotHomeList = [];
     if (!qSelectedMarks)
         qSelectedMarksList = [];
+    if (!qDestinationPolygon)
+        destinationPolygon = {};
+    if (!qStartingPolygon)
+        startingPolygon = {};
 
     let data = {
             companies: employersList,
@@ -93,7 +120,9 @@ export const getEmployees = (employers = [], livingCity = [], workingCity = [],
             workingCity: workingCityList,
             timeSlotHome: qTimeSlotHomeList,
             timeSlotWork: qTimeSlotWorkList,
-            marks: qSelectedMarksList
+            marks: qSelectedMarksList,
+            destinationPolygon: destinationPolygon,
+            startingPolygon: startingPolygon
     };
     let headers = actionUtils.getAxiosHeader().headers;
     headers = { ...{'Content-Type': 'application/json'}, headers }
