@@ -35,6 +35,8 @@ services:
     command: ["npm", "start"]
   native_laasakim:
     image: nativelaasakimcr.azurecr.io/native_laasakim
+    environment:
+      - REACT_APP_SERVER=${SERVER}
     stdin_open: true
     tty: true
     restart: always

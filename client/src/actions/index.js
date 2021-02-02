@@ -30,6 +30,7 @@ export const signin = (formProps, callback) => {
                 dispatch({ type: AUTH_USER, payload: data.data.token, userName: formProps.userId });
                 localStorage.setItem('token', data.data.token); // save token use for later
                 localStorage.setItem('userName', formProps.userId); // save userName use for later
+                dispatch(connected(true));
                 callback();
             }).catch(err => {
                 let message = actionUtils.handleError(err);

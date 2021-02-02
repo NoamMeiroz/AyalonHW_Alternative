@@ -202,7 +202,6 @@ const getEmployees = (employerList, livingCity = [], workingCity = [],
    };
    // add starting polygon to where clause
    if (startingPolygon) {
-      console.log(whereClause.where[Op.and]);
       let filter = getWhereForStartingPolygon(startingPolygon);
       if (filter) {
          whereClause.where[Op.and].push(filter);

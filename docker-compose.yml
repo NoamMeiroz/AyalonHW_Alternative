@@ -54,10 +54,10 @@ services:
       context: ./client
       dockerfile: dockerfile_app.dev
     volumes:
-    - ./client/node_modules:/client/node_modules
-    - ./client:/client
-    #- /client/node_modules
-    #- /client
+    #- ./client/node_modules:/client/node_modules
+    #- ./client:/client
+    - /client/node_modules
+    - /client
     restart: always
     stdin_open: true
     tty: true
