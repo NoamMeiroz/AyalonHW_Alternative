@@ -10,7 +10,7 @@ const getData = (callback) => {
     return new Promise(function (resolve, reject) {
         employerSchema.getAllSectors((err, sectorData)=> {
             if (err) {
-                logger.error(err);
+                logger.error(sectorData);
                 reject(new ServerError(500, sectorData));
             }
             let sectorList = {};
@@ -25,8 +25,16 @@ const getData = (callback) => {
                     reject(new ServerError(500, comapniesData));
                 }
                 let companyList = {};
-                if (comapniesData)
-                    companyList = comapniesData.map(company=>company.dataValues);
+                if (comapniesData.companies)
+                    companyList = comapniesData.companies.map(company=>{
+                        let result = company.dataValues;
+                        countResult = comapniesData.countValidEmployees.filter(row=>row.EMPLOYER_ID===result.id);
+                        if (countResult.length>0)
+                            result.countValidEmployees = countResult[0].validCount;
+                        else    
+                            result.countValidEmployees = 0;
+                        return result;
+                    });
                 resolve({"sectors": sectorList, "companies": companyList});          
             });
         });

@@ -29,10 +29,10 @@ class SharePotential extends Component {
         company: null
     }
 
-    componentDidMount() {
+  /*  componentDidMount() {
         this.props.getData();
         this.props.getSettlementList();
-    }
+    }*/
 
     handleCreateReport = () => {
         if (this.state.company)
@@ -227,69 +227,3 @@ function mapStateToProps(state) {
 
 export default requireAuth(
     connect(mapStateToProps, actions)(SharePotential));
-
-/**
- * <Grid item xs={12}>
-                        <MaterialTable
-                            columns={[
-                                { title: 'עיר מקום התעסוקה', field: 'WORK_CITY' },
-                                { title: 'עיר מגורים', field: 'LIVING_CITY' },
-                                { title: '# עובדים', field: 'SUM', defaultSort: "desc" },
-                            ]}
-                            data={this.props.data}
-                            detailPanel={[
-                                {
-                                    tooltip: 'פרטי חברות',
-                                    render: rowData => {
-                                        return (
-                                            <Company companies={rowData.DETAILS} style={{ padding: 0 }} />)
-                                    },
-                                }
-                            ]}
-                            title="פוטנציאל שיתוף לפי ערים"
-                            options={{
-                                pageSize: 20,
-                                pageSizeOptions: [5, 10, 20, 50, 100],
-                                emptyRowsWhenPaging: false,
-                                rowStyle: {
-                                    fontSize: 14,
-                                },
-                                cellStyle: {
-                                    width: 20,
-                                    height: 20,
-                                    maxWidth: 20,
-                                    padding: 0
-                                },
-                                headerStyle: {
-                                    height: 20,
-                                    maxHeight: 20,
-                                    fontSize: 14,
-                                }
-                            }}
-                            localization={{
-                                header: {
-                                    actions: ''
-                                },
-                                body: {
-                                    emptyDataSourceMessage: 'אין נתונים להצגה',
-                                    filterRow: {
-                                        filterTooltip: 'סינון'
-                                    }
-                                },
-                                pagination: {
-                                    labelDisplayedRows: '{from}-{to} מתוך {count}',
-                                    labelRowsSelect: 'שורות',
-                                    labelRowsPerPage: 'שורות בעמוד',
-                                    firstAriaLabel: 'עמוד ראשון',
-                                    firstTooltip: 'עמוד ראשון',
-                                    previousAriaLabel: 'עמוד קודם',
-                                    previousTooltip: 'עמוד קודם',
-                                    nextAriaLabel: 'עמוד הבא',
-                                    nextTooltip: 'עמוד הבא',
-                                    lastAriaLabel: 'עמוד אחרון',
-                                    lastTooltip: 'עמוד אחרון'
-                                }
-                            }}
-                        />
-                    </Grid>
- */

@@ -1,5 +1,5 @@
 
-const MAJOR_FAILURE = "בעיה במערכת. נא לנסות מאוחר יותר";
+const MAJOR_FAILURE = "בעיה במערכת. נא לפנות לתמיכה";
 
 export const getAxiosHeader = () => {
     return { headers : { 'authorization': localStorage.getItem('token') }};

@@ -26,6 +26,7 @@ services:
     volumes:
       - /server
       - /server/node_modules
+      - node_logs:/server/logs
     restart: always
     stdin_open: true
     tty: true
@@ -34,6 +35,8 @@ services:
     command: ["npm", "start"]
   native_laasakim:
     image: nativelaasakimcr.azurecr.io/native_laasakim
+    environment:
+      - REACT_APP_SERVER=${SERVER}
     stdin_open: true
     tty: true
     restart: always
@@ -50,6 +53,7 @@ services:
     restart: always
     volumes:
       - ./secret:/etc/nginx/certs
+      - node_logs:/spool/logs
   volumes:
     db-data:
       driver: local
@@ -57,4 +61,10 @@ services:
         o: bind
         type: None
         device: /home/NativeLaasakimAH/datadrive/db-data
+    node_logs:
+      driver: local
+      driver_opts:
+        o: bind
+        type: None
+        device: /home/NativeLaasakimAH/datadrive/logs
       

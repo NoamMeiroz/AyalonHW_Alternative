@@ -1,53 +1,54 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { connect } from 'react-redux';
+import * as actions from '../../actions';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField'
+import Divider from '@material-ui/core/Divider';
 import Grid from '@material-ui/core/Grid';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-
-import * as actions from '../../actions';
 import requireAuth from '../requireAuth'; //used to check if login successfull
+import TimeSlotQuery from './TimeSlotQuery';
+import MarksQuery from './MarksQuery';
 import './HeatmapQueryPanel.css';
 
-const CITY = "NAME";
+const CITY_NAME_COLUMN = "NAME";
 
-class HeatmapQueryPanel extends Component {
+class HeatmapQueryPanel extends PureComponent {
 
     state = {
         company: null,
         livingCity: null,
-        workingCity: null
-    }
-    componentDidMount() {
-        this.props.getData();
-        this.props.getSettlementList();
-        this.props.getEmployees(null,
-            null,
-            null);
+        workingCity: null,
     }
 
     handleClick = () => {
-        let cityList = null;
-        let workingCity = null;
-        let companies = null;
-        if (this.state.livingCity)
-            cityList = this.state.livingCity;
-        if (this.state.workingCity)
-            workingCity = this.state.workingCity;
-        if (this.state.company)
-            companies = this.state.company;
-            this.props.getEmployees(companies,
-                cityList,
-                workingCity);
+        let cityList = this.props.selectedLivingCityList.map(city => {
+            return city[CITY_NAME_COLUMN];
+        });
+        let workingCity = this.props.selectedWorkingCityList.map(city => {
+            return city[CITY_NAME_COLUMN];
+        });
+        let companies = this.props.selectedCompnayList.map(company => {
+            return company.id;
+        })
+
+        this.props.getEmployees(companies,
+            cityList,
+            workingCity,
+            this.props.qTimeSlotToWork,
+            this.props.qTimeSlotToHome,
+            this.props.qSelectedMarks,
+            this.props.qDestinationPolygon,
+            this.props.qStartingPolygon);
     }
 
     render() {
-        return <div>
+        return <div className="queryPanel">
             <Grid
                 container
-                spacing={6}
+                spacing={1}
                 alignItems="flex-start"
-                style={{margin: 0}}
+                style={{ margin: 2 }}
             >
                 <Grid container item spacing={2}>
                     <Grid item xs={10}>
@@ -55,6 +56,7 @@ class HeatmapQueryPanel extends Component {
                             size="small"
                             multiple
                             id="company"
+                            value={this.props.selectedCompnayList}
                             options={this.props.companies}
                             getOptionLabel={(option) => option.NAME}
                             filterSelectedOptions
@@ -68,7 +70,7 @@ class HeatmapQueryPanel extends Component {
                                 let companyList = value.map(company => {
                                     return company.id;
                                 })
-                                this.setState({ company: companyList })
+                                this.props.setQueryCompany(companyList);
                             }}
                         />
                     </Grid>
@@ -77,8 +79,9 @@ class HeatmapQueryPanel extends Component {
                             size="small"
                             multiple
                             id="living_city"
+                            value={this.props.selectedLivingCityList}
                             options={this.props.settlementList}
-                            getOptionLabel={(option) => option[CITY]}
+                            getOptionLabel={(option) => option[CITY_NAME_COLUMN]}
                             filterSelectedOptions
                             renderInput={(params) => (
                                 <TextField
@@ -88,9 +91,10 @@ class HeatmapQueryPanel extends Component {
                             )}
                             onChange={(event, value) => {
                                 let cities = value.map(city => {
-                                    return city[CITY];
+                                    return city[CITY_NAME_COLUMN];
                                 })
-                                this.setState({ livingCity: cities })
+                                this.setState({ livingCity: cities });
+                                this.props.setQueryLivingCity(cities);
                             }}
                         />
                     </Grid>
@@ -99,8 +103,9 @@ class HeatmapQueryPanel extends Component {
                             size="small"
                             multiple
                             id="work_city"
+                            value={this.props.selectedWorkingCityList}
                             options={this.props.settlementList}
-                            getOptionLabel={(option) => option[CITY]}
+                            getOptionLabel={(option) => option[CITY_NAME_COLUMN]}
                             filterSelectedOptions
                             renderInput={(params) => (
                                 <TextField
@@ -110,12 +115,25 @@ class HeatmapQueryPanel extends Component {
                             )}
                             onChange={(event, value) => {
                                 let cities = value.map(city => {
-                                    return city[CITY];
+                                    return city[CITY_NAME_COLUMN];
                                 })
-                                this.setState({ workingCity: cities })
+                                this.setState({ workingCity: cities });
+                                this.props.setQueryWorkingCity(cities);
                             }}
                         />
                     </Grid>
+                    <Grid item xs={10}>
+                        <TimeSlotQuery />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Divider style={{ width: '10vh', margin: 'auto' }} />
+                    </Grid>
+                    <Grid item xs={10}>
+                        <MarksQuery />
+                    </Grid>
+                </Grid>
+                <Grid item xs={12}>
+                    <Divider style={{ width: '10vh', margin: 'auto' }} />
                 </Grid>
                 <Grid item xs={12}>
                     <Button className="Button" variant="contained"
@@ -129,42 +147,78 @@ class HeatmapQueryPanel extends Component {
 function mapStateToProps(state) {
     let companies = [];
     let settlementList = [];
+    let qTimeSlotToHome = [];
+    let qTimeSlotToWork = [];
+    let qSelectedMarks = [];
+    let selectedCompnayList = [];
+    let selectedLivingCityList = [];
+    let selectedWorkingCityList = [];
+    let qStartingPolygon= {};
+    let qDestinationPolygon = {};
     if (state.loadData.companyList) {
         companies = state.loadData.companyList;
     }
-    if (state.reports.settlementList) {
-        settlementList = state.reports.settlementList;
+    if (state.consts.settlementList) {
+        settlementList = state.consts.settlementList;
     }
-    return { companies: companies, settlementList: settlementList };
+    // selected companyList
+    if (state.reportParams.qCompanyParams) {
+        for (const selectedCompany of state.reportParams.qCompanyParams) {
+            for (const company of companies)
+                if (company.id === selectedCompany) {
+                    selectedCompnayList.push(company);
+                    break;
+                }
+        }
+    }
+    // selected livingCity
+    if (state.reportParams.qLivingCityParams) {
+        for (const selectedCity of state.reportParams.qLivingCityParams) {
+            for (const city of state.consts.settlementList)
+                if (city[CITY_NAME_COLUMN] === selectedCity) {
+                    selectedLivingCityList.push(city);
+                    break;
+                }
+        }
+    }
+    // selected workingCity
+    if (state.reportParams.qWorkingCityParams) {
+        for (const selectedCity of state.reportParams.qWorkingCityParams) {
+            for (const city of state.consts.settlementList){
+                if (city[CITY_NAME_COLUMN] === selectedCity) {
+                    selectedWorkingCityList.push(city);
+                    break;
+                }
+            }
+        }
+    }
+    // selected time slots
+    if (state.reportParams.qTimeSlotHomeParams) {
+        qTimeSlotToHome = state.reportParams.qTimeSlotHomeParams;
+    }
+    if (state.reportParams.qTimeSlotWorkParams) {
+        qTimeSlotToWork = state.reportParams.qTimeSlotWorkParams;
+    }
+    if (state.reportParams.qSelectedMarks) {
+        qSelectedMarks = state.reportParams.qSelectedMarks;
+    }
+    if (state.reportParams.qDestinationPolygonParams) {
+        qDestinationPolygon = state.reportParams.qDestinationPolygonParams.polygon;
+    }
+    if (state.reportParams.qStartingPolygonParams) {
+        qStartingPolygon = state.reportParams.qStartingPolygonParams.polygon;
+    }
+    return {
+        companies: companies, settlementList: settlementList,
+        qTimeSlotToWork: qTimeSlotToWork, qTimeSlotToHome: qTimeSlotToHome,
+        qSelectedMarks: qSelectedMarks,
+        selectedCompnayList: selectedCompnayList,
+        selectedLivingCityList: selectedLivingCityList,
+        selectedWorkingCityList: selectedWorkingCityList,
+        qStartingPolygon: qStartingPolygon,
+        qDestinationPolygon: qDestinationPolygon
+    };
 };
 
 export default requireAuth(
     connect(mapStateToProps, actions)(HeatmapQueryPanel));
-
-/*
-<Autocomplete
-                            id="combo-box-companies"
-                            options={this.props.companies}
-                            getOptionLabel={(option) => option.NAME}
-                            style={{ width: 300 }}
-                            renderInput={(params) => <TextField {...params} label="רשימת חברות" variant="outlined" />}
-                            onChange={(event, value) => { this.setState({ company: value }) }}
-                        />
- <Autocomplete
-                        id="living_city"
-                        options={this.props.settlementList}
-
-                        style={{ width: 300 }}
-                        renderInput={(params) => <TextField {...params} label="ישוב המגורים" variant="outlined" />}
-                        onChange={(event, value) => { this.setState({  livingCity: value }) }}
-                    />
-
-                    <Autocomplete
-                            id="working_city"
-                            options={this.props.settlementList}
-                            getOptionLabel={(option) => option[CITY]}
-                            style={{ width: 300 }}
-                            renderInput={(params) => <TextField {...params} label="ישוב העבודה" variant="outlined" />}
-                            onChange={(event, value) => { this.setState({ workingCity: value }) }}
-                        />
-*/

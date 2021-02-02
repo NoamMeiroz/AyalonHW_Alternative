@@ -17,7 +17,7 @@ class SideBar extends Component {
     state = {
         active: {
             home: true,
-            dashboard: false,
+            map: false,
             companies: false,
             reports: false,
         },
@@ -77,14 +77,14 @@ class SideBar extends Component {
                     <div>
                         <div>
                             <IconButton edge="start" style={{ color: lime[50] }} aria-label="D"
-                                className={this.state.active.dashboard ? "active" : null}
+                                className={this.state.active.map ? "active" : null}
                                 onClick={(e) => {
-                                    this.setActive("dashboard");
+                                    this.setActive("map");
                                     this.setActiveReport("none");
                                 }}
-                                component={Link} to="/dashboard">
+                                component={Link} to="/map">
                                 <RoomIcon />
-                                Dashboard
+                                מפת חום
                             </IconButton>
                         </div>
                         <div>
@@ -96,7 +96,7 @@ class SideBar extends Component {
                                 }}
                                 component={Link} to="/companies">
                                 <EmojiTransportationIcon />
-                                קליטת נתונים
+                                רשימת החברות
                             </IconButton>
                         </div>
                         <div>

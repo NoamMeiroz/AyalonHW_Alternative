@@ -26,7 +26,7 @@ class CompanyTable extends Component {
                     { title: 'Carpool', field: 'CAR_POOL_SOLUTION', type: 'boolean' },
                     { title: 'עבודה מהבית', field: 'WORK_FROM_HOME_SOLUTION', type: 'boolean' },
                     { title: '# אתרים שנקלטו', field: 'SITE_COUNT' },
-                    { title: '# עובדים שנקלטו', field: 'EMP_COUNT' }
+                    { title: '# עובדים שנקלטו', field: 'EMP_COUNT_DESC' }
                 ]}
                 data={companyList}
                 title="רשימת חברות"
@@ -42,7 +42,7 @@ class CompanyTable extends Component {
                 actions={[
                     {
                         icon: "save",
-                        tooltip: 'שמירה',
+                        tooltip: 'דוח טעינה',
                         onClick: (event, rowData) => alert("You saved " + rowData.name)
                     }
                 ]}

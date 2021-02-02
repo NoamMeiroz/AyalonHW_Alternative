@@ -1,6 +1,7 @@
 module.exports = {
    DB: "127.0.0.1:3306",
    dialect: "mysql",
+   dialectOptions: { decimalNumbers: true },
    pool: {
       max: 5,
       min: 0,
@@ -12,11 +13,10 @@ module.exports = {
       SECTOR: "מגזר",
       NUMBER_OF_EMPLOYEES: "מספר עובדים",
       NUMBER_OF_SITES: "מספר סניפים",
-      PRIVATE_CAR: "רכב צמוד",
-//      SHUTTLE: "שאטלים",
-      MASS_TRANSPORTATION: "שירות הסעות",
-      CAR_POOL: "Carpool",
-      WORK_FROM_HOME: "עבודה מהבית"
+      PRIVATE_CAR_SOLUTION: "רכב צמוד",
+      MASS_TRANSPORTATION_SOLUTION: "שירות הסעות",
+      CAR_POOL_SOLUTION: "Carpool",
+      WORK_FROM_HOME_SOLUTION: "עבודה מהבית"
    },
    branchesFieldsName: {
       SITE_ID: "מספר סניף",
@@ -24,13 +24,14 @@ module.exports = {
       ADDRESS_CITY: "עיר",
       ADDRESS_STREET: "רחוב",
       ADDRESS_BUILDING_NUMBER: "מספר"
-//      NUM_OF_EMPLOYEES: "מספר עובדים",
    },
    employeeFieldsName: {
       WORKER_ID: "מזהה עובד",
       BRANCH_ID: "מס\"ד סניף",
       CITY: "עיר מגורים",
       STREET: "רחוב",
+      EXIT_HOUR_TO_WORK: "שעת הגעה למקום העבודה",
+      RETURN_HOUR_TO_HOME: "שעת היציאה ממקום העבודה",
       BUILDING_NUMBER: "מספר בית",
       SHORT_HOURS_GRADE: "קיצור שעות העבודה",
       SHIFTING_HOURS_GRADE: "הזזת זמן הגעה לעבודה",
@@ -46,5 +47,7 @@ module.exports = {
       WORKING_FROM_HOME_GRADE: "עבודה מהבית",
       SHARED_WORKSPACE_GRADE: "עבודה במרכזים שיתופיים",
       SHIFTING_WORKING_DAYS_GRADE: "שינוי ימי הגעה לעבודה"
-   }
+   },
+   DEFAULT_EXIT_HOUR_TO_WORK: 2,
+   DEFAULT_RETURN_HOUR_TO_HOME: 7
 };

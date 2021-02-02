@@ -2,6 +2,7 @@ const { Worker } = require('worker_threads');
 const { logger, ServerError } = require('../log');
 const employeeSchema = require("../db/employeeSchema");
 const employerSchema = require("../db/employerSchema");
+const { sendMessage } = require('../websocket');
 
 function employeesService(workerData) {
 	return new Promise((resolve, reject) => {
@@ -15,14 +16,20 @@ function employeesService(workerData) {
 	})
 }
 
-async function run(employer, employees) {
+async function run(req, employer, employees) {
 	logger.info(employer.NAME + ": saving employees information...");
+	const ip = req.headers['x-forwarded-for'].split(/\s*,\s*/)[0]; // get the ip of the client
 	let state = employerSchema.STATE.READY;
 	try {
 		result = await employeesService({ employer, employees });
-		logger.debug(employer.NAME + ": saving employees result is " + result);
 		if (!result.Employees) {
 			state = employerSchema.STATE.ERROR;
+		}
+		else {
+			let payload = checkResult(result.Employees);
+			payload.employerID = employer.id;
+			// notify client about the upload result; 
+			sendMessage(ip, {type: "upload_result", payload: payload });
 		}
 	}
 	catch (error) {
@@ -30,7 +37,7 @@ async function run(employer, employees) {
 		state = employerSchema.STATE.ERROR;
 	}
 	// finish working on employees
-	employerSchema.setEmploeeState(employer.id, state,
+	employerSchema.setEmployeeState(employer.id, state,
 		(err, result) => {
 			if (result)
 				logger.debug("employee state is " + JSON.stringify(result));
@@ -40,6 +47,20 @@ async function run(employer, employees) {
 			}
 		});
 };
+
+/**
+ * Check count employess that have no error in the UPLOAD_ERROR feature.
+ * @param {employeesList} employessList 
+ */
+const checkResult = (employessList) => {
+	let successCount = 0;
+	let total = employessList.length;
+	for ( emp of employessList ) {
+		if (!emp.dataValues.UPLOAD_ERROR) 
+			successCount = successCount + 1;
+	}
+	return { successCount: successCount, total: total};
+}
 
 /**
  * Check the data of the employer and then insert it to the database
@@ -60,6 +81,16 @@ const getEmployeesOfEmployer = (empId) => {
 				let workSite = employeesList[i].Site.dataValues
 				employeesList[i].WORK_SITE = workSite.ADDRESS_STREET + " " +
 					workSite.ADDRESS_BUILDING_NUMBER + ", " + workSite.ADDRESS_CITY;
+
+				// translate time slot id to meaningful text
+				let timeSLot = employeesList[i].ExitHourToWork.dataValues;
+				employeesList[i].EXIT_HOUR_TO_WORK = timeSLot.TIME_SLOT;
+
+				// translate time slot id to meaningful text
+				timeSLot = employeesList[i].ReturnHourToHome.dataValues;
+				employeesList[i].RETURN_HOUR_TO_HOME = timeSLot.TIME_SLOT;
+				
+				// remove column the client doesnt need
 				delete employeesList[i].updatedAt;
 				delete employeesList[i].createdAt;
 				delete employeesList[i].EMPLOYER_ID;
@@ -76,7 +107,7 @@ const getPrecentFinished = (empId) => {
 		employeeSchema.getPrecentFinished(empId, (err, payload) => {
 			if (err) {
 				logger.error(err.stack);
-				reject(new ServerError(500, "internal error"))
+				reject(new ServerError(500, err))
 			}
 			resolve({ employerID: empId, precent: payload });
 		});

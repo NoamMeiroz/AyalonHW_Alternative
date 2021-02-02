@@ -1,4 +1,5 @@
 const URL = require('url');
+const formidableMiddleware = require('express-formidable');
 const express = require('express');
 const passport = require('passport');
 const router = express.Router();
@@ -15,12 +16,12 @@ const { isInteger } = require("../tools");
  */
 const requireAuth = passport.authenticate('jwt', { session: false });
 
-router.post("/upload/", requireAuth, async (req, res, next) => {
+router.post("/upload/", requireAuth, formidableMiddleware(), async (req, res, next) => {
    let url = URL.parse(req.url, true);
    let xlsxSheets;
    xlsxSheets = await excel.post_file(req, res, url.query.f);
    if (xlsxSheets) {
-      companyData.readSheet(xlsxSheets).then(data => {
+      companyData.readSheet(req, xlsxSheets).then(data => {
          res.status(200).json(data);
       }).catch(error => {
          if (error.status)

@@ -1,0 +1,7 @@
+.queryPanel {
+    direction: rtl;
+}
+
+.queryPanel .MuiGrid-item {
+    box-sizing: content-box;
+}

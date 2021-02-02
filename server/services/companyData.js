@@ -3,9 +3,22 @@ const employerSchema = require("../db/employerSchema");
 const empFields = require("../config/config").employerFieldsName;
 const siteData = require("./siteData");
 const employeesData = require("./employeesData");
-const employer = require('../models/employer');
 const { branchesFieldsName, employeeFieldsName } = require('../config/config');
+const tools = require("../tools");
 
+const { Column, TYPES } = require('./columns/column');
+const { YesNoColumn } = require('./columns/yesno');
+const { Sector } = require('./columns/sector');
+
+const EMP_COLUMNS = [
+        new Column("NAME", "שם חברה",TYPES.STRING, 50, false),
+        new Column("NUMBER_OF_EMPLOYEES", "מספר עובדים",TYPES.INT, 8, false),
+        new Column("NUMBER_OF_SITES", "מספר סניפים",TYPES.INT, 3, false),
+        new YesNoColumn("PRIVATE_CAR_SOLUTION","רכב צמוד"),
+        new YesNoColumn("MASS_TRANSPORTATION_SOLUTION","שירות הסעות"),
+        new YesNoColumn("CAR_POOL_SOLUTION","Carpool"),
+        new YesNoColumn("WORK_FROM_HOME_SOLUTION","עבודה מהבית")
+];
 
 /**
  * Check if sheet has all attributes
@@ -45,10 +58,6 @@ saveEmployer = (employer) => {
  */
 const handleEmployerData = (data) => {
     return new Promise(function (resolve, reject) {
-        BOOL = {
-            "כן": 1,
-            "לא": 0
-        };
         result = defined_structure(data, Object.values(empFields));
         if (!result.valid) {
             return reject(new ServerError(status = 400,
@@ -61,30 +70,27 @@ const handleEmployerData = (data) => {
                     logger.error(err.stack);
                     return reject(new ServerError(500, err));
                 }
-                // create valid employer entity
-                currSector = sectorData.find(sector => sector.dataValues.SECTOR == data[empFields.SECTOR]);
-                if (currSector == null) {
-                    logger.info("incorrect sector");
-                    return reject(new ServerError(400, "סקטור לא תקין או לא קיים במערכת."));
-                }
+               
                 let employer = {
-                    NAME: data[empFields.NAME],
-                    SECTOR: currSector.dataValues.id,
-                    NUMBER_OF_EMPLOYEES: data[empFields.NUMBER_OF_EMPLOYEES],
-                    NUMBER_OF_SITES: data[empFields.NUMBER_OF_SITES],
-                    PRIVATE_CAR_SOLUTION: BOOL[data[empFields.PRIVATE_CAR]],
-                    MASS_TRANSPORTATION_SOLUTION: BOOL[data[empFields.MASS_TRANSPORTATION]],
-                    CAR_POOL_SOLUTION: BOOL[data[empFields.CAR_POOL]],
-                    WORK_FROM_HOME_SOLUTION: BOOL[data[empFields.WORK_FROM_HOME]],
                     EMPLOYER_ID: 0
                 };
+                // check employer data
+                let allColumns = EMP_COLUMNS.concat([new Sector("SECTOR", "מגזר", sectorData)])
+                for (const column of allColumns) {
+                    try {
+                        employer[column.name] = column.validityCheck(data[column.title]);
+                    }
+                    catch (err) {
+                        return reject(new ServerError(400, err.message));
+                    }
+                 }
                 return resolve(employer);
             });
         }
     });
 }
 
-const readSheet = (company_sheets) => {
+const readSheet = (req, company_sheets) => {
     return new Promise(function (resolve, reject) {
         if (company_sheets == undefined) {
             return reject(new ServerError(status = 400, message = "קובץ אקסל לא תקין"));
@@ -137,7 +143,7 @@ const readSheet = (company_sheets) => {
                                 employer.Sites = data;
                                 try {
                                     // handle employees
-                                    employeesData.run(employer, employees);
+                                    employeesData.run(req, employer, employees);
                                     resolve(employer);
                                 }
                                 catch (error) {

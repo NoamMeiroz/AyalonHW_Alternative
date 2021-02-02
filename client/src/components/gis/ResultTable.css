@@ -1,0 +1,21 @@
+.tableFixHead { 
+    height: 70vh;
+}
+
+.tableFixHead table thead tr th {  
+    background-color: white;
+    position: sticky; 
+    top: 0; 
+}
+
+
+.tableFixHead .firstHeader { 
+    position: sticky; 
+    top: 0; 
+}
+
+.tableFixHead .secondHeader { 
+    position: sticky; 
+    top: 50px; 
+}
+
