@@ -28,7 +28,7 @@ class Legend extends PureComponent {
         }
 
         return Object.values(companyList).map(values => {
-            let jsx = <ListItem key={values.name}>
+            let jsx = <ListItem key={values.name} style={{paddingRight:'1px'}}>
                 <ListItemIcon style={{minWidth: 20}}>
                     <CheckBoxOutlineBlankIcon fontSize="small"
                         style={{
@@ -46,8 +46,10 @@ class Legend extends PureComponent {
 
     render() {
         const jsx = <div>
-            <Box style={{ opacity: 0.8, backgroundColor: 'white', border: '2px solid rgba(0,0,0,0.2)' }} >
-                <List dense style={{padding:0}}>
+            <Box style={{ opacity: 0.8, backgroundColor: 'white',
+                direction: 'ltr', height: '10vh', overflowX: 'none', overflowY: 'auto', whiteSpace: 'nowrap',
+                border: '2px solid rgba(0,0,0,0.2)', paddingLeft: '0px' }} >
+                <List dense style={{padding:0, direction: "rtl"}}>
                     {this.getItemList()}
                 </List>
             </Box>

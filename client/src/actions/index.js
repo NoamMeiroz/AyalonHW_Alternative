@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { AUTH_USER, AUTH_ERROR, MESSAGE, CONNECTED } from './types';
 import * as actionUtils from '../utils/actionsUtil';
-import { getSettlementList, getEmployees} from './report';
+import { getSettlementList, getTimeSlotToWork, getTimeSlotToHome } from './const';
+import { getEmployees} from './report';
 import { getData } from './company';
 
 
@@ -29,6 +30,7 @@ export const signin = (formProps, callback) => {
                 dispatch({ type: AUTH_USER, payload: data.data.token, userName: formProps.userId });
                 localStorage.setItem('token', data.data.token); // save token use for later
                 localStorage.setItem('userName', formProps.userId); // save userName use for later
+                dispatch(connected(true));
                 callback();
             }).catch(err => {
                 let message = actionUtils.handleError(err);
@@ -54,9 +56,12 @@ export const connected = (isConnected) => {
         if (isConnected){
             dispatch(getData());
             dispatch(getSettlementList());
+            dispatch(getTimeSlotToHome());
+            dispatch(getTimeSlotToWork());
+            dispatch(getSettlementList());
             dispatch(getEmployees(null,
                 null,
-                null));
+                null, null, null));
         }
         else 
             dispatch(showMessage("קיימת בעיית תקשורת עם השרת"));

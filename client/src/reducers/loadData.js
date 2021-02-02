@@ -1,11 +1,13 @@
-import { ADD_NEW_COMPANY, LOAD_DATA, UPLOAD_RESULT } from '../actions/types';
+import { ADD_NEW_COMPANY, LOAD_DATA, UPLOAD_RESULT, CHECK_PROGRESS } from '../actions/types';
+import {UPLOAD_FAILED, UPLOAD_IN_PROGRESS, UPLOAD_SUCESS} from '../actions/const';
 
 const INITIAL_STATE = {
-    isSuccess: false,
     sectorList: {},
     companyList: [],
     timestamp: new Date()
 }
+
+const LOADING_FAILED_MESSAGE = "טעינת עובדים נכשלה"
 
 export default function (state = INITIAL_STATE, action) {
     let tempList;
@@ -17,25 +19,25 @@ export default function (state = INITIAL_STATE, action) {
                     return (sum + site.NUM_OF_EMPLOYEES);
                 }, 0);
                 company.EMP_COUNT = company.countValidEmployees;
-                company.EMP_COUNT_DESC = `${company.countValidEmployees} מתוך ${sum}`;
+                if (company.EMPLOYEES_READY === UPLOAD_FAILED)
+                    company.EMP_COUNT_DESC = LOADING_FAILED_MESSAGE
+                else
+                    company.EMP_COUNT_DESC = `${company.countValidEmployees} מתוך ${sum}`;
                 company.SITE_COUNT = company.Sites.length
             }
             return {
                 ...state,
-                isSuccess: action.isSuccess,
                 sectorList: action.sectorList,
                 companyList: companyList,
                 timestamp: new Date()
             };
         case ADD_NEW_COMPANY:
             let newCompany = action.new_company;
-            /*let sum = newCompany.Sites.reduce((sum, site) => {
-                return (sum + site.NUM_OF_EMPLOYEES);
-            }, 0);*/
             newCompany.EMP_COUNT = 0;
             newCompany.EMP_COUNT_DESC = "?";
             newCompany.SITE_COUNT = newCompany.Sites.length
-
+            newCompany.UPLOAD_PROGRESS = UPLOAD_IN_PROGRESS;
+            newCompany.EMPLOYEES_READY = 0;
             // remove old company if exists
             tempList = state.companyList
             tempList = tempList.filter(company => {
@@ -45,10 +47,28 @@ export default function (state = INITIAL_STATE, action) {
 
             return {
                 ...state,
-                isSuccess: action.isSuccess,
                 companyList: tempList,
                 timestamp: new Date()
             };
+        case CHECK_PROGRESS:
+            tempList = state.companyList;
+            tempList = tempList.map((company)=> {
+                if (company.id === action.employerID) {
+                    company.UPLOAD_PROGRESS = action.uploadProgess;
+                    if (action.uploadProgess === 100)
+                        company.EMPLOYEES_READY = UPLOAD_SUCESS;
+                    else if (action.uploadProgess === UPLOAD_FAILED){
+                        company.EMPLOYEES_READY = UPLOAD_FAILED;
+                        company.EMP_COUNT_DESC = LOADING_FAILED_MESSAGE
+                    }
+                 }
+                return company;
+            });
+            return {
+                ...state,
+                companyList: tempList,
+                timestamp: new Date()
+            }
         case UPLOAD_RESULT:
             tempList = state.companyList;
             tempList = tempList.map((company)=> {
@@ -58,10 +78,8 @@ export default function (state = INITIAL_STATE, action) {
                 }
                 return company;
             });
-            console.log(tempList);
             return {
                 ...state,
-                isSuccess: action.isSuccess,
                 companyList: tempList,
                 timestamp: new Date()
             };

@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import {  useDispatch } from "react-redux";
+import React from 'react';
 
 import WebSocketProvider from './webSocket';
 import StatusSnackBar from './common/StatusSnackBar';
@@ -77,7 +76,6 @@ const useStyles = makeStyles((theme) => ({
 
 function App({ children }) {
 	const classes = useStyles();
-	const dispatch = useDispatch();
 
 	return (
 		<RTL>

@@ -4,7 +4,9 @@
  * @param {string} s 
  */
 function isHebrewLetter(s) {
-   let result = s.match("^([א-ת]+(?:(\. )|- | - | -|-| |'|\"|״|\`))*[א-ת]*$");
+   //match=/^([א-ת]+(?:(\. )|- | - | -|-| \(| |'|\"|’|״|\`))*[א-ת]+(?:\))*$/
+   match=/^(([א-ת]+\s*(?:(\.)|-|\(| |'|\"|’|״|\`))*\s*[א-ת]+(?:\))*)+$/
+   let result = s.match(match);
    if (result)
       return true;
    else
@@ -16,7 +18,7 @@ function isHebrewLetter(s) {
  * @param {*} id 
  */
 function isInteger(id) {
-   if (!id)
+   if (id===null || id===undefined)
       return false;
    if (Number.isInteger(id))
       return true;
@@ -28,16 +30,19 @@ function isInteger(id) {
  * Will return sunday if date is thursday.
  * @param {Date} date 
  */
-function getNearestWorkDay(date) {
+function getNearestWorkDay(date, hour) {
    let now = new Date();
+   // get local timezone offset and convert to milliseconds
+   const localOffset = 2;
+   const hourParts = hour.split(":");
    now.setDate(date.getDate() + 1)
-   now.setHours(8);
-   now.setMinutes(0);
+   now.setHours(hourParts[0]-localOffset);
+   now.setMinutes(hourParts[1]);
    now.setMilliseconds(0);
    if (now.getDay() >= 5)
-      return getNearestWorkDay(now);
+      return getNearestWorkDay(now, hour);
    else {
-      return (Math.floor(now.getTime() / 1000));
+      return (now.getTime());
    }
 }
 

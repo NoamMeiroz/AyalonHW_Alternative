@@ -2,21 +2,8 @@ const axios = require('axios');
 const proj4 = require('proj4');
 const { ServerError, logger } = require('../log');
 const tools = require('../tools');
-const { debug, error } = require('winston');
 const localityService = require('../services/localityData');
-
-const ERRORS = {
-   INVALID_ADDRESS_CODE: 1000,
-   MISSING_CITY_CODE: 1001,
-   MISSING_STREET_CODE: 1002,
-   MISSING_BUILDING_NUMBER_CODE: 1003,
-   MISSING_ORIGIN_CODE: 1004,
-   MISSING_DESTINATION_CODE: 1005,
-   INVALID_CITY: 1006,
-   INVALID_STREET: 1007,
-   CITY_CODE_NOT_FOUND: 1008,
-   HELKA_NOT_FOUND: 1009
-};
+const { ERRORS } = require("./ERRORS");
 
 const LOCATION_TYPE = ["street_address", "route", "establishment", "hospital"];
 
@@ -102,28 +89,8 @@ getCoordinates = (payload, index) => {
  */
 const convertLocation = async (cityParam, streetParam, buildingNumber) => {
    return new Promise(function (resolve, reject) {
-      // check for valid addrees
-      
-      if (!cityParam) {
-         return resolve(new ServerError(ERRORS.MISSING_CITY_CODE, "missing city"));
-      }
-      if (!streetParam) {
-         return resolve(new ServerError(ERRORS.MISSING_STREET_CODE, "missing street"));
-      }
-      if (buildingNumber === null) {
-         return resolve(new ServerError(ERRORS.MISSING_BUILDING_NUMBER_CODE, "missing building number"));
-      }
-      let city = cityParam.trim();
-      if (!tools.isHebrewLetter(city)) {
-         return resolve(new ServerError(ERRORS.INVALID_CITY, "City name is incorrect:" + city));
-      }
-      let street = tools.removeLastWordWithDigits(streetParam).trim();
-
-      if (!tools.isHebrewLetter(street)) {
-         return resolve(new ServerError(ERRORS.INVALID_STREET, "Street name is incorrect:" + street));
-      }
-
-      let address = `${street} ${buildingNumber}, ${city}`;
+     
+      let address = `${streetParam} ${buildingNumber}, ${cityParam}`;
       address = encodeURI(address);
       let key = process.env.GOOGLE_API_KEY;
       url = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&language=iw&key=${key}`;
@@ -218,19 +185,19 @@ const checkRouteResults = (payload) => {
          result = "Google api denied the request";
          break;
       case 'NOT_FOUND':
-         result = {};
+         result = "";
          break;
       case 'ZERO_RESULTS':
-         result = {};
+         result = "";
          break;
       default:
-         result = "Google api denied the request: " + JSON.stringify(status);
+         result = "Google api denied the request: " + status;
          break;
    }
    return result;
 }
 
-const getRoutes = async (origin, destination) => {
+const getRoutes = async (origin, destination, time) => {
    return new Promise(function (resolve, reject) {
 
       if (!origin) {
@@ -265,7 +232,6 @@ const getRoutes = async (origin, destination) => {
       let key = process.env.GOOGLE_API_KEY;
       let modeList = ['transit', 'bicycling', 'walking', 'driving'];
       let promiseList = [];
-      let time = tools.getNearestWorkDay(new Date());
       modeList.forEach((mode, index, array) => {
          params = `origin=${originAddr}&destination=${destinationAddr}&mode=${mode}&language=iw&departure_time=${time}&alternatives=true&key=${key}`
          url = `https://maps.googleapis.com/maps/api/directions/json?${params}`;
@@ -280,11 +246,12 @@ const getRoutes = async (origin, destination) => {
                if (result==='OK') {
                   suggestedRoutes[modeList[index]] = res.data.routes;
                }
-               else if (result === {})
+               else if (result === ""){
                   suggestedRoutes[modeList[index]] = { error: "לא נמצא מסלול" };
+               }
                else {
-                  suggestedRoutes[modeList[index]] = { error: "שגיאה במערכת. לא ניתן לחשב מסלול - " + JSON.stringify(result)};
-                  logger.error(JSON.stringify(result));
+                  suggestedRoutes[modeList[index]] = { error: "שגיאה במערכת. לא ניתן לחשב מסלול - " + result};
+                  logger.error(result);
                }
             });
             return resolve(suggestedRoutes);

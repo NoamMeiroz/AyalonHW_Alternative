@@ -7,6 +7,7 @@ import {
     UPLOAD_RESULT,
     MESSAGE,
 } from './types';
+import {UPLOAD_FAILED} from './const';
 import * as actionUtils from '../utils/actionsUtil';
 
 /**
@@ -95,12 +96,12 @@ export const checkProgress = (employerId) => {
                     });
                 }
                 else {
-                    let message = "בעיה במערכת, תשובה מהשרת לא תקינה";
+                    let message = "בעיה במערכת, נא לפנות לתמיכה";
                     dispatch({ type: ERROR, errorMessage: message, employerID: employerId });
                     dispatch({
                         type: CHECK_PROGRESS,
-                        employerID: payload.data.employerID,
-                        uploadProgess: 100
+                        employerID: employerId,
+                        uploadProgess: UPLOAD_FAILED
                     });
                 }
             }).catch(err => {
@@ -109,7 +110,7 @@ export const checkProgress = (employerId) => {
                 dispatch({
                     type: CHECK_PROGRESS,
                     employerID: employerId,
-                    uploadProgess: 100
+                    uploadProgess: UPLOAD_FAILED
                 });
             });
     }

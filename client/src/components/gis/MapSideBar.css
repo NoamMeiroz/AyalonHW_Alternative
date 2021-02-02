@@ -1,8 +1,12 @@
 
 .sidebar {
     position: relative;
+    direction: ltr;
     z-index: 2;
-    width: 300px;;
+    width: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 500px;
 } 
 
 .sidebar-right {
@@ -11,6 +15,7 @@
 
 .Button {
     width: 80%;
+    margin: auto;
 }
 
 .sidebar .MuiTypography-h6 {

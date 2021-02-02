@@ -1,5 +1,5 @@
+const { ServerError } = require("../log");
 const db = require("./database");
-const Employee = db.employee;
 const Employer = db.employer;
 const Sector = db.sector;
 const EmployerSites = db.employerSites;
@@ -89,12 +89,12 @@ const getAllComapnies = (callback) => {
 };
 
 /**
- * Count for each employer how many employees are in valid status (no error field in the BEST_ROUTE json object);
+ * Count for each employer how many employees are in valid status (no error field in the UPLOAD_ERROR json object);
  * @param {*} callback 
  */
 const countValidEmployees = (callback) => {
   db.sequelize.query("SELECT e.EMPLOYER_ID, count(*) validCount FROM alternative.employees e " +
-     " where JSON_CONTAINS_PATH(e.BEST_ROUTE, 'one', '$.error')=0 group by e.EMployer_id", 
+     " where IFNULL(JSON_CONTAINS_PATH(e.UPLOAD_ERROR, 'one', '$.error'),0)=0 group by e.EMployer_id", 
      { type: db.Sequelize.QueryTypes.SELECT })
      .then(data => callback( null, data ))
      .catch( err => callback( err, getMessage(err)));
@@ -125,10 +125,17 @@ const loadingStatus = (employerId, callback) => {
     }
   }).then(data => {
     result = false;
-    if (data.length > 0)
-      if (data[0].dataValues.EMPLOYEES_READY === STATE.READY)
+    error = null;
+    if (data.length > 0) {
+      let state = data[0].dataValues.EMPLOYEES_READY;
+      if (state === STATE.READY)
         result = true;
-    callback(null, result)
+      else if (state === STATE.ERROR){
+        rerult = true;
+        error = new ServerError(500, "טעינת עובדים נכשלה. יש לפנות לתמיכה");
+      }
+    }
+    callback(error, result)
   })
   .catch(err => { callback(err, getMessage(err)); });
 };

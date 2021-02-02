@@ -35,21 +35,22 @@ const localization = {
 const defaultStyle = {
     cellStyle: {
         width: 20,
-        height: 10,
+        height: 8,
         maxWidth: 20,
         padding: 0,
         textAlign: 'right',
         lineHeight: '1vmax',
-        fontSize: '1.2vmax',
+        fontSize: '1vmax',
         letterSpacing: "0px",
         color: "#242736",
         opacity: 1
     },
     headerStyle: {
         height: 20,
-        maxHeight: 20,
+        maxHeight: 10,
         fontSize: '1vmax',
-        fontWeight: "bold"
+        fontWeight: "bold",
+        lineHeight: '1rem'
     }
 }
 

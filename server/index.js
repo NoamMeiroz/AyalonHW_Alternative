@@ -10,7 +10,6 @@ const constRoutes = require("./routes/constRoutes");
 const db = require("./db/database");
 const { logger, ServerError } = require('./log');
 const cors = require("cors");
-const formidableMiddleware = require('express-formidable');
 const { wsServer } = require("./websocket");
 
 var server_app = express();
@@ -50,8 +49,9 @@ server_app.use((req, res, done) => {
 
 //server_app.use(sessionParser);
 server_app.use(bodyParser.json());
+server_app.use(bodyParser.urlencoded({ extended: true }));
 server_app.use(cors());
-server_app.use(formidableMiddleware());
+//server_app.use(formidableMiddleware());
 // routing
 server_app.use("/api", authRoutes);
 server_app.use("/api/employer", employerRoutes);
@@ -62,6 +62,7 @@ server_app.use("/api/const", constRoutes);
 // error handling. must be last call 
 server_app.use(function (err, req, res, next) {
 	// set locals, only providing error in development
+	console.log(err);
 	if (err.message)
 		if (err.message instanceof ServerError)
 			res.locals.message = err.message.message;

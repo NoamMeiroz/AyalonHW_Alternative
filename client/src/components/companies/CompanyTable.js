@@ -42,7 +42,7 @@ class CompanyTable extends Component {
                 actions={[
                     {
                         icon: "save",
-                        tooltip: 'שמירה',
+                        tooltip: 'דוח טעינה',
                         onClick: (event, rowData) => alert("You saved " + rowData.name)
                     }
                 ]}
