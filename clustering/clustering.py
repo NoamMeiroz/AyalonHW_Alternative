@@ -366,7 +366,6 @@ class KMeansConstrained(KMeans):
 try:
     # parse input
     parsedInput = json.loads(sys.argv[1])
-
     # create data frame
     employees = pd.DataFrame(parsedInput['employees'])
     # preproccessing
@@ -376,9 +375,8 @@ try:
     for k in range(1,len(scaled)):
         try:
             kmeans_per_k = KMeansConstrained(n_clusters=k,
-                                            random_state=42,
-                                            size_min = parsedInput['minCluster'],
-                                            size_max = parsedInput['maxCluster'])
+                                             random_state=42,
+                                             size_max = parsedInput['maxCluster'])
             kmeans_per_k.fit_predict(scaled)
             silhouette_scores.append(silhouette_score(scaled,kmeans_per_k.labels_))
         except:
@@ -387,16 +385,18 @@ try:
 
     # run model
     kmeans_output = KMeansConstrained(n_clusters=k_clusters,
-                                            random_state=42,
-                                            size_min = parsedInput['minCluster'],
-                                            size_max = parsedInput['maxCluster'])
+                                             random_state=42,
+                                             size_max = parsedInput['maxCluster'])
     # fit model
     kmeans_output.fit_predict(scaled)
 
     # assign 
     employees = employees.assign(cluster = kmeans_output.labels_)
 
-    # print output
+    # eliminate clusters with less than 3 employees
+    employees.loc[employees.cluster.isin(employees.cluster.value_counts()[employees.cluster.value_counts()<3].index),'cluster'] = -1
+
+    # print
     print(employees.to_json(orient="records"))
 
 except Exception as e:
