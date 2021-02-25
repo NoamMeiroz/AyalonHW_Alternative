@@ -12,6 +12,8 @@ from sklearn.metrics import silhouette_score
 import sklearn.preprocessing as preprocessing
 import json
 import sys
+import traceback
+from json_schema import json_schema
 
 # Internal scikit learn methods imported into this project
 from k_means_constrained.sklearn_import.cluster._k_means import _centers_dense, _centers_sparse
@@ -364,8 +366,17 @@ class KMeansConstrained(KMeans):
 
 
 try:
-    # parse input
-    parsedInput = json.loads(sys.argv[1])
+    # check input
+    schema = '{"maxCluster": "int", "employees": [{"id": "int", "EMPLOYER_ID": "int", "WORKER_ID": "int", "X": "float", "Y": "float"}, "..."]}'
+    if json_schema.match(sys.argv[1],schema):
+        # parse input
+        parsedInput = json.loads(sys.argv[1])
+        # validate maxCluster as positive int
+        if (not isinstance(parsedInput['maxCluster'],int)) or (parsedInput['maxCluster'] < 0):
+            raise TypeError('maxCluster must be a positive integer')
+    else:
+        raise TypeError('Input does not comply with the required schema')
+
     # create data frame
     employees = pd.DataFrame(parsedInput['employees'])
     # preproccessing
@@ -399,5 +410,33 @@ try:
     # print
     print(employees.to_json(orient="records"))
 
-except Exception as e:
-    print(e)
+except:
+    # codes and messages
+    codes = {'Input does not comply with the required schema':3000,
+            'maxCluster must be a positive integer':3001,
+            'Not implemented for sparse X':3002,
+            'Invalid number of initializations':3003,
+            'Number of iterations should be a positive number':3004,
+            'Explicit initial center position passed':3005,
+            'size_min and size_max must be a positive number':3006,
+            'size_max must be larger than size_min':3007,
+            'The product of size_min and n_clusters cannot exceed the number of samples':3008,
+            '`edges`, `costs`, `capacities`, `supplies` must all be int dtype':3009,
+            'There was an issue with the min cost flow input':3010}
+    
+    # get error elements
+    errorObj = sys.exc_info()
+    code = 0
+    errString = str(errorObj[1])
+
+    # iterate over the dictionary
+    for message in codes:
+        if errString.find(message) != -1:
+            code = codes[message]
+            break
+
+    # generate error object
+    errorOutput = {'code':str(code), 'message':errString, 'trace':str(traceback.format_exc())}
+    
+    # print
+    print(json.dumps(errorOutput))
