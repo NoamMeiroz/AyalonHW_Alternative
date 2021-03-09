@@ -33,7 +33,7 @@ class ShapeLayer extends Component {
             className: `custom-div-icon-train`,
             html: `<div class='marker-pin'></div><i/>`,
             iconSize: [25, 37],
-            iconAnchor: [15, 37],
+            iconAnchor: [14, 28],
             popupAnchor: [0, -35]
         });
 

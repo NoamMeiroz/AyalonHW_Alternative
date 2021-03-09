@@ -16,8 +16,10 @@ import SaveRoundedIcon from '@material-ui/icons/SaveRounded';
 
 //const MAX_WALK_TIME = 30;
 //const MAX_BICYCLE_TIME = 60;
-const MARK_COLUMNS = {I:'J',K:'L',M:'N',O:'P',Q:'R',S:'T',U:'V',W:'X',
-   Y:'Z', AA:'AB', AC:'AD', AE:'AF', AG:'AH', AI:'AJ'};
+const MARK_COLUMNS = {
+   I: 'J', K: 'L', M: 'N', O: 'P', Q: 'R', S: 'T', U: 'V', W: 'X',
+   Y: 'Z', AA: 'AB', AC: 'AD', AE: 'AF', AG: 'AH', AI: 'AJ'
+};
 
 class DownloadButton extends Component {
 
@@ -111,7 +113,6 @@ class DownloadButton extends Component {
    getBicycleDescription = (bicycleDescription) => {
       if (bicycleDescription.error)
          return { description: bicycleDescription.error };
-      console.log(bicycleDescription);
       let bestRoute = this.findFastestRoute(bicycleDescription);
       const steps = bestRoute.legs[0].steps;
       let bicycle = [];
@@ -171,7 +172,7 @@ class DownloadButton extends Component {
 
       // 60 minute walking is not recommended
       //if ((walkingDescription[0].legs[0].duration.value / 60) > MAX_WALK_TIME)
-       //  return "";
+      //  return "";
 
       // add total length and length
       description = `סה"כ ${walkingDescription[0].legs[0].duration.text} למרחק של ${walkingDescription[0].legs[0].distance.text}\n`;
@@ -188,7 +189,6 @@ class DownloadButton extends Component {
    getDrivingDescription = (drivingDescription) => {
       if (drivingDescription.error)
          return { description: drivingDescription.error };
-      console.log(drivingDescription);
       let bestRoute = this.findFastestRoute(drivingDescription);
       const steps = bestRoute.legs[0].steps;
       let driving = [];
@@ -413,14 +413,12 @@ class DownloadButton extends Component {
 
    render() {
       let jsx = {};
-  
-
       if (this.props.csvData.EMPLOYEES_READY === 1)
-         jsx = <IconButton color="primary" aria-label="upload picture" component="span" style={{padding: '2px'}}
+         jsx = <IconButton color="primary" aria-label="upload picture" component="span" style={{ padding: '2px' }}
             onClick={(e) => { this.saveEmployeesList(this.props.csvData.id, this.props.fileName) }}>
             <SaveRoundedIcon />
          </IconButton>;
-      else if (this.props.csvData.EMPLOYEES_READY === 0 ) {
+      else if (this.props.csvData.EMPLOYEES_READY === 0) {
          jsx = <div>
             <Typography variant="caption" color="textSecondary">טעינת עובדים</Typography>
             <Box position="relative" display="inline-flex">
@@ -447,9 +445,9 @@ class DownloadButton extends Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
- //  if (state.employeesData.employerID === ownProps.csvData.id){
- //     return { uploadProgess: state.employeesData.uploadProgess };
-  // }
+   //  if (state.employeesData.employerID === ownProps.csvData.id){
+   //     return { uploadProgess: state.employeesData.uploadProgess };
+   // }
    return {};
 };
 

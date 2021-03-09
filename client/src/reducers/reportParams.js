@@ -2,10 +2,13 @@
 import {
     QUERY_TIME_SLOT_HOME, QUERY_TIME_SLOT_WORK,
     QUERY_COMPANY, QUERY_LIVING_CITY, QUERY_WORKING_CITY, QUERY_MARK,
-    QUERY_STARTING_POLYGON, QUERY_DESTINATION_POLYGON
+    QUERY_STARTING_POLYGON, QUERY_DESTINATION_POLYGON,
+    QUERY_CLUSTRING_BOUNDERY
 } from '../actions/types';
 const MIN_MARK = -1;
 const MAX_MARK = 16;
+const MIN_CLUSTER = 3;
+const MAX_CLUSRTER = 30;
 const INITIAL_STATE = {
     qTimeSlotHomeParams: [],
     qTimeSlotWorkParams: [],
@@ -26,6 +29,7 @@ const INITIAL_STATE = {
         FINAL_SHARED_WORKSPACE_GRADE: [MIN_MARK, MAX_MARK],
         FINAL_SHIFTING_WORKING_DAYS_GRADE: [MIN_MARK, MAX_MARK]
     },
+    qClusterBoundery: MAX_CLUSRTER,
     qLivingCityParams: [],
     qWorkingCityParams: [],
     qDestinationPolygonParams: {},
@@ -63,6 +67,12 @@ export default function (state = INITIAL_STATE, action) {
             return {
                 ...state,
                 qWorkingCityParams: action.workingCityList,
+                timestamp: new Date()
+            };
+        case QUERY_CLUSTRING_BOUNDERY:
+            return {
+                ...state,
+                qClusterBoundery: action.value,
                 timestamp: new Date()
             };
         case QUERY_MARK:

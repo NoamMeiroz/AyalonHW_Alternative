@@ -13,7 +13,7 @@ class MarkerLayer extends Component {
                 className: `custom-div-icon-${iconName}`,
                 html: `<div style="background-color:${color}" class='shape-marker-pin'></div><i/>`,
                 iconSize: [30, 42],
-                iconAnchor: [15, 42],
+                iconAnchor: [14, 28],
                 popupAnchor:[0, -30]
             });
         else

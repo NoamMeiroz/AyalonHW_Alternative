@@ -39,6 +39,21 @@ const insertBulk = (employees, callback) => {
       });
 };
 
+/**
+ * Update a bulk of emplyees with one sql statement
+ * @param {*} employees 
+ * @param {*} callback 
+ */
+const updateBulk = (employees, callback) => {
+   // Save  in the database
+   Employee.bulkUpate(employees)
+      .then(data => { callback(null, data) })
+      .catch(err => {
+         callback(err, getMessage(err));
+      });
+};
+
+
 
 /**
  * Delete all employees of employer
@@ -296,5 +311,5 @@ const getPrecentFinished = (employerID, callback) => {
 
 module.exports = {
    insertBulk, updateRoute, getEmployeesOfEmployer, getPrecentFinished,
-   getEmployees
+   getEmployees, updateBulk
 };

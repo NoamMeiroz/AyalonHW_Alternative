@@ -14,19 +14,30 @@ services:
       - '3306:3306'
     volumes:
       - db-data:/var/lib/mysql
+  clustering:
+    image: nativelaasakimcr.azurecr.io/clustering
+    volumes:
+      - /clustering/node_modules
+      - /clustering
+      - logs_dir:/clustering/logs
+    restart: always
+    stdin_open: true
+    tty: true
+    command: ["npm", "run", "start"] 
   node_server:
     image: nativelaasakimcr.azurecr.io/node_server
     environment:
       - mysql_server=mysql
-      - NODE_ENV=development
+      - NODE_ENV=production
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - secert=${secret}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - CLUSTERING_SERVER=clustering
     volumes:
       - /server
       - /server/node_modules
-      - node_logs:/server/logs
+      - logs_dir:/server/logs
     restart: always
     stdin_open: true
     tty: true
@@ -53,7 +64,7 @@ services:
     restart: always
     volumes:
       - ./secret:/etc/nginx/certs
-      - node_logs:/spool/logs
+      - logs_dir:/spool/logs
   volumes:
     db-data:
       driver: local
@@ -61,7 +72,7 @@ services:
         o: bind
         type: None
         device: /home/NativeLaasakimAH/datadrive/db-data
-    node_logs:
+    logs_dir:
       driver: local
       driver_opts:
         o: bind

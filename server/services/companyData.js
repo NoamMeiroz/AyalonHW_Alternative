@@ -4,7 +4,6 @@ const empFields = require("../config/config").employerFieldsName;
 const siteData = require("./siteData");
 const employeesData = require("./employeesData");
 const { branchesFieldsName, employeeFieldsName } = require('../config/config');
-const tools = require("../tools");
 
 const { Column, TYPES } = require('./columns/column');
 const { YesNoColumn } = require('./columns/yesno');
@@ -179,7 +178,7 @@ const readSheet = (req, company_sheets) => {
                     reject(error);
                 }
                 else {
-                    logger.error(error.stack);
+                    logger.error(error);
                     reject(new ServerError(500, error));
                 }
             });
@@ -187,4 +186,21 @@ const readSheet = (req, company_sheets) => {
     });
 }
 
-module.exports = { readSheet };
+/**
+ * Delete and reomove entire company data
+ * @param {*} employer 
+ */
+const deleteEmployer = (empID) => {
+	return new Promise(function (resolve, reject) {
+		employerSchema.deleteEmployer(empID, (err, payload) => {
+			if (err) {
+				logger.error(err.stack);
+				reject(new ServerError(500, err))
+			}
+			resolve({});
+		});
+	});
+}
+
+
+module.exports = { readSheet, deleteEmployer };

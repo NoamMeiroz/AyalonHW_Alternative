@@ -11,7 +11,6 @@ import Welcome from './components/Welcome';
 import SignIn from './components/auth/SignIn';
 import Companies from './components/companies/Companies';
 import MapTabsPanel from './components/gis/MapTabsPanel';
-import SharePotential from './components/reports/SharePotential';
 import InfoPanel from './components/dashboard/InfoPanel';
 import reducers from './reducers';
 import SignOut from './components/auth/SignOut';
@@ -43,7 +42,6 @@ ReactDOM.render(
 					<Route path="/signin" exact component={SignIn} />
 					<Route path="/companies" exact component={getMainComponent(<Companies />)} />
 					<Route path="/map" exact component={MapTabsPanel} />
-					<Route path="/reports/share_potential" exact component={getMainComponent(<SharePotential />)} />
 					<Route path="/signout" exact component={SignOut} />
 					<Route path="/" component={Welcome} />
 				</Switch>

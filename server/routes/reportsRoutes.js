@@ -101,4 +101,60 @@ router.post("/employee", requireAuth, (req, res, next) => {
 
 });
 
+/**
+ * get all employees of specific employer
+ */
+router.post("/cluster", requireAuth, (req, res, next) => {
+    let errorMessage = "employer id is missing or incorrect";
+    let isError = false;
+    if (req.body) {
+        companies = req.body.companies;
+        if (companies) {
+            try {
+                companies = companies.map((value, index, arr) => {
+                    return parseInt(value);
+                });
+            }
+            catch (err) {
+                logger.error(err.stack);
+                isError = true;
+                companies = null;
+            }
+        }
+        if (!isError) {
+            let livingCity = req.body.livingCity;
+            let workingCity = req.body.workingCity;
+            let timeSlotWork =req.body.timeSlotWork;
+            let timeSlotHome = req.body.timeSlotHome;
+            let destinationPolygon = req.body.destinationPolygon;
+            let startingPolygon = req.body.startingPolygon;
+            let clusterBoundery = req.body.clusterBoundery;
+
+            let marks = req.body.marks;
+            reports.getCluster(companies, livingCity, workingCity, 
+                timeSlotWork, timeSlotHome, marks, 
+                destinationPolygon, startingPolygon, clusterBoundery).then((payload) => {
+                res.status(200).json(payload);
+            }).catch(error => {
+                if (error.status)
+                    res.status(error.status).send(error.message);
+                else {
+                    logger.error(error.stack);
+                    res.status(500).send("Internal Error");
+                }
+            });
+        }
+        else
+            isError = true;
+    }
+    else
+        isError = true;
+
+    if (isError) {
+        logger.info(errorMessage);
+        res.status(400).send(errorMessage);
+    }
+
+});
+
 module.exports = router;

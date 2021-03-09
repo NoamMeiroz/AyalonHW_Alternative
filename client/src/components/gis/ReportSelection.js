@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect, useDispatch} from 'react-redux';
+import { connect, useDispatch, useSelector} from 'react-redux';
 
 import ToggleButton from '@material-ui/lab/ToggleButton';
 import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
@@ -21,6 +21,13 @@ const ReportSelection = () => {
     const dispatch = useDispatch();
 
     const [report, setReoprt] = React.useState(reportTypes.GENERAL_REPORT);
+    const isCouplungDisabled = useSelector(state => { 
+        if (state.reports.clusterReport.length>0)
+            return false;
+        else    
+            return true;
+    });
+
 
     const handleReport = (event, newReport) => {
         if (newReport !== null) {
@@ -45,6 +52,9 @@ const ReportSelection = () => {
                 </ToggleButton>
                 <ToggleButton value={reportTypes.TOP_FIVE_SOLUTIONS} aria-label="top 5 solution">
                     דרוג פתרונות
+                </ToggleButton>
+                <ToggleButton value={reportTypes.COUPLING_REPORT} aria-label="coupling report" disabled={isCouplungDisabled}>
+                    דוח צימודים
                 </ToggleButton>
             </ToggleButtonGroup>    </div>
     );

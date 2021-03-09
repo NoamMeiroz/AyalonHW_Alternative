@@ -9,6 +9,8 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import requireAuth from '../requireAuth'; //used to check if login successfull
 import TimeSlotQuery from './TimeSlotQuery';
 import MarksQuery from './MarksQuery';
+import Fade from '@material-ui/core/Fade';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import './HeatmapQueryPanel.css';
 
 const CITY_NAME_COLUMN = "NAME";
@@ -136,8 +138,22 @@ class HeatmapQueryPanel extends PureComponent {
                     <Divider style={{ width: '10vh', margin: 'auto' }} />
                 </Grid>
                 <Grid item xs={12}>
-                    <Button className="Button" variant="contained"
-                        onClick={this.handleClick}>הצגה</Button>
+                    <Button className="queryButton" variant="contained"
+                        onClick={this.handleClick}>הצגה
+                        <Fade
+                            in={this.props.isGeneralReportRunnig}
+                            style={{
+                                transitionDelay: this.props.isGeneralReportRunnig ? '800ms' : '0ms',
+                            }}
+                            unmountOnExit
+                        >
+                            <CircularProgress size={15} />
+                        </Fade>
+                    </Button>
+
+                </Grid>
+                <Grid item xs={12}>
+                    {this.props.children}
                 </Grid>
             </Grid>
         </div>
@@ -153,8 +169,9 @@ function mapStateToProps(state) {
     let selectedCompnayList = [];
     let selectedLivingCityList = [];
     let selectedWorkingCityList = [];
-    let qStartingPolygon= {};
+    let qStartingPolygon = {};
     let qDestinationPolygon = {};
+    let isGeneralReportRunnig = false;
     if (state.loadData.companyList) {
         companies = state.loadData.companyList;
     }
@@ -184,7 +201,7 @@ function mapStateToProps(state) {
     // selected workingCity
     if (state.reportParams.qWorkingCityParams) {
         for (const selectedCity of state.reportParams.qWorkingCityParams) {
-            for (const city of state.consts.settlementList){
+            for (const city of state.consts.settlementList) {
                 if (city[CITY_NAME_COLUMN] === selectedCity) {
                     selectedWorkingCityList.push(city);
                     break;
@@ -208,6 +225,7 @@ function mapStateToProps(state) {
     if (state.reportParams.qStartingPolygonParams) {
         qStartingPolygon = state.reportParams.qStartingPolygonParams.polygon;
     }
+    isGeneralReportRunnig = state.reports.isGeneralReportRunnig;
     return {
         companies: companies, settlementList: settlementList,
         qTimeSlotToWork: qTimeSlotToWork, qTimeSlotToHome: qTimeSlotToHome,
@@ -216,7 +234,8 @@ function mapStateToProps(state) {
         selectedLivingCityList: selectedLivingCityList,
         selectedWorkingCityList: selectedWorkingCityList,
         qStartingPolygon: qStartingPolygon,
-        qDestinationPolygon: qDestinationPolygon
+        qDestinationPolygon: qDestinationPolygon,
+        isGeneralReportRunnig: isGeneralReportRunnig
     };
 };
 

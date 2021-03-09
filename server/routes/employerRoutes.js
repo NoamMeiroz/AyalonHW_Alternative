@@ -122,4 +122,38 @@ router.get("/:employerId/employee/precentReady", requireAuth, (req, res, next) =
 
 });
 
+/**
+ * delete and remove entire company
+ */
+router.delete("/:employerId", requireAuth, (req, res, next) => {
+   let errorMessage = "employer id is missing or incorrect";
+   let isError = false;
+   if (req.params) {
+      if ((req.params.employerId) && isInteger(req.params.employerId)) {
+         empId = parseInt(req.params.employerId);
+         companyData.deleteEmployer(empId).then((payload) => {
+            res.status(200).json("success");
+         }).catch(error => {
+            if (error.status)
+               res.status(error.status).send(error.message);
+            else {
+               logger.error(error.stack);
+               res.status(500).send("Internal Error");
+            }
+         });
+      }
+      else
+         isError = true;
+   }
+   else
+      isError = true;
+
+   if (isError) {
+      logger.info(errorMessage);
+      res.status(400).send(errorMessage);
+   }
+
+});
+
+
 module.exports = router;

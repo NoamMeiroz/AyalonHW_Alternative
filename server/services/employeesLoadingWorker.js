@@ -54,7 +54,7 @@ const findRoutes = async function (employee, sites) {
       if (employee.UPLOAD_ERROR) {
          resolve(employee);
       }
-      origin = {
+      let origin = {
          city: employee.CITY, street: employee.STREET,
          buildingNumber: employee.BUILDING_NUMBER
       };
@@ -63,7 +63,7 @@ const findRoutes = async function (employee, sites) {
       workSite = sites.find((site) => {
          return (site.id === employee.WORK_SITE)
       })
-      destination = {
+      let destination = {
          city: workSite.ADDRESS_CITY, street: workSite.ADDRESS_STREET,
          buildingNumber: workSite.ADDRESS_BUILDING_NUMBER
       };
@@ -77,15 +77,15 @@ const findRoutes = async function (employee, sites) {
             employee.BEST_ROUTE_TO_WORK = routeResult;
             return employee;
          })
-         .then(employee => {
+         .then(empl => {
             // calculate routes from home to work for the nearest work day at
             // the hour the employee is going to work
             // the hour it utc and not local because of google api 
-            let time = getNearestWorkDay(new Date(), getTimeSlotHour(employee.RETURN_HOUR_TO_HOME));
+            let time = getNearestWorkDay(new Date(), getTimeSlotHour(empl.RETURN_HOUR_TO_HOME));
             googleAPI.getRoutes(destination, origin, time)
                .then(routeHomeResult => {
-                  employee.BEST_ROUTE_TO_HOME = routeHomeResult;
-                  return resolve(employee);
+                  empl.BEST_ROUTE_TO_HOME = routeHomeResult;
+                  return resolve(empl);
                })
                .catch(error => {
                   logger.error(error.stack);

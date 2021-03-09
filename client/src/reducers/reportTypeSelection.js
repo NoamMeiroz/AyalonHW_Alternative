@@ -195,6 +195,42 @@ const getTopSolutionsColumns = () => {
     return columns;
 }
 
+const getCouplngReportColumns = () => {
+    const columns = [
+        { Header: 'שם חברה', accessor: 'COMPANY', className: "secondHeader", style: { width: 100 } },
+        { Header: 'מזהה עובד', accessor: 'WORKER_ID', className: "secondHeader", style: { width: 50 } },
+        { Header: 'קבוצה', accessor: 'cluster', className: "secondHeader", style: { width: 50 } },
+        {
+            Header: 'ציונים', className: "firstHeader", columns: [
+                { Header: "Shuttle On Demand", accessor: 'FINAL_PERSONALIZED_SHUTTLE_GRADE', className: "secondHeader", style: { width: 100 } },
+                { Header: "שאטלים מטעם העבודה", accessor: 'FINAL_WORK_SHUTTLE_GRADE', className: "secondHeader", style: { width: 100 } },
+                { Header: "Carshare/Vanshare", accessor: 'FINAL_CARSHARE_GRADE', className: "secondHeader", style: { width: 100 } },
+                { Header: "Carpool/Vanpool", accessor: 'FINAL_CARPOOL_GRADE', className: "secondHeader", style: { width: 100 } },
+                { Header: "מוניות שיתופיות", accessor: 'FINAL_CABSHARE_GRADE', className: "secondHeader", style: { width: 100 } }
+            ]
+        },
+        {
+            Header: 'כתובת מגורים', className: "firstHeader", columns: [
+                { Header: "ישוב", accessor: 'CITY', className: "secondHeader", style: { width: 100 } },
+                { Header: "רחוב", accessor: 'STREET', className: "secondHeader", style: { width: 100 } },
+                { Header: "מספר בית", accessor: 'BUILDING_NUMBER', className: "secondHeader", style: { width: 100 } }
+            ]
+        },
+        {
+            Header: 'מקום עבודה', className: "firstHeader", columns: [
+                { Header: "סניף", accessor: 'SITE_NAME', className: "secondHeader", style: { width: 100 } },
+                { Header: "ישוב", accessor: 'WORK_CITY', className: "secondHeader", style: { width: 100 } },
+                { Header: "רחוב", accessor: 'WORK_STREET', className: "secondHeader", style: { width: 100 } },
+                { Header: "מספר", accessor: 'WORK_BUILDING', className: "secondHeader", style: { width: 100 } }
+            ]
+        },
+        { Header: "שעת הגעה למקום העבודה", accessor: 'EXIT_HOUR_TO_WORK', className: "secondHeader", style: { width: 100 } },
+        { Header: "שעת היציאה ממקום העבודה", accessor: 'RETURN_HOUR_TO_HOME', className: "secondHeader", style: { width: 100 } },
+    ];
+    return columns;
+}
+
+
 const getTopSolutionsData = (origData) => {
     let data = [];
     const MARK_COLUMNS = [{ Header: "קיצור שעות העבודה", accessor: 'FINAL_SHORT_HOURS_GRADE' },
@@ -240,27 +276,45 @@ const getTopSolutionsData = (origData) => {
  * @param {*} origData 
  * @param {*} reportType 
  */
-const getData = (origData, reportType) => {
+const getData = (reportsData, reportType) => {
     let data = [];
     switch (reportType) {
         case reportTypes.GENERAL_REPORT:
+            // show only employees with location data;
+            if (reportsData.employeesList) {
+                data = reportsData.employeesList.filter(employee => {
+                    return parseFloat(employee.X);
+                });
+            }
+            break;
         case reportTypes.TIME_POTENTIAL:
             // show only employees with location data;
-            if (origData) {
-                data = origData.filter(employee => {
+            if (reportsData.employeesList) {
+                data = reportsData.employeesList.filter(employee => {
                     return parseFloat(employee.X);
                 });
             }
             break;
         case reportTypes.TOP_FIVE_SOLUTIONS:
-            if (origData) {
-                data = getTopSolutionsData(origData);
+            if (reportsData) {
+                data = getTopSolutionsData(reportsData.employeesList);
+            }
+            break;
+        case reportTypes.COUPLING_REPORT:
+            if (reportsData.clusterReport) {
+                data = reportsData.clusterReport.slice(0);
+                data = data.map(employee=> {
+                    let emp = {...employee};
+                    if (emp.cluster===-1)
+                        emp.cluster = "ללא שיוך לקבוצה";
+                    return emp;
+                })
             }
             break;
         default:
             // show only employees with location data;
-            if (origData) {
-                data = origData.filter(employee => {
+            if (reportsData.employeesList) {
+                data = reportsData.employeesList.filter(employee => {
                     return parseFloat(employee.X);
                 });
             }
@@ -286,6 +340,9 @@ const getColumns = (reportType) => {
         case reportTypes.TOP_FIVE_SOLUTIONS:
             columns = getTopSolutionsColumns();
             break;
+        case reportTypes.COUPLING_REPORT:
+            columns = getCouplngReportColumns();
+            break;
         default:
             columns = getGeneralReport();
             break;
@@ -306,15 +363,15 @@ export default function (state = INITIAL_STATE, action) {
                 ...state,
                 columns: getColumns(reportTypes.GENERAL_REPORT),
                 reportType: reportTypes.GENERAL_REPORT,
-                data: getData(action.employeesList, reportTypes.GENERAL_REPORT),
+                data: getData({ employeesList: action.employeesList }, reportTypes.GENERAL_REPORT),
                 timestamp: new Date()
-            };
+            };    
         case REPORT_SELECTION:
             return {
                 ...state,
                 columns: getColumns(action.reportType),
                 reportType: action.reportType,
-                data: getData(action.origData, action.reportType),
+                data: getData(action.reportsData, action.reportType),
                 timestamp: new Date()
             };
         default:

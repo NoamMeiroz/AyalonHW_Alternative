@@ -7,7 +7,9 @@ class MapSidebar extends PureComponent {
 
     render() {
         var jsx = <div className="sidebar">
-            <HeatmapQueryPanel/>
+            <HeatmapQueryPanel>
+                {this.props.children}
+            </HeatmapQueryPanel>
         </div>
         return jsx;
     }

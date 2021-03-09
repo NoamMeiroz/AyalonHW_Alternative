@@ -6,6 +6,7 @@ import {
     CHECK_PROGRESS, ERROR,
     UPLOAD_RESULT,
     MESSAGE,
+    DELETE_COMPANY
 } from './types';
 import {UPLOAD_FAILED} from './const';
 import * as actionUtils from '../utils/actionsUtil';
@@ -112,6 +113,24 @@ export const checkProgress = (employerId) => {
                     employerID: employerId,
                     uploadProgess: UPLOAD_FAILED
                 });
+            });
+    }
+};
+
+/**
+ * return the company list stores in server
+ */
+export const deleteCompany = (employerId) => {
+    return (dispatch) => {
+        axios.delete(`/api/employer/${employerId}`, actionUtils.getAxiosHeader())
+            .then(() => {
+                dispatch({ type: DELETE_COMPANY, isSuccess: true, employerID: employerId });
+                dispatch({ type: MESSAGE, message: `מחיקת החברה הסתיימה בהצלחה` });
+                
+            }).catch(err => {
+                console.log(err);
+                let message = actionUtils.handleError(err);
+                dispatch({ type: ERROR, errorMessage: message });
             });
     }
 };

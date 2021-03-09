@@ -5,3 +5,7 @@
 .queryPanel .MuiGrid-item {
     box-sizing: content-box;
 }
+
+.queryButton {
+    width: 85%;
+}

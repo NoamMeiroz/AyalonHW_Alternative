@@ -87,6 +87,10 @@ class DownloadButton extends Component {
       FileSaver.saveAs(data, fileName + this.fileExtension);
    }
 
+   /**
+    * Export timePotential report to excel file
+    * @param {*} csvData 
+    */
    timePotential = async (csvData) => {
       const fileName = "דוח פוטנציאל צמצום זמני נסיעה";
       let wb = new ExcelJS.Workbook();
@@ -153,6 +157,10 @@ class DownloadButton extends Component {
       FileSaver.saveAs(data, fileName + this.fileExtension);
    }
 
+   /**
+    * Export top 5 solution report to excel file
+    * @param {*} csvData 
+    */
    topSolutions = async (csvData) => {
       const fileName = "דוח דירוג פתרונות ניידות";
       let wb = new ExcelJS.Workbook();
@@ -192,6 +200,54 @@ class DownloadButton extends Component {
       FileSaver.saveAs(data, fileName + this.fileExtension);
    }
 
+   /**
+    * Export cluster data report to excel file
+    * @param {*} csvData 
+    */
+   clusterReport = async (csvData) => {
+      const fileName = "דוח צימודים";
+      let wb = new ExcelJS.Workbook();
+      let ws = wb.addWorksheet('רשימת עובדים');
+
+      // set columns 
+      ws.columns = [
+         { header: 'שם חברה', key: 'COMPANY', width: 20 },
+         { header: 'מזהה עובד', key: 'WORKER_ID', width: 20 },
+         { header: 'קבוצה', key: 'cluster', width: 20 },
+         { header: 'ציון מחושב\nShuttle On Demand', key: 'FINAL_PERSONALIZED_SHUTTLE_GRADE', width: 15 },
+         { header: 'ציון מחושב\nשאטלים מטעם העבודה', key: 'FINAL_WORK_SHUTTLE_GRADE', width: 15 },
+         { header: 'ציון מחושב\nCarshare/Vanshare', key: 'FINAL_CARSHARE_GRADE', width: 15 },
+         { header: 'ציון מחושב\nCarpool/Vanpool', key: 'FINAL_CARPOOL_GRADE', width: 15 },
+         { header: 'ציון מחושב\nמוניות שיתופיות', key: 'FINAL_CABSHARE_GRADE', width: 15 },
+         { header: 'ישוב', key: 'CITY', width: 20 },
+         { header: 'רחוב', key: 'STREET', width: 20 },
+         { header: 'מספר בניין', key: 'BUILDING_NUMBER', width: 12 },
+         { header: "סניף", key: 'SITE_NAME', width: 20 },
+         { header: "מקום עבודה-ישוב", key: 'WORK_CITY', width: 20 },
+         { header: "מקום עבודה-רחוב", key: 'WORK_STREET', width: 20 },
+         { header: "מקום עבודה-מספר בנין", key: 'WORK_BUILDING', width: 12 },
+         { header: 'שעת הגעה למקום העבודה', key: 'EXIT_HOUR_TO_WORK', width: 15 },
+         { header: 'שעת היציאה ממקום העבודה', key: 'RETURN_HOUR_TO_HOME', width: 15 }
+      ];
+
+      // make header bold
+      ws.getRow(1).font = { bold: true }
+
+      // add data
+      ws.addRows(csvData);
+
+      ws.eachRow((row, rowNumber) => {
+         if (rowNumber === 1) {
+            row.height = 30;
+            return;
+         }
+         row.height = 30;
+      });
+      const buffer = await wb.xlsx.writeBuffer();
+      const data = new Blob([buffer], { type: this.fileType });
+      FileSaver.saveAs(data, fileName + this.fileExtension);
+   }
+
    exportToCSV = (data, reportType) => {
       switch (reportType) {
          case reportTypes.GENERAL_REPORT:
@@ -202,6 +258,9 @@ class DownloadButton extends Component {
             break;
          case reportTypes.TOP_FIVE_SOLUTIONS:
             this.topSolutions(data);
+            break;
+         case reportTypes.COUPLING_REPORT:
+            this.clusterReport(data);
             break;
          default:
             this.generalReport(data);

@@ -1,0 +1,15 @@
+FROM nikolaik/python-nodejs:latest
+
+WORKDIR '/clustering'
+
+# install python dependecies
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
+
+# install node.js dependecies
+COPY ./package.json .
+RUN npm install
+
+COPY . .
+
+CMD ["npm", "run", "start"]

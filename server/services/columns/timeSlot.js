@@ -39,8 +39,9 @@ class TimeSlot extends Column {
         let slot = value;
         if (slot) {
             slot = this.getTimeSlotID(value);
-            if (!slot)
-                throw new ColumnError(ERROR_CODES.INPUT_ERROR, `הערך ב ${this.title} אינו תקין`);
+            if (!slot) {
+                throw new ColumnError(ERROR_CODES.INPUT_ERROR, `הערך ${value} ב ${this.title} אינו תקין`);
+            }
         }
         return slot;
     }

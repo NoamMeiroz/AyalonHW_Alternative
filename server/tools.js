@@ -5,7 +5,7 @@
  */
 function isHebrewLetter(s) {
    //match=/^([א-ת]+(?:(\. )|- | - | -|-| \(| |'|\"|’|״|\`))*[א-ת]+(?:\))*$/
-   match=/^(([א-ת]+\s*(?:(\.)|-|\(| |'|\"|’|״|\`))*\s*[א-ת]+(?:\))*)+$/
+   match=/^(([א-ת]+\s*(?:(\.)|-|\(| |'|\"|”|’|״|\`))*\s*[א-ת]+(?:\))*)+$/
    let result = s.match(match);
    if (result)
       return true;
@@ -33,7 +33,7 @@ function isInteger(id) {
 function getNearestWorkDay(date, hour) {
    let now = new Date();
    // get local timezone offset and convert to milliseconds
-   const localOffset = 2;
+   const localOffset = 0;
    const hourParts = hour.split(":");
    now.setDate(date.getDate() + 1)
    now.setHours(hourParts[0]-localOffset);
@@ -42,7 +42,7 @@ function getNearestWorkDay(date, hour) {
    if (now.getDay() >= 5)
       return getNearestWorkDay(now, hour);
    else {
-      return (now.getTime());
+      return (now.getTime()/1000);
    }
 }
 

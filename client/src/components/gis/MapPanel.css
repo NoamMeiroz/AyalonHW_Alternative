@@ -15,8 +15,24 @@
     width: 30px;
     height: 30px;
     border-bottom: 1px solid #ccc;
+    border-radius: 0%;
 }
 
 .drawBox .MuiButton-root {
     min-width: auto;
+}
+
+.leaflet-control-layers-list {
+    max-height: 200px;
+    overflow: auto;
+}
+
+.leaflet-control-layers-scrollbar {
+    max-height: 200px;
+    overflow: auto;
+}
+
+.leaflet-control-layers-expanded {
+    max-height: 200px;
+    overflow: auto;
 }
