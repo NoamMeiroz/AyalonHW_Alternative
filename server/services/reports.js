@@ -123,19 +123,13 @@ const getCluster = (employers, livingCity, workingCity,
 						if (res) {
 							switch (res.data.code) {
 								case 3000:
-								case 3001:
-								case 3002:
-								case 3003:
-								case 3004:
-								case 3005:
-								case 3007:
-								case 3008:
-								case 3009:
-								case 3010:
 									message = "שגיאה פנימית במערכת";
 									break;
-								case 3006:
-									message = "גודל קבוצה אינו יכול להיות גדול מסך כל העובדים";
+								case 3001:
+									message = "מספר העובדים המקסימלי לקלאסטר חייב להיות מספר חיובי ושלם";
+									break;
+								case 3011:
+									message = "דוח צימודים ניתן להפיק עבור 2 עובדים לפחות";
 									break;
 								default:
 									message = "שגיאה לא יודעה בשירות דוח הצימודים";
