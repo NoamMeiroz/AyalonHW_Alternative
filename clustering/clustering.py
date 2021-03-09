@@ -374,6 +374,8 @@ try:
         # validate maxCluster as positive int
         if (not isinstance(parsedInput['maxCluster'],int)) or (parsedInput['maxCluster'] < 0):
             raise TypeError('maxCluster must be a positive integer')
+        if (len(parsedInput['employees']) < 2):
+            raise ValueError('Input must include more than one employee')
     else:
         raise TypeError('Input does not comply with the required schema')
 
@@ -414,15 +416,8 @@ except:
     # codes and messages
     codes = {'Input does not comply with the required schema':3000,
             'maxCluster must be a positive integer':3001,
-            'Not implemented for sparse X':3002,
-            'Invalid number of initializations':3003,
-            'Number of iterations should be a positive number':3004,
-            'Explicit initial center position passed':3005,
-            'size_min and size_max must be a positive number':3006,
-            'size_max must be larger than size_min':3007,
-            'The product of size_min and n_clusters cannot exceed the number of samples':3008,
-            '`edges`, `costs`, `capacities`, `supplies` must all be int dtype':3009,
-            'There was an issue with the min cost flow input':3010}
+
+            'Input must include more than one employee':3011}
     
     # get error elements
     errorObj = sys.exc_info()
