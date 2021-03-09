@@ -9,6 +9,7 @@ import { getData } from './company';
 export * from './report';
 export * from './company';
 export * from './notifications';
+export * from './map';
 
 /**
  * Signin method.If success then store user token localy
@@ -54,14 +55,15 @@ export const signOut = () => {
 export const connected = (isConnected) => {
     return (dispatch) => {
         if (isConnected){
+            dispatch(getEmployees(null,
+                null,
+                null, null, null));
             dispatch(getData());
             dispatch(getSettlementList());
             dispatch(getTimeSlotToHome());
             dispatch(getTimeSlotToWork());
             dispatch(getSettlementList());
-            dispatch(getEmployees(null,
-                null,
-                null, null, null));
+
         }
         else 
             dispatch(showMessage("קיימת בעיית תקשורת עם השרת"));

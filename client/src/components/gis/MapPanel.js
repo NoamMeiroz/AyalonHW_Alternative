@@ -16,26 +16,17 @@ import { connect } from 'react-redux';
 
 import requireAuth from '../requireAuth'; //used to check if login successfull
 import * as actions from '../../actions';
-//import proj4 from 'proj4';
 import MapSidebar from './MapSidebar';
 import MarkerLayer from './MarkerLayer';
 import Legend from './Legend';
 import { template } from '../../utils/string';
 import ShapeLayer from "./ShapeLayer";
+import ClusterLayer from '../clustering/ClusterLayer';
+import ClusterBounderyQuery from '../clustering/ClusterBounderyQuery';
 import tazUrl from "./TAZ.zip";
 import trainStationUrl from "./railstations.zip";
 
 import './MapPanel.css';
-
-//const israelProjection = "+proj=tmerc +lat_0=31.73439361111111 +lon_0=35.20451694444445 +k=1.0000067 +x_0=219529.584 +y_0=626907.39 +ellps=GRS80 +towgs84=-48,55,52,0,0,0,0 +units=m +no_defs";
-
-/*const convertCoordinate = (location) => {
-    const y = parseFloat(location["Y"]);
-    const x = parseFloat(location["X"]);
-    const converted_xy = proj4(israelProjection).inverse([x, y]);
-    const result = { X: converted_xy[0], Y: converted_xy[1] };
-    return result;
-}*/
 
 /**
  * Return list of companies. for each company has a unique color
@@ -56,11 +47,25 @@ const createColorIndex = (employees) => {
     return companies;
 }
 
+/**
+ * Return list of unquie colors for each clusrer id.
+ * @param {*} employees 
+ */
+const createClusterColor = (employees) => {
+    let clusterCount = 0;
+    for (let employee of employees) {
+        if (employee.cluster > clusterCount)
+            clusterCount = employee.cluster;
+    }
+    let colorList = randomColor({ luminosity: 'dark', hue: 'random', count: clusterCount + 1, seed: 20 });
+    return colorList;
+}
+
 
 class MapPanel extends Component {
     state = {
-        position: [32.087934, 34.774547],
-        zoom: 7,
+        //   position: [32.087934, 34.774547],
+        //   zoom: 7,
         bounds: [
             [31.4101697, 34.2486116],
             [33.5074706, 36.2478762]],
@@ -75,8 +80,9 @@ class MapPanel extends Component {
     destination = createRef();
     starting = createRef();
 
-    handleZoom = (e) => {
-        this.setState({ zoom: this.mapRef.current.viewport.zoom });
+    handleMoveEnd = (e) => {
+        let center = this.mapRef.current.viewport.center;
+        this.props.mapChange(this.mapRef.current.viewport.zoom, center);
     };
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -166,6 +172,53 @@ class MapPanel extends Component {
         });
     }
 
+    createClusterGroup(cluster) {
+        let jsx = [];
+        let icon = "Cluster";
+
+        let employees = this.props.clusterReport.filter(emp => {
+            return (emp.cluster === cluster)
+        });
+        if (cluster === -1)
+            icon = "NoCluster";
+
+        jsx = <ClusterLayer
+            data={employees}
+            icon={icon}
+            colorIndex="color"
+            popupFields={["WORKER_ID", "COMPANY"]}
+            popupString={template(["מזהה עובד: ", "<br>חברת "], "WORKER_ID", "COMPANY")}
+        />
+        return <LayerGroup>{jsx}</LayerGroup>;
+    }
+
+    createClusterLayer() {
+        if (!this.props.clusterReport || this.props.clusterReport.length === 0)
+            return null;
+        var groups = [];
+        // find cluster groups
+        for (let emp of this.props.clusterReport) {
+            if (!groups.includes(emp.cluster))
+                groups.push(emp.cluster);
+        }
+        // sort asc
+        groups = groups.sort((a, b) => {
+            return a - b;
+        })
+        return groups.map(group => {
+            if (group !== -1) {
+                return <LayersControl.Overlay key={`cluster_${group}`} name={`קבוצה ${group}`} checked>
+                    {this.createClusterGroup(group)}
+                </LayersControl.Overlay>
+            }
+            else {
+                return <LayersControl.Overlay key={`cluster_${group}`} name={`ללא קבוצה`} checked>
+                    {this.createClusterGroup(group)}
+                </LayersControl.Overlay>
+            }
+        });
+    }
+
     /**
      * show control 
      */
@@ -241,10 +294,11 @@ class MapPanel extends Component {
     render() {
         return <Box display="flex">
             <MapSidebar>
+                <ClusterBounderyQuery />
             </MapSidebar>
-            <Map center={this.state.position}
-                zoom={this.state.zoom}
-                onzoomend={this.handleZoom}
+            <Map center={this.props.position}
+                zoom={this.props.zoom}
+                onmoveend={this.handleMoveEnd}
                 maxZoom={14}
                 ref={this.mapRef}
             >
@@ -264,6 +318,7 @@ class MapPanel extends Component {
                         />
                     </LayersControl.Overlay>
                     {this.createDataLayers()}
+                    {this.createClusterLayer()}
                     <LayersControl.Overlay name="תחנות רכבת">
                         <ShapeLayer zipUrl={trainStationUrl} fieldsName={{ STAT_NAMEH: "שם תחנה" }} />
                     </LayersControl.Overlay>
@@ -333,6 +388,7 @@ function mapStateToProps(state, ownProps) {
     let timestamp = new Date();
     let destinationPolygon = {};
     let startPolygon = {};
+    let clusterReport = [];
     if (state.reports.employeesList) {
         timestamp = state.reports.timestamp;
         data = state.reports.employeesList.filter(employee => {
@@ -341,9 +397,8 @@ function mapStateToProps(state, ownProps) {
         // employees data
         data = data.map(employee => {
             // handle employee
-            let coor = { "X": employee.X, "Y": employee.Y };//convertCoordinate({"X": employee.X, "Y": employee.Y });
-            employee.lat = coor.X;
-            employee.lng = coor.Y;
+            employee.lat = employee.X;
+            employee.lng = employee.Y;
             employee.intensity = 100;
 
             // find the employee's working place and add it the branch list
@@ -356,9 +411,8 @@ function mapStateToProps(state, ownProps) {
                 currentSite.count = currentSite.count + 1;
             else {
                 let site = {};
-                let coor = { "X": employee.WORK_X, "Y": employee.WORK_Y };//convertCoordinate({"X": employee.WORK_X, "Y": employee.WORK_Y });
-                site.lat = coor.X;
-                site.lng = coor.Y;
+                site.lat = employee.WORK_X;
+                site.lng = employee.WORK_Y;
                 site.count = 1;
                 site.EMPLOYER_ID = employee.EMPLOYER_ID;
                 site.COMPANY = employee.COMPANY;
@@ -376,9 +430,27 @@ function mapStateToProps(state, ownProps) {
     if (state.reportParams.qStartingPolygonParams) {
         startPolygon = state.reportParams.qStartingPolygonParams;
     }
+    if (state.reports.clusterReport) {
+        timestamp = state.reports.timestamp;
+        clusterReport = state.reports.clusterReport.filter(employee => {
+            return parseFloat(employee.X);
+        });
+        let colorList = createClusterColor(clusterReport);
+        // employees data
+        clusterReport = clusterReport.map(employee => {
+            employee.lat = employee.X;
+            employee.lng = employee.Y;
+            if (employee.cluster === -1)
+                employee.color = '#808080';
+            else
+                employee.color = colorList[employee.cluster];
+            return employee;
+        });
+    }
     return {
         data: data, branches: branches, companies: companies, timestamp: timestamp,
-        destinationPolygon: destinationPolygon, startPolygon: startPolygon
+        destinationPolygon: destinationPolygon, startPolygon: startPolygon, clusterReport: clusterReport,
+        zoom: state.map.zoom, position: state.map.position
     };
 };
 

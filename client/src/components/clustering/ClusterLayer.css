@@ -1,0 +1,32 @@
+.cluster-pin {
+    width: 10px;
+    height: 10px;
+    border-radius: 50% 50% 50% 50%;
+    background: #c30b82;
+    position: absolute;
+    left: 80%;
+    top: 100%;
+    margin: -15px 0 0 -15px;
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+  }
+  
+.custom-div-icon-NoCluster i {
+  background: transparent;
+  border: 0px transparent;
+  width:8px;
+  height:8px;
+  position: absolute;
+  background-image: url(/mono-tab-remove.svg);
+  background-size: 10px 10px;
+  margin: 28px 12px 0px 0px;
+}
+
+.custom-div-icon-Cluster .cluster-pin:after {
+  content: attr(cluster);
+  position: absolute;
+  margin: -1px 2px 0px 0px;
+  color: white;
+  font-size: xx-small;
+}

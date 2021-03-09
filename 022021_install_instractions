@@ -1,0 +1,19 @@
+
+-----------------------------
+docker tag clustering nativelaasakimcr.azurecr.io/clustering:1.2.0
+docker push nativelaasakimcr.azurecr.io/clustering:1.2.0
+
+docker tag node_server nativelaasakimcr.azurecr.io/node_server:1.2.0
+docker push nativelaasakimcr.azurecr.io/node_server:1.2.0
+
+docker tag native_laasakim_dev nativelaasakimcr.azurecr.io/native_laasakim:1.2.0
+docker push nativelaasakimcr.azurecr.io/native_laasakim:1.2.0
+
+docker tag nginx nativelaasakimcr.azurecr.io/nginx:1.2.0
+docker push nativelaasakimcr.azurecr.io/nginx:1.2.0
+
+docker pull nativelaasakimcr.azurecr.io/clustering:1.2.0
+docker pull nativelaasakimcr.azurecr.io/node_server:1.2.0
+docker pull nativelaasakimcr.azurecr.io/native_laasakim:1.2.0
+docker pull nativelaasakimcr.azurecr.io/nginx:1.2.0
+

@@ -1,6 +1,8 @@
 const express = require('express');
 const spawn = require("child_process").spawn;
 var bodyParser = require('body-parser');
+const {performance} = require('perf_hooks');
+const { logger, ServerError } = require('./log');
 
 const app = express();
 
@@ -14,53 +16,55 @@ app.use(bodyParser.json());
 
 
 app.post('/', (req,res) => {
-        
         // parse request body
         var sample_data = req.body;
         var script_output = [];
-
+        var start = performance.now();
+        logger.info("Start cluster calculation");
         try {
-
-
-            console.log('SPAWNING!');
-            // console.log(Object.keys(JSON.parse(JSON.stringify(sample_data))).length);
-
-            
-
             const pythonProcess = spawn('python',["clustering.py",JSON.stringify(sample_data)]);
-            
-            
+            var length = sample_data.employees.length;
 
             pythonProcess.stdout.on('data',(data)=>{
-
                 script_output.push(data);
-                console.log(`Python output is ${data}`);
-
             });
 
             pythonProcess.on("close",(code)=>{
-                console.log(code);
+                let end = performance.now();
+                logger.info(`Number of employees: ${length}, Execution time: ${end - start} ms`);
+                let response = {};
+                let resCode = 200;
                 if(code==0) {
-                    res_close = JSON.parse(script_output+"");
-                    res.status(200).json(res_close);
+                    // try to parse return result to valid json (list of employees)
+                    try {
+                        let result = script_output+"";
+                        let index = result.lastIndexOf('],');
+                        if (index!==-1)
+                            result = result.slice(0, (index+1));
+                        response = JSON.parse(result);
+                        if (response.code !==undefined) {
+                            resCode = 400;
+                            logger.error(response);
+                        }
+                    }
+                    // catch error of the parse. This means the return result is an error string
+                    catch(error) {
+                        console.log(script_output+"");
+                        resCode = 500;  
+                        logger.error(error.stack);
+                        response = {code: "4000", message: "Unknown error"};
+                    }
+                    res.status(resCode).json(response);
                 }
                 else {
                     res.status(500).send("Error!");
                 }
                 
-            })
-
-/*             pythonProcess.on("exit",(code,signal)=> {
-                console.log(code);
-                console.log(signal);
-            }); */
-    
-
+            });
         }
-
         catch (error) {
             res.status(500).send(error);
-            console.log(error);
+            logger.error(error.stack);
         };
 
    
@@ -69,4 +73,4 @@ app.post('/', (req,res) => {
 
 const PORT = 3000;
 
-app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+var server = app.listen(PORT, () => logger.info(`Listening on port ${PORT}`));

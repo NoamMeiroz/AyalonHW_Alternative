@@ -1,3 +1,4 @@
+const axios = require('axios');
 const { logger, ServerError } = require('../log');
 const employeeSchema = require("../db/employeeSchema");
 const reports = require("../db/reports");
@@ -11,7 +12,7 @@ const SOLUTIONS_LIST = ["walking", "bicycling", "driving", "transit"];
  * if data is not valid then reject.
  * @param {} data 
  */
-const getEmployeesOfEmployer = (employers, livingCity, workingCity, 
+const getEmployeesOfEmployer = (employers, livingCity, workingCity,
 	timeSlotWork, timeSlotHome, marks, destinationPolygon, startingPolygon) => {
 	return new Promise(function (resolve, reject) {
 		employeeSchema.getEmployees(employers, livingCity, workingCity,
@@ -76,6 +77,85 @@ const getEmployeesOfEmployer = (employers, livingCity, workingCity,
 }
 
 /**
+ * Check the data of the employer and then insert it to the database
+ * if data is not valid then reject.
+ * @param {} data 
+ */
+const getCluster = (employers, livingCity, workingCity,
+	timeSlotWork, timeSlotHome, marks, destinationPolygon, startingPolygon, clusterBoundery) => {
+	return new Promise(function (resolve, reject) {
+		getEmployeesOfEmployer(employers, livingCity, workingCity,
+			timeSlotWork, timeSlotHome, marks, destinationPolygon, startingPolygon)
+			.then(empList => {
+				if (empList.length === 0)
+					return resolve(empList);
+				let data = {
+					maxCluster: clusterBoundery,
+					//maxCluster: clusterBoundery[1],
+					// minCluster: clusterBoundery[0], 
+					employees: empList.map(employee => {
+						return {
+							id: employee.id,
+							WORKER_ID: employee.WORKER_ID,
+							EMPLOYER_ID: employee.EMPLOYER_ID,
+							X: employee.X, Y: employee.Y
+						}
+					})
+				};
+				let headers = { 'Content-Type': 'application/json' }
+				let url = `http://${process.env.CLUSTERING_SERVER}:3000`;
+				axios.post(url, data, headers)
+					.then(res => {
+						let clusterList = [];
+						for (let emp of res.data) {
+							result = empList.filter(employee => {
+								return employee.id === emp.id
+							});
+							result[0].cluster = emp.cluster;
+							clusterList.push(result[0]);
+						}
+						resolve(clusterList);
+					}).catch(error => {
+						// return meaningful message about the error to the client
+						let errorCode = 400;
+						let message = "שגיאה פנימית במערכת";
+						let res = error.response;
+						if (res) {
+							switch (res.data.code) {
+								case 3000:
+								case 3001:
+								case 3002:
+								case 3003:
+								case 3004:
+								case 3005:
+								case 3007:
+								case 3008:
+								case 3009:
+								case 3010:
+									message = "שגיאה פנימית במערכת";
+									break;
+								case 3006:
+									message = "גודל קבוצה אינו יכול להיות גדול מסך כל העובדים";
+									break;
+								default:
+									message = "שגיאה לא יודעה בשירות דוח הצימודים";
+									break;
+							}
+						}
+						else
+							errorCode = 500;
+						reject(new ServerError(errorCode, message));
+					})
+			})
+			.catch(error => {
+				console.log(error);
+				reject(error);
+			})
+	});
+}
+
+
+/**
  * return list of potential employers to cooperate where their
  * employees work in the same city of the given employer.
  * if data is not valid then reject.
@@ -93,4 +173,4 @@ const getSharePotential = (employerId) => {
 	});
 }
 
-module.exports = { getEmployeesOfEmployer, getSharePotential }
+module.exports = { getEmployeesOfEmployer, getSharePotential, getCluster }

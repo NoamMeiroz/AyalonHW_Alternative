@@ -12,8 +12,18 @@ services:
       MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
     ports:
       - '3306:3306'
+  clustering:
+    build:
+      context: ./clustering
+      dockerfile: dockerfile_clustering
     volumes:
-      - db-data:/var/lib/mysql  
+      - /clustering/node_modules
+      - /clustering
+      - ./clustering/logs:/clustering/logs
+    restart: always
+    stdin_open: true
+    tty: true
+    command: ["npm", "run", "start"] 
   node_server:
     build:
       context: ./server
@@ -26,11 +36,13 @@ services:
     environment: 
       - mysql_server=mysql
       - NODE_ENV=development
+      - CLUSTERING_SERVER=clustering
     restart: always
     stdin_open: true
     tty: true
     depends_on:
       - mysql
+      - clustering
     command: ["npm", "run", "dev"] 
   node_server_test:
     build:
@@ -56,8 +68,8 @@ services:
     volumes:
     #- ./client/node_modules:/client/node_modules
     #- ./client:/client
-    - /client/node_modules
-    - /client
+      - /client/node_modules
+      - /client
     restart: always
     stdin_open: true
     tty: true

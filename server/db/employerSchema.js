@@ -23,11 +23,24 @@ const insert = (employer, callback) => {
 };
 
 /**
+ * delete employer by its id
+ * @param {*} employerId 
+ * @param {*} callback 
+ */
+const deleteEmployer = (employerId, callback) => {
+  Employer.destroy({ where: { id: employerId } })
+    .then(data => { callback(null, data) })
+    .catch(err => {
+      callback(err, getMessage(err));
+    });
+}
+
+/**
  * Delete an employer
  * @param {*} employer 
  * @param {*} callback 
  */
-const deleteEmployer = (employer, callback) => {
+const deleteEmployerByName = (employer, callback) => {
   Employer.destroy({ where: { name: employer.NAME } })
     .then(data => { callback(null, data) })
     .catch(err => {
@@ -42,7 +55,7 @@ const deleteEmployer = (employer, callback) => {
  */
 const insertEmployer = (employer, callback) => {
   // Save Tutorial in the database
-  deleteEmployer(employer, (err, data) => {
+  deleteEmployerByName(employer, (err, data) => {
     if (!err)
       insert(employer, callback);
     else

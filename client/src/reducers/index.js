@@ -10,6 +10,8 @@ import reportTypeSelection from './reportTypeSelection';
 import reportParams from './reportParams';
 import notifications from './notifications';
 import consts from './const';
+import map from './map';
+
 
 export default combineReducers({
     auth,
@@ -22,5 +24,6 @@ export default combineReducers({
     consts,
     reportParams,
     notifications,
+    map,
     form: formReducer
 });

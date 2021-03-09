@@ -15,6 +15,8 @@ export const handleErrorResponse = (response) => {
             return "המערכת לא הצליחה ליצור משתמש חדש.";
         case 500:
             return MAJOR_FAILURE;
+        case 504:
+            return "המערכת לא יכולה להחזיר תשובה בפרק זמן סביר";
         default:
             return MAJOR_FAILURE;
     }

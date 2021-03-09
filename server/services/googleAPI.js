@@ -266,4 +266,4 @@ const getRoutes = async (origin, destination, time) => {
    });
 }
 
-module.exports = { convertLocation, findLocality, getRoutes, ERRORS };
+module.exports = { convertLocation, findLocality, getRoutes };

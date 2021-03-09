@@ -11,8 +11,8 @@ class Sector extends Column {
     check = function (value) {
         // convert sector to id
         let currSector = this.sectorList.find(sector => sector.dataValues.SECTOR == value);
-        if (currSector === null) {
-            throw new ColumnError(ERROR_CODES.INPUT_ERROR, `הערך ב ${this.title} אינו תקין`);
+        if (currSector === null || currSector === undefined) {
+            throw new ColumnError(ERROR_CODES.INPUT_ERROR, `הערך ${value} ב ${this.title} אינו תקין`);
         }
         return currSector.dataValues.id;
     }

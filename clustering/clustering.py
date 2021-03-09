@@ -367,7 +367,7 @@ class KMeansConstrained(KMeans):
 
 try:
     # check input
-    schema = '{"maxCluster": "int", "employees": [{"id": "int", "EMPLOYER_ID": "int", "WORKER_ID": "int", "X": "float", "Y": "float"}, "..."]}'
+    schema = '{"maxCluster": "int", "employees": [{"id": "int", "EMPLOYER_ID": "int", "WORKER_ID": "int", "X": "float|int", "Y": "float|int"}, "..."]}'
     if json_schema.match(sys.argv[1],schema):
         # parse input
         parsedInput = json.loads(sys.argv[1])
@@ -436,7 +436,7 @@ except:
             break
 
     # generate error object
-    errorOutput = {'code':str(code), 'message':errString, 'trace':str(traceback.format_exc())}
+    errorOutput = {'code':code, 'message':errString, 'trace':str(traceback.format_exc())}
     
     # print
     print(json.dumps(errorOutput))

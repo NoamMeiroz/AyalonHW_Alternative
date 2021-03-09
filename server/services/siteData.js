@@ -1,7 +1,8 @@
 const { ServerError, logger } = require('../log');
 const employerSitesSchema = require("../db/employerSitesSchema");
-const { branchesFieldsName, employeeFieldsName } = require("../config/config");
+const { employeeFieldsName } = require("../config/config");
 const googleAPI = require('./googleAPI');
+const { ERRORS } = require("./ERRORS");
 
 const { Column, TYPES } = require('./columns/column');
 const { City } = require('./columns/city');
@@ -41,16 +42,16 @@ const convertAddress = (branchList) => {
                     if (value instanceof ServerError) {
                         logger.info(value);
                         switch (value.status) {
-                            case googleAPI.ERRORS.INVALID_ADDRESS_CODE:
+                            case ERRORS.INVALID_ADDRESS_CODE:
                                 error = new ServerError(400, `כתובת סניף ${branchList[index].NAME} לא תקינה.`);
                                 break;
-                            case googleAPI.ERRORS.MISSING_CITY_CODE:
+                            case ERRORS.MISSING_CITY_CODE:
                                 error = new ServerError(400, `לסניף ${branchList[index].NAME} חסר עיר.`);
                                 break;
-                            case googleAPI.ERRORS.MISSING_STREET_CODE:
+                            case ERRORS.MISSING_STREET_CODE:
                                 error = new ServerError(400, `לסניף ${branchList[index].NAME} חסר שם רחוב.`);
                                 break;
-                            case googleAPI.ERRORS.MISSING_BUILDING_NUMBER_CODE:
+                            case ERRORS.MISSING_BUILDING_NUMBER_CODE:
                                 error = new ServerError(400, `לסניף ${branchList[index].NAME} חסר מספר בניין.`);
                                 break;
                             case ERRORS.INVALID_CITY:
@@ -60,15 +61,13 @@ const convertAddress = (branchList) => {
                                 error = new ServerError(400, `לסניף ${branchList[index].NAME} שם הרחוב שגוי`);
                                 break;
                             case ERRORS.MISSING_CITY_CODE:
-                                logger.error(value);
                                 branchList[index].X = value.X;
                                 branchList[index].Y = value.Y;
-                                break;
+                                return  resolve(branchList);
                             case ERRORS.HELKA_NOT_FOUND:
-                                logger.error(value);
                                 branchList[index].X = value.X;
                                 branchList[index].Y = value.Y;
-                                break;
+                                return  resolve(branchList);
                             case 500:
                                 error = value;
                                 break;

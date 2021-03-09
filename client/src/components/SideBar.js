@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 
 import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
-import ListAltIcon from '@material-ui/icons/ListAlt';
 import HomeIcon from '@material-ui/icons/Home';
 import EmojiTransportationIcon from '@material-ui/icons/EmojiTransportation';
 import RoomIcon from '@material-ui/icons/Room';
@@ -18,12 +17,8 @@ class SideBar extends Component {
         active: {
             home: true,
             map: false,
+            clustering: false,
             companies: false,
-            reports: false,
-        },
-        showReportOptions: false,
-        reports: {
-            share_potential: false
         }
     };
 
@@ -42,18 +37,6 @@ class SideBar extends Component {
         this.setState({
             active: activeState
         });
-    }
-
-    setActiveReport = (component) => {
-
-        let ractiveState = this.state.reports;
-        Object.keys(ractiveState).forEach(v => ractiveState[v] = false);
-        if (ractiveState[component] !== undefined ) {
-            ractiveState[component] = true;
-            this.setState({
-                reports: ractiveState
-            });
-        }
     }
 
     render() {
@@ -80,11 +63,10 @@ class SideBar extends Component {
                                 className={this.state.active.map ? "active" : null}
                                 onClick={(e) => {
                                     this.setActive("map");
-                                    this.setActiveReport("none");
                                 }}
                                 component={Link} to="/map">
                                 <RoomIcon />
-                                מפת חום
+                                מפה 
                             </IconButton>
                         </div>
                         <div>
@@ -92,32 +74,11 @@ class SideBar extends Component {
                                 className={this.state.active.companies ? "active" : null}
                                 onClick={(e) => {
                                     this.setActive("companies");
-                                    this.setActiveReport("none");
                                 }}
                                 component={Link} to="/companies">
                                 <EmojiTransportationIcon />
                                 רשימת החברות
                             </IconButton>
-                        </div>
-                        <div>
-                            <IconButton edge="start" style={{ color: lime[50] }} aria-label="דוחות"
-                                className={this.state.active.reports ? "active" : null}
-                                onClick={(e) => {
-                                    this.setActive("reports");
-                                    this.setState({ showReportOptions: !this.state.showReportOptions });
-                                }}>
-                                <ListAltIcon />
-                                דוחות
-                            </IconButton>
-                            {this.state.showReportOptions ?
-                                <IconButton edge="start" style={{ color: lime[50] }} aria-label="מעסיקים"
-                                    className={"report ".concat(this.state.reports.share_potential ? "active-report" : "not-active-report")}
-                                    onClick={(e) => { this.setActiveReport("share_potential"); }}
-                                    component={Link} to="/reports/share_potential">
-                                    איתור עובדים קרובים מבחינה פיסית
-                                </IconButton>
-                                : <div></div>
-                            }
                         </div>
                     </div>
                     : null

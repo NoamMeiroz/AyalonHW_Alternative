@@ -1,4 +1,4 @@
-import { ADD_NEW_COMPANY, LOAD_DATA, UPLOAD_RESULT, CHECK_PROGRESS } from '../actions/types';
+import { ADD_NEW_COMPANY, LOAD_DATA, UPLOAD_RESULT, CHECK_PROGRESS, DELETE_COMPANY } from '../actions/types';
 import {UPLOAD_FAILED, UPLOAD_IN_PROGRESS, UPLOAD_SUCESS} from '../actions/const';
 
 const INITIAL_STATE = {
@@ -78,6 +78,16 @@ export default function (state = INITIAL_STATE, action) {
                 }
                 return company;
             });
+            return {
+                ...state,
+                companyList: tempList,
+                timestamp: new Date()
+            };
+        case DELETE_COMPANY:
+            tempList = state.companyList;
+            console.log(action.employerID);
+            console.log(tempList);
+            tempList = tempList.filter((company)=> company.id !== action.employerID );
             return {
                 ...state,
                 companyList: tempList,
