@@ -132,7 +132,7 @@ class DownloadButton extends Component {
                rules: [
                   {
                      type: 'expression',
-                     formulae: [`IF(ISNUMBER(C${rowNumber}), IF(${column}${rowNumber}<C${rowNumber}, 1, 0), 0)`],
+                     formulae: [`IF(ISNUMBER(C${rowNumber}), IF(${column}${rowNumber}<=C${rowNumber}, 1, 0), 0)`],
                      style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFFFF00' } } },
                   }
                ]
@@ -145,7 +145,7 @@ class DownloadButton extends Component {
                rules: [
                   {
                      type: 'expression',
-                     formulae: [`IF(ISNUMBER(G${rowNumber}), IF(${column}${rowNumber}<G${rowNumber}, 1, 0), 0)`],
+                     formulae: [`IF(ISNUMBER(G${rowNumber}), IF(${column}${rowNumber}<=G${rowNumber}, 1, 0), 0)`],
                      style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFFFF00' } } },
                   }
                ]

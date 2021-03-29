@@ -114,4 +114,53 @@ const getPrecentFinished = (empId) => {
 	});
 }
 
-module.exports = { run, getEmployeesOfEmployer, getPrecentFinished }
+/**
+ * 
+ * @param {*} workerData 
+ */
+function recalculateService(workerData) {
+	return new Promise((resolve, reject) => {
+		const worker = new Worker('./services/employeesUpdateWorker.js', { workerData });
+		worker.on('message', resolve);
+		worker.on('error', reject);
+		worker.on('exit', (code) => {
+			if (code !== 0)
+				return reject(new ServerError(500, `Worker stopped with exit code ${code}`));
+		})
+	})
+}
+
+
+async function runRecalculate(req, employer, employees) {
+	logger.info(employer.NAME + ": updating employees routes and marks...");
+	const ip = req.headers['x-forwarded-for'].split(/\s*,\s*/)[0]; // get the ip of the client
+	let state = employerSchema.STATE.READY;
+	try {
+		result = await recalculateService({ employer, employees });
+		if (!result.Employees) {
+			state = employerSchema.STATE.ERROR;
+		}
+		else {
+			let payload = checkResult(result.Employees);
+			payload.employerID = employer.id;
+			// notify client about the upload result; 
+			sendMessage(ip, {type: "recalculate_result", payload: payload });
+		}
+	}
+	catch (error) {
+		logger.error(employer.NAME + ": saving employees information failed." + error.stack);
+		state = employerSchema.STATE.ERROR;
+	}
+	// finish working on employees
+	employerSchema.setEmployeeState(employer.id, state,
+		(err, result) => {
+			if (result)
+				logger.debug("employee state is " + JSON.stringify(result));
+			else {
+				
+				logger.error(err)
+			}
+		});
+};
+
+module.exports = { run, getEmployeesOfEmployer, getPrecentFinished, runRecalculate }

@@ -142,7 +142,7 @@ const handleBranchData = (branches, emploeesList) => {
         // count number of emplyees in each unqiue site
         for (const [index, employee] of emploeesList.entries()) {
             if (!uniqueBranch.has(employee[employeeFieldsName.BRANCH_ID])) {
-                let employeeID = `בשורה ${index + 1}`;
+                let employeeID = `בשורה ${index + 2}`;
                 if (employee[employeeFieldsName.WORKER_ID])
                     employeeId = employee[employeeFieldsName.WORKER_ID];
                 return reject(new ServerError(400, `מספר סניף של עובד  ${employeeID} שגוי או סניף לא קיים`));

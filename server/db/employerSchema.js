@@ -79,6 +79,21 @@ const findByName = (name, callback) => {
 };
 
 /**
+ * Find employer by id
+ * @param {number} id of the employer (company name)
+ * @param {function} callback (err, result)
+ */
+const findByID = (id, callback) => {
+  // find emp in the database
+  Employer.findAll({
+    where: {
+      ID: id
+    }
+  }).then(data => { callback(null, data[0]) })
+    .catch(err => { callback(err, getMessage(err)); });
+};
+
+/**
  * Get all companies
  * @param {function} callback (err, result)
  */
@@ -166,6 +181,6 @@ const getAllSectors = (callback) => {
 };
 
 module.exports = {
-  loadingStatus, insertEmployer, deleteEmployer, findByName,
+  loadingStatus, insertEmployer, deleteEmployer, findByName, findByID,
   getAllSectors, getAllComapnies, setEmployeeState, STATE
 };

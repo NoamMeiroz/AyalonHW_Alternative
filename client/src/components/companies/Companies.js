@@ -14,17 +14,14 @@ class Companies extends Component {
 
     componentDidUpdate(prevProps, prevState) {
         // check if to handle uploadFile results
-        if (this.props.uploadFile && (this.props.uploadFile.timestamp !== prevProps.uploadFile.timestamp)) {
-            this.props.showMessage("נתוני חברה בתהליך טעינה...");
-
-            // start check if finished uploading 
-            let employerID = this.props.uploadFile.newCompany.id;
+        if (this.props.longExecution && (this.props.longExecution.timestamp !== prevProps.longExecution.timestamp)) {
+            // start check progress of execution by calling an action.
+            let employerID = this.props.longExecution.employerID;
             // delete old process interval if exists
             if (sessionStorage.getItem(employerID)) {
                 clearInterval(sessionStorage.getItem(employerID));
                 sessionStorage.removeItem(employerID)
             }
-            //let processID = setInterval(this.props.checkProgress(employerID), 3000);
             let processID = setInterval(() => { this.props.checkProgress(employerID) }, 3000);
             // save process id
             sessionStorage.setItem(employerID, processID);
@@ -68,10 +65,9 @@ function mapStateToProps(state) {
         sectorList: state.loadData.sectorList,
         timestamp: state.loadData.timestamp
     },
-    uploadFile: {
-        newCompany: state.uploadFile.data,
-        isSuccess: state.uploadFile.isSuccess,
-        timestamp: state.uploadFile.timestamp
+    longExecution: {
+        employerID: state.longExecution.employerID,
+        timestamp: state.longExecution.timestamp
     }}
     return newProps;
 }

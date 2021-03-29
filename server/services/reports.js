@@ -128,6 +128,9 @@ const getCluster = (employers, livingCity, workingCity,
 								case 3001:
 									message = "מספר העובדים המקסימלי לקלאסטר חייב להיות מספר חיובי ושלם";
 									break;
+								case 3002:
+									message = "גודל קבוצת הצימוד חייב להיות נמוך או שווה למספר העובדים";
+									break;
 								case 3011:
 									message = "דוח צימודים ניתן להפיק עבור 2 עובדים לפחות";
 									break;

@@ -1,12 +1,14 @@
 import axios from 'axios';
 import {
-    FILE_UPLOAD,
+    START_FILE_UPLOAD,
     LOAD_DATA, EMPLOYEES_DATA,
     ADD_NEW_COMPANY,
     CHECK_PROGRESS, ERROR,
     UPLOAD_RESULT,
     MESSAGE,
-    DELETE_COMPANY
+    DELETE_COMPANY,
+    RECALCULATE_COMPANY,
+    START_RECALCULATE_COMPANY
 } from './types';
 import {UPLOAD_FAILED} from './const';
 import * as actionUtils from '../utils/actionsUtil';
@@ -27,9 +29,10 @@ export const upload = (file) => {
                     'authorization': localStorage.getItem('token')
                 }
             }).then(data => {
-                dispatch({ type: FILE_UPLOAD, isSuccess: true, data: data.data });
-                dispatch({ type: ADD_NEW_COMPANY, new_company: data.data })
-                dispatch(checkProgress(data.data.id));
+                dispatch({ type: START_FILE_UPLOAD, isSuccess: true, company: data.data });
+                dispatch({ type: ADD_NEW_COMPANY, new_company: data.data });
+                dispatch({ type: MESSAGE, message: 'תהליך טעינת נתוני החברה החל'});
+                //dispatch(checkProgress(data.data.id));
             }).catch(err => {
                 let message = actionUtils.handleError(err);
                 dispatch({ type: ERROR, errorMessage: message })
@@ -128,9 +131,38 @@ export const deleteCompany = (employerId) => {
                 dispatch({ type: MESSAGE, message: `מחיקת החברה הסתיימה בהצלחה` });
                 
             }).catch(err => {
-                console.log(err);
                 let message = actionUtils.handleError(err);
                 dispatch({ type: ERROR, errorMessage: message });
             });
+    }
+};
+
+
+/**
+ * run recalculation of routes from google and final marks
+ */
+export const recalculate = (employerId) => {
+    return (dispatch) => {
+        axios.get(`/api/employer/${employerId}/recalculate`, actionUtils.getAxiosHeader())
+            .then(() => {
+                dispatch({ type: START_RECALCULATE_COMPANY, isSuccess: true, employerID: employerId });
+                dispatch({ type: RECALCULATE_COMPANY, employerID: employerId});
+                dispatch({ type: MESSAGE, message: `חישוב מסלולים וציונים החל` });
+            }).catch(err => {
+                let message = actionUtils.handleError(err);
+                dispatch({ type: ERROR, errorMessage: message });
+            });
+    }
+};
+
+/**
+ * Show upload result as a message and update the company row
+ * @param {*} file 
+ * @param {*} callback 
+ */
+export const recalculateResult = (result) => {
+    return (dispatch) => {
+        dispatch({ type: UPLOAD_RESULT, result: result });
+        dispatch({ type: MESSAGE, message: `תהליך חישוב מסלולים וציונים מחדש הסתיים בהצלחה.` })
     }
 };

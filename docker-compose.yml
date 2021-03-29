@@ -29,10 +29,10 @@ services:
       context: ./server
       dockerfile: dockerfile_server.dev
     volumes:
-      - ./server/node_modules:/server/node_modules
-      - ./server:/server
-    #  - /server/node_modules
-    #  - /server
+    #  - ./server/node_modules:/server/node_modules
+    #  - ./server:/server
+      - /server/node_modules
+      - /server
     environment: 
       - mysql_server=mysql
       - NODE_ENV=development
@@ -66,8 +66,8 @@ services:
       context: ./client
       dockerfile: dockerfile_app.dev
     volumes:
-    #- ./client/node_modules:/client/node_modules
-    #- ./client:/client
+    #  - ./client/node_modules:/client/node_modules
+    #  - ./client:/client
       - /client/node_modules
       - /client
     restart: always

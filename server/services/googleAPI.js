@@ -199,7 +199,6 @@ const checkRouteResults = (payload) => {
 
 const getRoutes = async (origin, destination, time) => {
    return new Promise(function (resolve, reject) {
-
       if (!origin) {
          return resolve(new ServerError(ERRORS.MISSING_ORIGIN_CODE, "missing origin"));
       }

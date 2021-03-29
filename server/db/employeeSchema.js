@@ -46,7 +46,22 @@ const insertBulk = (employees, callback) => {
  */
 const updateBulk = (employees, callback) => {
    // Save  in the database
-   Employee.bulkUpate(employees)
+   Employee.bulkCreate(employees, {updateOnDuplicate:["BEST_ROUTE_TO_WORK", "BEST_ROUTE_TO_HOME",
+      "FINAL_SHORT_HOURS_GRADE",
+     "FINAL_SHIFTING_HOURS_GRADE",
+      "FINAL_BICYCLE_GRADE",
+      "FINAL_SCOOTER_GRADE",
+      "FINAL_PERSONALIZED_SHUTTLE_GRADE",
+      "FINAL_WORK_SHUTTLE_GRADE",
+      "FINAL_CARSHARE_GRADE",
+      "FINAL_CARPOOL_GRADE",
+      "FINAL_CABSHARE_GRADE",
+      "FINAL_PUBLIC_TRANSPORT_GRADE",
+      "FINAL_WALKING_GRADE",
+      "FINAL_WORKING_FROM_HOME_GRADE",
+      "FINAL_SHARED_WORKSPACE_GRADE",
+      "FINAL_SHIFTING_WORKING_DAYS_GRADE",
+      "updatedAt"]})
       .then(data => { callback(null, data) })
       .catch(err => {
          callback(err, getMessage(err));
@@ -308,8 +323,24 @@ const getPrecentFinished = (employerID, callback) => {
    });
 }
 
+/**
+ * Clear all google suggested routes of a given employer by its id
+ * @param {*} employerID 
+ * @param {*} callback 
+ */
+const cleanBestRoute = (employerID, callback) => {
+   // Save  in the database
+   Employee.update({BEST_ROUTE_TO_HOME: null, 
+      BEST_ROUTE_TO_WORK: null},
+      {where: {EMPLOYER_ID: employerID}})
+      .then(data => { callback(null, data) })
+      .catch(err => {
+         callback(err, getMessage(err));
+      });
+};
+
 
 module.exports = {
    insertBulk, updateRoute, getEmployeesOfEmployer, getPrecentFinished,
-   getEmployees, updateBulk
+   getEmployees, updateBulk, cleanBestRoute
 };

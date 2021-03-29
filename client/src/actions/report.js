@@ -21,7 +21,7 @@ export const setClusterBoundey = (value=30) => {
 /**
  * 
  */
-export const setDestinationPolygonQuery = (value=[]) => {
+export const setDestinationPolygonQuery = (value={}) => {
     return (dispatch) => {
         dispatch({ type: QUERY_DESTINATION_POLYGON, value: value });
     }
@@ -30,7 +30,7 @@ export const setDestinationPolygonQuery = (value=[]) => {
 /**
  * 
  */
-export const setStartingPolygonQuery = (value=[]) => {
+export const setStartingPolygonQuery = (value={}) => {
     return (dispatch) => {
         dispatch({ type: QUERY_STARTING_POLYGON, value: value });
     }
@@ -199,9 +199,14 @@ export const calculateCluster = (employers = [], livingCity = [], workingCity = 
             clusterBoundery: qClusterBoundery
     };
     let headers = actionUtils.getAxiosHeader().headers;
-    headers = { ...{'Content-Type': 'application/json'}, headers };
+    headers = { ...{'Content-Type': 'application/json'}, headers }
+
+    // update list of employees
     return (dispatch) => {
         dispatch({ type: CLUSTER_REPORT_RUN, isRunning: true });
+        dispatch(getEmployees(employers, livingCity, workingCity, 
+            qTimeSlotWork, qTimeSlotHome, qSelectedMarks, 
+            qDestinationPolygon, qStartingPolygon));
         axios.post(`/api/reports/cluster`, data, headers)  
             .then(payload => {
                 dispatch({ type: CLUSTER_REPORT_RUN, isRunning: false });
@@ -213,6 +218,15 @@ export const calculateCluster = (employers = [], livingCity = [], workingCity = 
                 dispatch({ type: ERROR, errorMessage: message });
                 dispatch({ type: CLUSTER_REPORT_RUN, isRunning: false });
             });
+    }
+};
+
+/**
+ * return the list of employees for a given comapny.
+ */
+export const clearClusterReport = () => {
+    return (dispatch) => {
+        dispatch({ type: CLUSTER_REPORT_RESULT, employeesList: [] });
     }
 };
 

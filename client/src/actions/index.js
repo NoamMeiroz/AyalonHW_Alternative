@@ -8,7 +8,6 @@ import { getData } from './company';
 
 export * from './report';
 export * from './company';
-export * from './notifications';
 export * from './map';
 
 /**

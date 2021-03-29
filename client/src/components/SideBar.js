@@ -45,7 +45,7 @@ class SideBar extends Component {
             anchor="left"
             className="SideBar"
         >
-            <img src="https://www.ayalonhw.co.il/wp-content/themes/_tk-master/images/logo.png"
+            <img src="logo.png"
                 alt="חברת נתיבי איילון" width="184px" height="81" />
 
             <div className="menu-bar">

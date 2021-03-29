@@ -3,6 +3,7 @@ import { MTableToolbar } from "material-table";
 import Sites from './Sites';
 import DownloadButton from './DownloadButton';
 import DeleteButton from './DeleteButton';
+import RecalculateButton from './RecalculateButton';
 import CompanyUploadButton from './CompanyUploadButton';
 import TemplateButton from './TemplateButton';
 import Table from '../common/Table';
@@ -54,10 +55,14 @@ class CompanyTable extends Component {
             components={{
                 Action: props => (
                     <Grid container direction="row" spacing={1} style={{width:'80px'}}>
-                        <Grid item xs={6}>
+                        <Grid item xs={4}>
                             <DownloadButton fontSize="small" csvData={props.data} fileName={props.data.NAME} />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid item xs={4}>
+                            <RecalculateButton id={`recalcButton_${props.data.id}`}
+                                fontSize="small" csvData={props.data} />
+                        </Grid>
+                        <Grid item xs={4}>
                             <DeleteButton id={`deleteButton_${props.data.id}`}
                                 fontSize="small" csvData={props.data} />
                         </Grid>
