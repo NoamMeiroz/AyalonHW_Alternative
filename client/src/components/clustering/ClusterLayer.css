@@ -4,9 +4,9 @@
     border-radius: 50% 50% 50% 50%;
     background: #c30b82;
     position: absolute;
-    left: 80%;
-    top: 100%;
-    margin: -15px 0 0 -15px;
+    left: 70%;
+    top: 120%;
+    margin: -10px 0 0 -10px;
     border-color: black;
     border-style: solid;
     border-width: 1px;
@@ -20,7 +20,7 @@
   position: absolute;
   background-image: url(/mono-tab-remove.svg);
   background-size: 10px 10px;
-  margin: 28px 12px 0px 0px;
+  margin: 41px 10px 0px 0px;
 }
 
 .custom-div-icon-Cluster .cluster-pin:after {

@@ -62,12 +62,11 @@ class HeatmapQueryPanel extends PureComponent {
                             options={this.props.companies}
                             getOptionLabel={(option) => option.NAME}
                             filterSelectedOptions
-                            renderInput={(params) => (
+                            renderInput={(params) => 
                                 <TextField
                                     {...params}
                                     label="שם חברה"
-                                />
-                            )}
+                                />}
                             onChange={(event, value) => {
                                 let companyList = value.map(company => {
                                     return company.id;
@@ -85,12 +84,12 @@ class HeatmapQueryPanel extends PureComponent {
                             options={this.props.settlementList}
                             getOptionLabel={(option) => option[CITY_NAME_COLUMN]}
                             filterSelectedOptions
-                            renderInput={(params) => (
+                            renderInput={(params) => 
                                 <TextField
                                     {...params}
                                     label="ישוב מגורים"
                                 />
-                            )}
+                            }
                             onChange={(event, value) => {
                                 let cities = value.map(city => {
                                     return city[CITY_NAME_COLUMN];
@@ -109,12 +108,11 @@ class HeatmapQueryPanel extends PureComponent {
                             options={this.props.settlementList}
                             getOptionLabel={(option) => option[CITY_NAME_COLUMN]}
                             filterSelectedOptions
-                            renderInput={(params) => (
-                                <TextField
+                            renderInput={(params) => <TextField
                                     {...params}
                                     label="ישוב עבודה"
                                 />
-                            )}
+                            }
                             onChange={(event, value) => {
                                 let cities = value.map(city => {
                                     return city[CITY_NAME_COLUMN];

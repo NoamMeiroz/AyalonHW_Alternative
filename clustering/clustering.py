@@ -416,7 +416,7 @@ except:
     # codes and messages
     codes = {'Input does not comply with the required schema':3000,
             'maxCluster must be a positive integer':3001,
-
+            "size_min and size_max must be a positive number smaller than the number of data points or `None`":3002,
             'Input must include more than one employee':3011}
     
     # get error elements

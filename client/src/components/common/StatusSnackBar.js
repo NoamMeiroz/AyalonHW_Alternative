@@ -52,7 +52,7 @@ class StatusSnackBar extends Component {
 				horizontal: 'left',
 			}}
 			open={this.state.open}
-			autoHideDuration={2000}
+			autoHideDuration={5000}
 			onClose={this.handleClose}
 			message={this.state.text}
 			action={

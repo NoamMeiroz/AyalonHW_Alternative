@@ -54,9 +54,6 @@ const theme = createMuiTheme({
 		MuiAutocomplete: {
 			input: {
 				fontSize: "1vmax"
-			},
-			label: {
-				fontSize: "1vmax"
 			}
 		}
 	},

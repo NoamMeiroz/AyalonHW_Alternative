@@ -1,6 +1,6 @@
 export const AUTH_USER = 'auth_user';
 export const AUTH_ERROR = 'auth_error';
-export const FILE_UPLOAD = 'file_upload';
+export const START_FILE_UPLOAD = 'start_file_upload';
 export const LOAD_DATA = 'load_data';
 export const ADD_NEW_COMPANY = 'new_company';
 export const EMPLOYEES_DATA = 'employees_data';
@@ -28,6 +28,7 @@ export const MESSAGE = 'message';
 export const CONNECTED = 'connected';
 export const UPLOAD_RESULT = 'upload_result';
 export const COMPANY_EXIST = 'company_exist';
-export const LOAD_RESULT_NOTIFICATION = 'load_result_notification';
 export const MAP_CHANGE = 'map_change'; // saving the map position
 export const DELETE_COMPANY = "delete_company";
+export const RECALCULATE_COMPANY = "recalculate_company";
+export const START_RECALCULATE_COMPANY = 'start_recalculate_company';

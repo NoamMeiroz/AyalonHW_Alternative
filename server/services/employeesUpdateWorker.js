@@ -1,20 +1,11 @@
 const { workerData, parentPort } = require('worker_threads')
 const employeeSchema = require('../db/employeeSchema');
-const empFields = require("../config/config").employeeFieldsName;
-const DEFAULT_EXIT_HOUR = require("../config/config").DEFAULT_EXIT_HOUR_TO_WORK;
-const DEFAULT_RETURN_HOUR = require("../config/config").DEFAULT_RETURN_HOUR_TO_HOME;
-
+const configData = require("./configData");
 const { getNearestWorkDay } = require('../tools');
 const googleAPI = require("./googleAPI");
-const configData = require("./configData");
 const timeSlotsData = require("./timeSlotsData");
 const { ERRORS } = require("./ERRORS");
 const { ServerError, logger } = require('../log');
-const { Column, TYPES } = require('./columns/column');
-const { City } = require('./columns/city');
-const { Street } = require('./columns/street');
-const { BuildingNumber } = require('./columns/buildingNumber');
-const { TimeSlot } = require('./columns/timeSlot');
 const { calculateMark } = require('./route');
 
 
@@ -46,7 +37,7 @@ const getTimeSlotHour = (timeSlot) => {
       throw (new ServerError(ERRORS.TIME_SLOT_NOT_FOUND, timeSlot));
 }
 
-const findRoutes = async function (employee, sites) {
+const findRoutes = async function (employee) {
    return new Promise(async function (resolve, reject) {
       promiseList = [];
       // check if the employee UPLOAD_ERROR is empty. 
@@ -59,10 +50,7 @@ const findRoutes = async function (employee, sites) {
          buildingNumber: employee.BUILDING_NUMBER
       };
 
-      // find the address of the office where the employees work
-      workSite = sites.find((site) => {
-         return (site.id === employee.WORK_SITE)
-      })
+      let workSite = employee.Site.dataValues;
       let destination = {
          city: workSite.ADDRESS_CITY, street: workSite.ADDRESS_STREET,
          buildingNumber: workSite.ADDRESS_BUILDING_NUMBER
@@ -123,9 +111,10 @@ const updateEmployee = async function (employeeList) {
       let promiseList = []
       // calculate coordination
       employeeList.forEach(employee => {
+         employee.updatedAt = new Date();
          // find routes only to employees with valid address
          if (employee.UPLOAD_ERROR === null)
-            promiseList.push(findRoutes(employee, employer.Sites));
+            promiseList.push(findRoutes(employee));
          else
             promiseList.push(employee);
       });
@@ -162,32 +151,52 @@ const runAndWait = async (waitTime, callback, employeeList) => {
 
 const employer = workerData.employer;
 var employeeList = workerData.employees;
+logger.info(`employer ${employer.NAME}: calculation new routes thread is running`);
 
-logger.info(`employer ${employer.NAME}: calculation employees new routes`)
-
-let awaitTime = 2000;
-let chunk = 5;
-let promiseList = [];
-// work on chunck of employees to avoid huge bulk insert and to much requests of the google api at once
-for (i = 0, j = empList.length; i < j; i += chunk) {
-   employeesChunk = empList.slice(i, i + chunk);
-   promise = runAndWait(awaitTime * (i / chunk), updateEmployee, employeesChunk)
-   promiseList.push(promise);
-}
-
-
-// collect all employees to one list and return result to main thread.
-Promise.all(promiseList)
-   .then(results => {
-      let empList = [];
-      results.forEach((emplyees, index, array) => {
-         empList = empList.concat(emplyees);
-      });
-      parentPort.postMessage({ Employees: empList });
-
+var config = [];
+// init configuation from database
+configData.getAllConfig()
+   .then(configuration => {
+      config = configuration;
+      return timeSlotsData.getTimeSlots();
+   })
+   // init timeSlots
+   .then(data => {
+      timeSlots = data;
+      main();
    })
    .catch(error => {
-      logger.error(error);
+      logger.error(error.stack);
       // return result to main thread
       parentPort.postMessage({ Employees: null, message: error });
+      process.exit(-1);
    });
+
+
+const main = () => {
+   let awaitTime = 2000;
+   let chunk = 5;
+   let promiseList = [];
+   // work on chunck of employees to avoid huge bulk insert and to much requests of the google api at once
+   for (i = 0, j = employeeList.length; i < j; i += chunk) {
+      employeesChunk = employeeList.slice(i, i + chunk);
+      promise = runAndWait(awaitTime * (i / chunk), updateEmployee, employeesChunk)
+      promiseList.push(promise);
+   }
+
+   // collect all employees to one list and return result to main thread.
+   Promise.all(promiseList)
+      .then(results => {
+         let empList = [];
+         results.forEach((emplyees, index, array) => {
+            empList = empList.concat(emplyees);
+         });
+         parentPort.postMessage({ Employees: empList });
+
+      })
+      .catch(error => {
+         logger.error(error);
+         // return result to main thread
+         parentPort.postMessage({ Employees: null, message: error });
+      });
+}

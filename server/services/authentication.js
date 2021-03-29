@@ -14,9 +14,9 @@ tokenForUser = (userId) => {
  * @param {*} res 
  * @param {*} next 
  */
-const singup = function(req, res, next) {
-   let user = req.fields.userId;
-   let password = req.fields.password;
+const singup = function(req, res, next) {  
+   let user = req.body.userId;
+   let password = req.body.password;
    if (!user || !password) {
        return res.status(401).send("userId or password are missing\n");
    }

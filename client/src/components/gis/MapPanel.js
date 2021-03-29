@@ -153,8 +153,14 @@ class MapPanel extends Component {
             let layer = layers[id];
             layerContainer.removeLayer(layer);
         });
-        this.props.setDestinationPolygonQuery([]);
-        this.props.setStartingPolygonQuery([]);
+
+        if (this.state.startGeoJSON !== null)
+            this.removeLayer(this.mapRef.current.leafletElement, this.state.startGeoJSON);
+        if (this.state.destinationGeoJSON !== null)
+            this.removeLayer(this.mapRef.current.leafletElement, this.state.destinationGeoJSON);
+
+        this.props.setDestinationPolygonQuery({});
+        this.props.setStartingPolygonQuery({});
     }
 
     /**
@@ -231,7 +237,7 @@ class MapPanel extends Component {
                         var layerContainer = this.starting.current.leafletElement.options.edit.featureGroup;
                         let targetId = this.props.startPolygon.id;
                         this.removeLayer(layerContainer, targetId);
-                        if (this.state.destinationGeoJSON !== null)
+                        if (this.state.startGeoJSON !== null)
                             this.removeLayer(this.mapRef.current.leafletElement, this.state.startGeoJSON);
 
                         this.props.setStartingPolygonQuery([]);
@@ -426,8 +432,10 @@ function mapStateToProps(state, ownProps) {
     }
     if (state.reportParams.qDestinationPolygonParams) {
         destinationPolygon = state.reportParams.qDestinationPolygonParams;
+        timestamp = state.reports.timestamp;
     }
     if (state.reportParams.qStartingPolygonParams) {
+        timestamp = state.reports.timestamp;
         startPolygon = state.reportParams.qStartingPolygonParams;
     }
     if (state.reports.clusterReport) {

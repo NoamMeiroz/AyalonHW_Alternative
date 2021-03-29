@@ -9,6 +9,9 @@ import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
 import Fade from '@material-ui/core/Fade';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import IconButton from '@material-ui/core/IconButton';
+import Tooltip from '@material-ui/core/Tooltip';
+import LayersClearIcon from '@material-ui/icons/LayersClear';
 import requireAuth from '../requireAuth'; //used to check if login successfull
 import * as actions from '../../actions';
 
@@ -133,25 +136,41 @@ function ClusterBounderyQuery({ qClusterBoundery }) {
             qClusterBounderyParams));
     }
 
+    const clearReport = () => {
+        dispatch(actions.clearClusterReport());
+    }
+
     return (
         <div className={classes.root}>
             <Grid item xs={12}>
                 <Divider style={{ width: '10vh', margin: 'auto' }} />
             </Grid>
             <ClusterComponents values={qClusterBoundery} />
-            <Grid item xs={10}>
-                <Button className={classes.button} variant="contained"
-                    onClick={handleClick}>הפק דוח צימודים
+            <Grid item container xs={10}>
+                <Grid item xs={10}>
+                    <Button className={classes.button} variant="contained"
+                        onClick={handleClick}>הפק דוח צימודים
                          <Fade
-                        in={isClusterReportRunnig}
-                        style={{
-                            transitionDelay: isClusterReportRunnig ? '800ms' : '0ms',
-                        }}
-                        unmountOnExit
-                    >
-                        <CircularProgress size={15} />
-                    </Fade>
-                </Button>
+                            in={isClusterReportRunnig}
+                            style={{
+                                transitionDelay: isClusterReportRunnig ? '800ms' : '0ms',
+                            }}
+                            unmountOnExit
+                        >
+                            <CircularProgress size={15} />
+                        </Fade>
+                    </Button>
+                </Grid>
+                <Grid item xs={2}>
+                    <Tooltip title="נקה דוח צימודים">
+                        <IconButton color="primary" aria-label="clear cluster report" 
+                            component="span"
+                            disabled={isClusterReportRunnig}
+                            onClick={clearReport}>
+                            <LayersClearIcon />
+                        </IconButton>
+                    </Tooltip>
+                </Grid>
             </Grid>
         </div >
     );

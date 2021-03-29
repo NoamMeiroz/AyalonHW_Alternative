@@ -13,6 +13,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import SaveRoundedIcon from '@material-ui/icons/SaveRounded';
+import { Tooltip } from '@material-ui/core';
 
 //const MAX_WALK_TIME = 30;
 //const MAX_BICYCLE_TIME = 60;
@@ -414,15 +415,19 @@ class DownloadButton extends Component {
    render() {
       let jsx = {};
       if (this.props.csvData.EMPLOYEES_READY === 1)
-         jsx = <IconButton color="primary" aria-label="upload picture" component="span" style={{ padding: '2px' }}
-            onClick={(e) => { this.saveEmployeesList(this.props.csvData.id, this.props.fileName) }}>
-            <SaveRoundedIcon />
-         </IconButton>;
+         jsx = <div>
+            <Tooltip title="דוח טעינה">
+               <IconButton color="primary" aria-label="upload picture" component="span" style={{ padding: '2px' }}
+                  onClick={(e) => { this.saveEmployeesList(this.props.csvData.id, this.props.fileName) }}>
+                  <SaveRoundedIcon />
+               </IconButton>
+            </Tooltip>
+         </div>;
       else if (this.props.csvData.EMPLOYEES_READY === 0) {
          jsx = <div>
             <Typography variant="caption" color="textSecondary">טעינת עובדים</Typography>
             <Box position="relative" display="inline-flex">
-               <CircularProgress variant="static" value={this.props.csvData.UPLOAD_PROGRESS} />
+               <CircularProgress variant="determinate" value={this.props.csvData.UPLOAD_PROGRESS} />
                <Box
                   top={0}
                   left={0}

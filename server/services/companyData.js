@@ -8,15 +8,16 @@ const { branchesFieldsName, employeeFieldsName } = require('../config/config');
 const { Column, TYPES } = require('./columns/column');
 const { YesNoColumn } = require('./columns/yesno');
 const { Sector } = require('./columns/sector');
+const employeeSchema = require('../db/employeeSchema');
 
 const EMP_COLUMNS = [
-        new Column("NAME", "שם חברה",TYPES.STRING, 50, false),
-        new Column("NUMBER_OF_EMPLOYEES", "מספר עובדים",TYPES.INT, 8, false),
-        new Column("NUMBER_OF_SITES", "מספר סניפים",TYPES.INT, 3, false),
-        new YesNoColumn("PRIVATE_CAR_SOLUTION","רכב צמוד"),
-        new YesNoColumn("MASS_TRANSPORTATION_SOLUTION","שירות הסעות"),
-        new YesNoColumn("CAR_POOL_SOLUTION","Carpool"),
-        new YesNoColumn("WORK_FROM_HOME_SOLUTION","עבודה מהבית")
+    new Column("NAME", "שם חברה", TYPES.STRING, 50, false),
+    new Column("NUMBER_OF_EMPLOYEES", "מספר עובדים", TYPES.INT, 8, false),
+    new Column("NUMBER_OF_SITES", "מספר סניפים", TYPES.INT, 3, false),
+    new YesNoColumn("PRIVATE_CAR_SOLUTION", "רכב צמוד"),
+    new YesNoColumn("MASS_TRANSPORTATION_SOLUTION", "שירות הסעות"),
+    new YesNoColumn("CAR_POOL_SOLUTION", "Carpool"),
+    new YesNoColumn("WORK_FROM_HOME_SOLUTION", "עבודה מהבית")
 ];
 
 /**
@@ -69,7 +70,7 @@ const handleEmployerData = (data) => {
                     logger.error(err.stack);
                     return reject(new ServerError(500, err));
                 }
-               
+
                 let employer = {
                     EMPLOYER_ID: 0
                 };
@@ -82,7 +83,7 @@ const handleEmployerData = (data) => {
                     catch (err) {
                         return reject(new ServerError(400, err.message));
                     }
-                 }
+                }
                 return resolve(employer);
             });
         }
@@ -187,20 +188,92 @@ const readSheet = (req, company_sheets) => {
 }
 
 /**
+ * Update walking, driving, bycicle and public transportation suggested routes using google api
+ * and update the marks
+ * @param {*} req 
+ * @param {*} company_sheets 
+ */
+const recalculateRoutes = (req, employerId) => {
+    return new Promise(function (resolve, reject) {
+        // set state to not ready 
+        employerSchema.setEmployeeState(employerId, employerSchema.STATE.NOT_READY, ((error, data) => {
+            if (error) {
+                if (error instanceof ServerError) {
+                    logger.info(error.stack);
+                    return reject(error);
+                }
+                else {
+                    logger.error(error.stack);
+                    return reject(new ServerError(500, error));
+                }
+            }
+            employerSchema.findByID(employerId, ((error, employer) => {
+                if (error) {
+                    if (error instanceof ServerError) {
+                        logger.info(error.stack);
+                        return reject(error);
+                    }
+                    else {
+                        logger.error(error.stack);
+                        return reject(new ServerError(500, error));
+                    }
+                }
+                // clear all values in best route
+                employeeSchema.cleanBestRoute(employerId, ((error, data) => {
+                    if (error) {
+                        if (error instanceof ServerError) {
+                            logger.info(error.stack);
+                            return reject(error);
+                        }
+                        else {
+                            logger.error(error.stack);
+                            return reject(new ServerError(500, error));
+                        }
+                    }
+                    // get all employees of employer from db
+                    employeeSchema.getEmployeesOfEmployer([employerId], [], [], ((error, employees) => {
+                        if (error) {
+                            if (error instanceof ServerError) {
+                                logger.info(error.stack);
+                                return reject(error);
+                            }
+                            else {
+                                logger.error(error.stack);
+                                return reject(new ServerError(500, error));
+                            }
+                        }
+                        var employeesList = employees.map(employee => { return employee.dataValues });
+                        try {
+                            employeesData.runRecalculate(req, employer.dataValues, employeesList);
+                            return resolve("ok");
+                        }
+                        catch (error) {
+                            logger.error(error.stack);
+                            return reject(new ServerError(500, error));
+                        }
+                    }));
+                }));
+            }));
+
+        }));
+    });
+}
+
+/**
  * Delete and reomove entire company data
  * @param {*} employer 
  */
 const deleteEmployer = (empID) => {
-	return new Promise(function (resolve, reject) {
-		employerSchema.deleteEmployer(empID, (err, payload) => {
-			if (err) {
-				logger.error(err.stack);
-				reject(new ServerError(500, err))
-			}
-			resolve({});
-		});
-	});
+    return new Promise(function (resolve, reject) {
+        employerSchema.deleteEmployer(empID, (err, payload) => {
+            if (err) {
+                logger.error(err.stack);
+                reject(new ServerError(500, err))
+            }
+            resolve({});
+        });
+    });
 }
 
 
-module.exports = { readSheet, deleteEmployer };
+module.exports = { readSheet, deleteEmployer, recalculateRoutes };

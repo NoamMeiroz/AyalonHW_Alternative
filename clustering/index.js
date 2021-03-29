@@ -14,7 +14,6 @@ app.use(bodyParser.json());
 // curl request
 // curl -X POST --header "Content-Type: Application/json" localhost:3000 -d '{"name":"Amit"}'
 
-
 app.post('/', (req,res) => {
         // parse request body
         var sample_data = req.body;
@@ -44,12 +43,12 @@ app.post('/', (req,res) => {
                         response = JSON.parse(result);
                         if (response.code !==undefined) {
                             resCode = 400;
-                            logger.error(response);
                         }
+                        logger.info(response);
                     }
                     // catch error of the parse. This means the return result is an error string
                     catch(error) {
-                        console.log(script_output+"");
+                        logger.error(script_output+"");
                         resCode = 500;  
                         logger.error(error.stack);
                         response = {code: "4000", message: "Unknown error"};

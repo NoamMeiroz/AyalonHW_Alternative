@@ -90,7 +90,7 @@ const getTimePotential = () => {
                     Cell: (props) => {
                         return (<div style={{
                             width: 100,
-                            backgroundColor: (props.row.values.BEST_ROUTE_TO_WORK_DRIVING_DURATION >
+                            backgroundColor: (props.row.values.BEST_ROUTE_TO_WORK_DRIVING_DURATION >=
                                 props.value ? 'yellow' : null)
                         }}>
                             {props.value}
@@ -103,7 +103,7 @@ const getTimePotential = () => {
                     Cell: (props) => {
                         return (<div style={{
                             width: 100,
-                            backgroundColor: (props.row.values.BEST_ROUTE_TO_WORK_DRIVING_DURATION >
+                            backgroundColor: (props.row.values.BEST_ROUTE_TO_WORK_DRIVING_DURATION >=
                                 props.value ? 'yellow' : null)
                         }}>
                             {props.value}
@@ -116,7 +116,7 @@ const getTimePotential = () => {
                     Cell: (props) => {
                         return (<div style={{
                             width: 100,
-                            backgroundColor: (props.row.values.BEST_ROUTE_TO_WORK_DRIVING_DURATION >
+                            backgroundColor: (props.row.values.BEST_ROUTE_TO_WORK_DRIVING_DURATION >=
                                 props.value ? 'yellow' : null)
                         }}>
                             {props.value}
@@ -134,7 +134,7 @@ const getTimePotential = () => {
                     Cell: (props) => {
                         return (<div style={{
                             width: 100,
-                            backgroundColor: (props.row.values.BEST_ROUTE_TO_HOME_DRIVING_DURATION >
+                            backgroundColor: (props.row.values.BEST_ROUTE_TO_HOME_DRIVING_DURATION >=
                                 props.value ? 'yellow' : null)
                         }}>
                             {props.value}
@@ -147,7 +147,7 @@ const getTimePotential = () => {
                     Cell: (props) => {
                         return (<div style={{
                             width: 100,
-                            backgroundColor: (props.row.values.BEST_ROUTE_TO_HOME_DRIVING_DURATION >
+                            backgroundColor: (props.row.values.BEST_ROUTE_TO_HOME_DRIVING_DURATION >=
                                 props.value ? 'yellow' : null)
                         }}>
                             {props.value}
@@ -160,7 +160,7 @@ const getTimePotential = () => {
                     Cell: (props) => {
                         return (<div style={{
                             width: 100,
-                            backgroundColor: (props.row.values.BEST_ROUTE_TO_HOME_DRIVING_DURATION >
+                            backgroundColor: (props.row.values.BEST_ROUTE_TO_HOME_DRIVING_DURATION >=
                                 props.value ? 'yellow' : null)
                         }}>
                             {props.value}

@@ -1,5 +1,5 @@
-import { ADD_NEW_COMPANY, LOAD_DATA, UPLOAD_RESULT, CHECK_PROGRESS, DELETE_COMPANY } from '../actions/types';
-import {UPLOAD_FAILED, UPLOAD_IN_PROGRESS, UPLOAD_SUCESS} from '../actions/const';
+import { ADD_NEW_COMPANY, LOAD_DATA, UPLOAD_RESULT, CHECK_PROGRESS, DELETE_COMPANY, RECALCULATE_COMPANY } from '../actions/types';
+import { UPLOAD_FAILED, UPLOAD_IN_PROGRESS, UPLOAD_SUCESS } from '../actions/const';
 
 const INITIAL_STATE = {
     sectorList: {},
@@ -50,18 +50,32 @@ export default function (state = INITIAL_STATE, action) {
                 companyList: tempList,
                 timestamp: new Date()
             };
+        case RECALCULATE_COMPANY:
+            tempList = state.companyList;
+            tempList = tempList.map((company) => {
+                if (company.id === action.employerID) {
+                    company.UPLOAD_PROGRESS = UPLOAD_IN_PROGRESS;
+                    company.EMPLOYEES_READY = 0;
+                }
+                return company;
+            });
+            return {
+                ...state,
+                companyList: tempList,
+                timestamp: new Date()
+            }
         case CHECK_PROGRESS:
             tempList = state.companyList;
-            tempList = tempList.map((company)=> {
+            tempList = tempList.map((company) => {
                 if (company.id === action.employerID) {
                     company.UPLOAD_PROGRESS = action.uploadProgess;
                     if (action.uploadProgess === 100)
                         company.EMPLOYEES_READY = UPLOAD_SUCESS;
-                    else if (action.uploadProgess === UPLOAD_FAILED){
+                    else if (action.uploadProgess === UPLOAD_FAILED) {
                         company.EMPLOYEES_READY = UPLOAD_FAILED;
                         company.EMP_COUNT_DESC = LOADING_FAILED_MESSAGE
                     }
-                 }
+                }
                 return company;
             });
             return {
@@ -71,7 +85,7 @@ export default function (state = INITIAL_STATE, action) {
             }
         case UPLOAD_RESULT:
             tempList = state.companyList;
-            tempList = tempList.map((company)=> {
+            tempList = tempList.map((company) => {
                 if (company.id === action.result.employerID) {
                     company.EMP_COUNT = action.result.successCount;
                     company.EMP_COUNT_DESC = `${action.result.successCount} מתוך ${action.result.total}`;
@@ -85,9 +99,7 @@ export default function (state = INITIAL_STATE, action) {
             };
         case DELETE_COMPANY:
             tempList = state.companyList;
-            console.log(action.employerID);
-            console.log(tempList);
-            tempList = tempList.filter((company)=> company.id !== action.employerID );
+            tempList = tempList.filter((company) => company.id !== action.employerID);
             return {
                 ...state,
                 companyList: tempList,
