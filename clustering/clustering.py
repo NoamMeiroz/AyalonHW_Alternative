@@ -1,6 +1,7 @@
 import warnings
 import numpy as np
 import scipy.sparse as sp
+from scipy.cluster.hierarchy import dendrogram, linkage, cut_tree, fcluster
 from sklearn.metrics.pairwise import euclidean_distances
 from sklearn.utils.extmath import row_norms, squared_norm, cartesian
 from sklearn.utils.validation import check_array, check_random_state, as_float_array, check_is_fitted
@@ -383,31 +384,20 @@ try:
     employees = pd.DataFrame(parsedInput['employees'])
     # preproccessing
     scaled = preprocessing.scale(employees[['X','Y']])
-    # choose K
-    silhouette_scores = []
-    for k in range(1,len(scaled)):
-        try:
-            kmeans_per_k = KMeansConstrained(n_clusters=k,
-                                             random_state=42,
-                                             size_max = parsedInput['maxCluster'])
-            kmeans_per_k.fit_predict(scaled)
-            silhouette_scores.append(silhouette_score(scaled,kmeans_per_k.labels_))
-        except:
-            silhouette_scores.append(0)     
-    k_clusters = np.argmax(silhouette_scores) + 1
+    # create linkage
+    Z = linkage(scaled, 'ward')
+    # select K
+    for k in range(1,employees.shape[0]):
+        lables = fcluster(Z, t=k, criterion='maxclust')
+        largestClusterSize = np.unique(lables, return_counts=True)[1].max()
+        
+        if largestClusterSize <= parsedInput['maxCluster']:
+            employees = employees.assign(cluster = lables)
+            break
 
-    # run model
-    kmeans_output = KMeansConstrained(n_clusters=k_clusters,
-                                             random_state=42,
-                                             size_max = parsedInput['maxCluster'])
-    # fit model
-    kmeans_output.fit_predict(scaled)
 
-    # assign 
-    employees = employees.assign(cluster = kmeans_output.labels_)
-
-    # eliminate clusters with less than 3 employees
-    employees.loc[employees.cluster.isin(employees.cluster.value_counts()[employees.cluster.value_counts()<3].index),'cluster'] = -1
+    # eliminate remote employees
+    employees.loc[employees.cluster.isin(employees.cluster.value_counts()[employees.cluster.value_counts()<2].index),'cluster'] = -1
 
     # print
     print(employees.to_json(orient="records"))
