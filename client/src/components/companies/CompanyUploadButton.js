@@ -7,7 +7,6 @@ import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import OverideAlert from './OverideAlert';
 import * as excelUtil from '../../utils/excelUtil';
-import Tooltip from '@material-ui/core/Tooltip';
 import CloudUploadIcon from '@material-ui/icons/CloudUpload';
 
 const labelText = "טעינת נתוני חברה";

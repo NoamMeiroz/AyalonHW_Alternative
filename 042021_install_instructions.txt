@@ -1,0 +1,4 @@
+// change WORKER_ID column type from int to string in EMPLOYEES
+-------------
+ALTER TABLE `alternative`.`employees` 
+CHANGE COLUMN `WORKER_ID` `WORKER_ID` VARCHAR(80) NOT NULL ;

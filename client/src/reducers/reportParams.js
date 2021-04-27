@@ -7,7 +7,6 @@ import {
 } from '../actions/types';
 const MIN_MARK = -1;
 const MAX_MARK = 16;
-const MIN_CLUSTER = 3;
 const MAX_CLUSRTER = 30;
 const INITIAL_STATE = {
     qTimeSlotHomeParams: [],

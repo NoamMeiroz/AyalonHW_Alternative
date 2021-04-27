@@ -81,6 +81,7 @@ const handleEmployerData = (data) => {
                         employer[column.name] = column.validityCheck(data[column.title]);
                     }
                     catch (err) {
+                        console.log(column.title);
                         return reject(new ServerError(400, err.message));
                     }
                 }

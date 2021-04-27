@@ -5,16 +5,18 @@ const tools = require('../tools');
 const localityService = require('../services/localityData');
 const { ERRORS } = require("./ERRORS");
 
-const LOCATION_TYPE = ["street_address", "route", "establishment", "hospital"];
+const LOCATION_TYPE = ["street_address", "route", "establishment", "hospital", "neighborhood", "locality"];
 
 
-function convertCoordinate(location) {
+/**
+ * Convert X,Y in EPSG:4326 (WG84) to EPSG:2039
+ * @param {*} x 
+ * @param {*} y 
+ */
+function convertCoordinate(x, y) {
    const secondProjection = "+proj=tmerc +lat_0=31.73439361111111 +lon_0=35.20451694444445 +k=1.0000067 +x_0=219529.584 +y_0=626907.39 +ellps=GRS80 +towgs84=-48,55,52,0,0,0,0 +units=m +no_defs";
-   const x = location["lat"];
-   const y = location["lng"];
-   const result = { X: x, Y: y };
-   //const converted_xy = proj4(proj4.defs["EPSG:4326"], secondProjection, [x, y]);
-   //const result = { X: converted_xy[0], Y: converted_xy[1] };
+   const converted_xy = proj4(proj4.defs["EPSG:4326"], secondProjection, [x, y]);
+   const result = { X: converted_xy[0], Y: converted_xy[1] };
    return result;
 }
 
@@ -43,8 +45,10 @@ checkResults = (payload) => {
             result = index;
             finish = true;
          }
-         else if (location.geometry.location_type === 'GEOMETRIC_CENTER')
+         else if (location.geometry.location_type === 'GEOMETRIC_CENTER' ||
+            location.geometry.location_type === 'APPROXIMATE') {
             result = index;
+         }
       }
    }
    if (result === null) {
@@ -62,15 +66,18 @@ getCoordinates = (payload, index) => {
          if (payload.results[index].geometry) {
             location = payload.results[index].geometry.location;
             if (location) {
-               result = convertCoordinate(location);
+               const x = location["lat"];
+               const y = location["lng"];
+               result = { X: x, Y: y }
             }
             else
                result = new ServerError(500, "Google api is different then expected.");
          }
          else
             result = new ServerError(500, "Google api is different then expected.");
-      else
+      else {
          result = new ServerError(ERRORS.INVALID_ADDRESS_CODE, "Invalid address: " + JSON.stringify(payload));
+      }
    }
    else
       result = new ServerError(500, "Google api is different then expected.");
@@ -89,8 +96,11 @@ getCoordinates = (payload, index) => {
  */
 const convertLocation = async (cityParam, streetParam, buildingNumber) => {
    return new Promise(function (resolve, reject) {
-     
-      let address = `${streetParam} ${buildingNumber}, ${cityParam}`;
+      let address = "";
+      if (buildingNumber === 0)
+         address = `${streetParam}, ${cityParam}`;
+      else
+         address = `${streetParam} ${buildingNumber}, ${cityParam}`;
       address = encodeURI(address);
       let key = process.env.GOOGLE_API_KEY;
       url = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&language=iw&key=${key}`;
@@ -107,7 +117,9 @@ const convertLocation = async (cityParam, streetParam, buildingNumber) => {
                if (result instanceof ServerError)
                   return resolve(result)
                else {
-                  findLocality(result.X, result.Y)
+                  const converted = convertCoordinate(result.Y, result.X);
+                  findLocality(cityParam, converted.X, converted.Y)
+                  //findLocality(result.X, result.Y)
                      .then(locality => {
                         if (locality instanceof ServerError) {
                            locality.X = result.X;
@@ -115,7 +127,7 @@ const convertLocation = async (cityParam, streetParam, buildingNumber) => {
                            return resolve(locality);
                         }
                         else {
-                           result.CITY = locality; 
+                           result.CITY = locality;
                            return resolve(result);
                         }
                      })
@@ -132,13 +144,20 @@ const convertLocation = async (cityParam, streetParam, buildingNumber) => {
    });
 }
 
+const findLocality = async (city, x, y) => {
+   return new Promise(function (resolve, reject) {
+      return resolve(localityService.getXYLocality(city, x, y));
+
+   });
+}
+
 /**
  * Find city/settelment name by its coordinates.
  * The function uses the api form:
  * https://data-israeldata.opendata.arcgis.com/datasets/6e653612eece41faa34c1d0fe1bd919c_0/geoservice?geometry=34.3%2C31.593
  * @param {geocoding point} x, y 
  */
-const findLocality = async (x, y) => {
+const findLocalityOld = async (x, y) => {
    return new Promise(function (resolve, reject) {
       let service = encodeURI('חלקות');
       let address = `${y},${x}`
@@ -146,21 +165,21 @@ const findLocality = async (x, y) => {
       axios.get(url)
          .then(res => {
             if (res.data.features.length > 0) {
-               if (res.data.features[0].attributes.LOCALITY_I!==0)
+               if (res.data.features[0].attributes.LOCALITY_I !== 0)
                   return localityService.getLocality(res.data.features[0].attributes.LOCALITY_I);
                else
-                  return (resolve(new ServerError(ERRORS.HELKA_NOT_FOUND, "location is not mapped in service: "+ address)));
+                  return (resolve(new ServerError(ERRORS.HELKA_NOT_FOUND, "location is not mapped in service: " + address)));
             }
             else
-               return (resolve(new ServerError(ERRORS.HELKA_NOT_FOUND, "location is not mapped in service: "+ address)));
+               return (resolve(new ServerError(ERRORS.HELKA_NOT_FOUND, "location is not mapped in service: " + address)));
          })
          .then(result => {
             if (result instanceof ServerError)
                return resolve(result)
-            else if( result )
+            else if (result)
                return resolve(result.NAME);
             else
-               return resolve(new ServerError(ERRORS.CITY_CODE_NOT_FOUND, "City name doesn't appear in the db. Adrress:" + address ));
+               return resolve(new ServerError(ERRORS.CITY_CODE_NOT_FOUND, "City name doesn't appear in the db. Adrress:" + address));
          })
          .catch((err) => {
             return reject(err);
@@ -242,14 +261,14 @@ const getRoutes = async (origin, destination, time) => {
             suggestedRoutes = {};
             routesResponeList.forEach((res, index, array) => {
                let result = checkRouteResults(res.data);
-               if (result==='OK') {
+               if (result === 'OK') {
                   suggestedRoutes[modeList[index]] = res.data.routes;
                }
-               else if (result === ""){
+               else if (result === "") {
                   suggestedRoutes[modeList[index]] = { error: "לא נמצא מסלול" };
                }
                else {
-                  suggestedRoutes[modeList[index]] = { error: "שגיאה במערכת. לא ניתן לחשב מסלול - " + result};
+                  suggestedRoutes[modeList[index]] = { error: "שגיאה במערכת. לא ניתן לחשב מסלול - " + result };
                   logger.error(result);
                }
             });

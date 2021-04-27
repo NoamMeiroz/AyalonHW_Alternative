@@ -40,13 +40,12 @@ const convertAddress = (branchList) => {
                 result.forEach((value, index, array) => {
                     let error = null;
                     if (value instanceof ServerError) {
-                        logger.info(value);
                         switch (value.status) {
                             case ERRORS.INVALID_ADDRESS_CODE:
                                 error = new ServerError(400, `כתובת סניף ${branchList[index].NAME} לא תקינה.`);
                                 break;
                             case ERRORS.MISSING_CITY_CODE:
-                                error = new ServerError(400, `לסניף ${branchList[index].NAME} חסר עיר.`);
+                                error = new ServerError(400, `לסניף ${branchList[index].NAME} שם הישוב חסר`);
                                 break;
                             case ERRORS.MISSING_STREET_CODE:
                                 error = new ServerError(400, `לסניף ${branchList[index].NAME} חסר שם רחוב.`);
@@ -55,12 +54,12 @@ const convertAddress = (branchList) => {
                                 error = new ServerError(400, `לסניף ${branchList[index].NAME} חסר מספר בניין.`);
                                 break;
                             case ERRORS.INVALID_CITY:
-                                error = new ServerError(400, `לסניף ${branchList[index].NAME} שם העיר שגוי`);
+                                error = new ServerError(400, `לסניף ${branchList[index].NAME} שם הישוב שגוי`);
                                 break;
                             case ERRORS.INVALID_STREET:
                                 error = new ServerError(400, `לסניף ${branchList[index].NAME} שם הרחוב שגוי`);
                                 break;
-                            case ERRORS.MISSING_CITY_CODE:
+                            case ERRORS.CITY_CODE_NOT_FOUND:
                                 branchList[index].X = value.X;
                                 branchList[index].Y = value.Y;
                                 return  resolve(branchList);

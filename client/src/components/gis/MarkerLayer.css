@@ -12,6 +12,10 @@
     border-style: solid;
     border-width: 1px;
   }
+
+  .shape-marker-label {
+   margin-top: -20px;
+ }
   
   .custom-div-icon-building .shape-marker-pin::after {
       content: '';

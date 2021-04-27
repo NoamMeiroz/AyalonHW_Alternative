@@ -6,12 +6,17 @@ import TextField from '@material-ui/core/TextField'
 import Divider from '@material-ui/core/Divider';
 import Grid from '@material-ui/core/Grid';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import Checkbox from '@material-ui/core/Checkbox';
+import CheckBoxOutlineBlankIcon from '@material-ui/icons/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
+import Typography from '@material-ui/core/Typography';
 import requireAuth from '../requireAuth'; //used to check if login successfull
 import TimeSlotQuery from './TimeSlotQuery';
 import MarksQuery from './MarksQuery';
 import Fade from '@material-ui/core/Fade';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import './HeatmapQueryPanel.css';
+import VirtualListBox from '../common/VirtualListBox';
 
 const CITY_NAME_COLUMN = "NAME";
 
@@ -45,6 +50,9 @@ class HeatmapQueryPanel extends PureComponent {
     }
 
     render() {
+        const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+        const checkedIcon = <CheckBoxIcon fontSize="small" />;
+
         return <div className="queryPanel">
             <Grid
                 container
@@ -58,10 +66,24 @@ class HeatmapQueryPanel extends PureComponent {
                             size="small"
                             multiple
                             id="company"
+                            disableCloseOnSelect
                             value={this.props.selectedCompnayList}
                             options={this.props.companies}
                             getOptionLabel={(option) => option.NAME}
-                            filterSelectedOptions
+                            renderOption={(option, { selected }) => (
+                                <React.Fragment>
+                                  <Checkbox
+                                    icon={icon}
+                                    size="small"
+                                    checkedIcon={checkedIcon}
+                                    style={{ margin: '0px', paddingBottom: '0px', paddingTop: '0px'}}
+                                    checked={selected}
+                                  />
+                                  <Typography variant="caption" style={{margin:'0px',  paddingBottom: '0px', paddingTop: '0px'}}>
+                                      {option.NAME}
+                                  </Typography>
+                                </React.Fragment>
+                              )}
                             renderInput={(params) => 
                                 <TextField
                                     {...params}
@@ -83,7 +105,22 @@ class HeatmapQueryPanel extends PureComponent {
                             value={this.props.selectedLivingCityList}
                             options={this.props.settlementList}
                             getOptionLabel={(option) => option[CITY_NAME_COLUMN]}
-                            filterSelectedOptions
+                            disableCloseOnSelect
+                            ListboxComponent={VirtualListBox}
+                            renderOption={(option, { selected }) => (
+                                <React.Fragment>
+                                  <Checkbox
+                                    icon={icon}
+                                    size="small"
+                                    checkedIcon={checkedIcon}
+                                    style={{ margin: '0px', paddingBottom: '0px', paddingTop: '0px'}}
+                                    checked={selected}
+                                  />
+                                  <Typography variant="caption" style={{margin:'0px',  paddingBottom: '0px', paddingTop: '0px'}}>
+                                      {option[CITY_NAME_COLUMN]}
+                                  </Typography>
+                                </React.Fragment>
+                              )}
                             renderInput={(params) => 
                                 <TextField
                                     {...params}
@@ -107,7 +144,22 @@ class HeatmapQueryPanel extends PureComponent {
                             value={this.props.selectedWorkingCityList}
                             options={this.props.settlementList}
                             getOptionLabel={(option) => option[CITY_NAME_COLUMN]}
-                            filterSelectedOptions
+                            disableCloseOnSelect
+                            ListboxComponent={VirtualListBox}
+                            renderOption={(option, { selected }) => (
+                                <React.Fragment>
+                                  <Checkbox
+                                    icon={icon}
+                                    size="small"
+                                    checkedIcon={checkedIcon}
+                                    style={{ margin: '0px', paddingBottom: '0px', paddingTop: '0px'}}
+                                    checked={selected}
+                                  />
+                                  <Typography variant="caption" style={{margin:'0px',  paddingBottom: '0px', paddingTop: '0px'}}>
+                                      {option[CITY_NAME_COLUMN]}
+                                  </Typography>
+                                </React.Fragment>
+                              )}
                             renderInput={(params) => <TextField
                                     {...params}
                                     label="ישוב עבודה"

@@ -1,10 +1,12 @@
 # docker-compose.yml
-version: '3'
+version: '3'  
 services:
   mysql:
     image: mysql
     restart: always
     command: --default-authentication-plugin=mysql_native_password
+    stdin_open: true
+    tty: true
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
@@ -12,6 +14,8 @@ services:
       MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
     ports:
       - '3306:3306'
+    volumes: 
+      - ./mysql:/etc/mysql/conf.d
   clustering:
     build:
       context: ./clustering
@@ -29,10 +33,10 @@ services:
       context: ./server
       dockerfile: dockerfile_server.dev
     volumes:
-    #  - ./server/node_modules:/server/node_modules
-    #  - ./server:/server
-      - /server/node_modules
-      - /server
+      - ./server/node_modules:/server/node_modules
+      - ./server:/server
+    #  - /server/node_modules
+    #  - /server
     environment: 
       - mysql_server=mysql
       - NODE_ENV=development
@@ -66,10 +70,10 @@ services:
       context: ./client
       dockerfile: dockerfile_app.dev
     volumes:
-    #  - ./client/node_modules:/client/node_modules
-    #  - ./client:/client
-      - /client/node_modules
-      - /client
+      - ./client/node_modules:/client/node_modules
+      - ./client:/client
+    #  - /client/node_modules
+    #  - /client
     restart: always
     stdin_open: true
     tty: true

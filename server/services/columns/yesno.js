@@ -15,7 +15,14 @@ class YesNoColumn extends Column {
     };
 
     check = function (value) {
-        let yesNo = value.trim();
+
+        let yesNo;
+        try {
+            yesNo = value.trim();
+        }
+        catch(error) {
+            throw new ColumnError(ERROR_CODES.INPUT_ERROR, `הערך ${value} ב ${this.title} אינו תקין`);
+        }
         try{
             yesNo = this.BOOL[yesNo];
             if (yesNo === undefined )

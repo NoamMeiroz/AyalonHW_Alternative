@@ -26,7 +26,7 @@ export default function (state = INITIAL_STATE, action) {
             };
         case DELETE_COMPANY:
             let tempList = state.employeesList;
-            tempList = tempList.filter((employee)=> {employee.EMPLOYER_ID !== action.employerID });
+            tempList = tempList.filter((employee)=> employee.EMPLOYER_ID !== action.employerID );
             return {
                 ...state,
                 employeesList: tempList,
