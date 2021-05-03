@@ -1,18 +1,25 @@
-import warnings
+
+# import libraries
 import numpy as np
-import scipy.sparse as sp
-from scipy.cluster.hierarchy import dendrogram, linkage, cut_tree, fcluster
 from sklearn.metrics.pairwise import euclidean_distances
 from sklearn.utils.extmath import row_norms, squared_norm, cartesian
 from sklearn.utils.validation import check_array, check_random_state, as_float_array, check_is_fitted
-from joblib import Parallel
-from joblib import delayed
 import pandas as pd
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
 import sklearn.preprocessing as preprocessing
 import json
 import sys
+from scipy.cluster.hierarchy import dendrogram, linkage, cut_tree, fcluster
+from matplotlib import pyplot as plt
+from datetime import datetime
+import warnings
+import scipy.sparse as sp
+from sklearn.metrics.pairwise import euclidean_distances
+from sklearn.utils.extmath import row_norms, squared_norm, cartesian
+from joblib import Parallel
+from joblib import delayed
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+import sklearn.preprocessing as preprocessing
 import traceback
 from json_schema import json_schema
 
@@ -379,22 +386,71 @@ try:
             raise ValueError('Input must include more than one employee')
     else:
         raise TypeError('Input does not comply with the required schema')
+        
+    def get_labels(row,maxCluster,label_max,labels_split):
+        """ADD DOCSTRING HERE"""
+        # XY frequency is smaller than maxCluster value
+        if row.Time.astype(int) <= maxCluster:
+            # get label
+            label = label_max[-1] + 1
+            labels_split += ([label]*row.Time.astype(int))
+            label_max.append(label)
 
-    # create data frame
+        # XY frequency is greater than maxCluster value
+        else:
+            # get quotient and remainder
+            divmod_split = divmod(row.Time.astype(int),maxCluster)
+            # iterate over the range of 0 to quotient
+            for x in range(0,divmod_split[0]):
+                label = label_max[-1] + 1
+                labels_split += ([label]*maxCluster)
+                label_max.append(label)
+            # add labels for the remainder
+            label = label_max[-1] + 1
+            labels_split += ([label]*divmod_split[1])
+            label_max.append(label)
+
+        return None
+
+
+    # parse json
+    parsedInput = json.loads(rawData)
     employees = pd.DataFrame(parsedInput['employees'])
-    # preproccessing
+
+    # find employees who share XY locations
+    split_XY = employees.groupby(["X", "Y"]).size().reset_index(name="Time")[
+        employees.groupby(["X", "Y"]).size().reset_index(name="Time").Time >
+        1][['X','Y']].values.tolist()
+
+    # split employees
+    split = employees[[x.tolist() in split_XY for x in employees[['X','Y']].values]]
+    employees = employees[~employees['Id'].isin(split.Id)]
     scaled = preprocessing.scale(employees[['X','Y']])
+
     # create linkage
     Z = linkage(scaled, 'ward')
     # select K
+    k_selected = False
     for k in range(1,employees.shape[0]):
         lables = fcluster(Z, t=k, criterion='maxclust')
         largestClusterSize = np.unique(lables, return_counts=True)[1].max()
-        
+
         if largestClusterSize <= parsedInput['maxCluster']:
             employees = employees.assign(cluster = lables)
+            k_selected = True
             break
 
+    # are there any groups to split?
+    if split.shape[0] > 0:
+        # get the unique XY combinations from split
+        split_uniqueXY = split.groupby(["X", "Y"]).size().reset_index(name="Time")
+        labels_split = []
+        label_max = [lables.max()]
+        # get labels
+        split_uniqueXY.apply(get_labels,args=(parsedInput['maxCluster'],label_max,labels_split), axis = 1)
+        split_uniqueXY['sort_value'] = range(0,split_uniqueXY.shape[0])
+        split = split.merge(split_uniqueXY, how='left', on=['X','Y']).sort_values(by=['sort_value']).assign(cluster=labels_split)
+        employees = pd.concat([employees,split])[['Id','EMPLOYER_ID','WORKER_ID','X','Y','cluster']]
 
     # eliminate remote employees
     employees.loc[employees.cluster.isin(employees.cluster.value_counts()[employees.cluster.value_counts()<2].index),'cluster'] = -1
