@@ -414,7 +414,6 @@ try:
 
 
     # parse json
-    parsedInput = json.loads(rawData)
     employees = pd.DataFrame(parsedInput['employees'])
 
     # find employees who share XY locations
