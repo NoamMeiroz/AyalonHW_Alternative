@@ -455,7 +455,7 @@ try:
     employees.loc[employees.cluster.isin(employees.cluster.value_counts()[employees.cluster.value_counts()<2].index),'cluster'] = -1
 
     # print
-    print(json.dumps(json.loads(employees.to_json(orient="records"))))
+    print(employees.to_json(orient="records"))
 
 except:
     # codes and messages
