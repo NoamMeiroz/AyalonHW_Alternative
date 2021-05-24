@@ -306,7 +306,7 @@ class DownloadButton extends Component {
       // set columns 
       ws.columns = [
          { header: 'שגיאות ברשומה', key: 'ERROR', width: 50 },
-         { header: 'מזהה עובד', key: 'WORKER_ID', width: 10 },
+         { header: 'מזהה עובד', key: 'WORKER_ID', width: 20 },
          { header: 'עיר', key: 'CITY', width: 20 },
          { header: 'רחוב', key: 'STREET', width: 20 },
          { header: 'מספר בניין', key: 'BUILDING_NUMBER', width: 12 },

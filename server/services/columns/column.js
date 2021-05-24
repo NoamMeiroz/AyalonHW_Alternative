@@ -31,7 +31,23 @@ class Column {
      * @param {any} value 
      */
     check = (value) => {
-        return value;
+        var result = value;
+        switch (this.type) {
+            case TYPES.STRING:
+                // in case input is an object return the text representation string
+                if (typeof value === 'object') {
+                    if (value.text) {
+                        result = value.text
+                    }
+                }
+                else
+                    // convert number values as string
+                    result = "" + value;
+                break;
+            default:
+                break;
+        }
+        return result;
     };
 
     /**

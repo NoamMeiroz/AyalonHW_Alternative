@@ -6,16 +6,32 @@ import './MarkerLayer.css';
 
 class MarkerLayer extends Component {
 
-    getIcon(iconName, color) {
+    getIcon(iconName, color, label) {
+        const iconSize = [30, 42];
+        const iconAnchor = [14, 28];
+        const popupAnchor = [0, -30];
         var m;
-        if (iconName)
-            m = new L.divIcon({
-                className: `custom-div-icon-${iconName}`,
-                html: `<div style="background-color:${color}" class='shape-marker-pin'></div><i/>`,
-                iconSize: [30, 42],
-                iconAnchor: [14, 28],
-                popupAnchor:[0, -30]
-            });
+        if (iconName) {
+            if (label) {
+                m = new L.divIcon({
+                    className: `custom-div-icon-${iconName}`,
+                    html: `<div><div style="background-color:${color}" class='shape-marker-pin'></div><i/>
+                        <div class="shape-marker-label">${label}</div>
+                    <div>`,
+                    iconSize: iconSize,
+                    iconAnchor: iconAnchor,
+                    popupAnchor: popupAnchor
+                });
+            }
+            else
+                m = new L.divIcon({
+                    className: `custom-div-icon-${iconName}`,
+                    html: `<div style="background-color:${color}" class='shape-marker-pin'></div><i/>`,
+                    iconSize: iconSize,
+                    iconAnchor: iconAnchor,
+                    popupAnchor: popupAnchor
+                });
+        }
         else
             m = new L.Icon.Default();
         return m;
@@ -33,22 +49,23 @@ class MarkerLayer extends Component {
         let str = this.props.popupString(this.getParams(item));
         let parts = str.split("<br>");
         let jsx = []
-        let i =0;
+        let i = 0;
         for (let part of parts) {
-            i = i+1;
-            jsx.push(<div key={i}>{part}<br/></div>);
+            i = i + 1;
+            jsx.push(<div key={i}>{part}<br /></div>);
         }
         return jsx;
     }
 
     render() {
         let jsx = this.props.data.map((item, index, arr) => (
-            <Marker key={index}
+            <Marker key={`${index}_${item.lat}`}
+                count={item.count}
                 position={[item.lat, item.lng]}
-                icon={this.getIcon(this.props.icon, this.props.companies[item[this.props.colorIndex]].color)}
+                icon={this.getIcon(this.props.icon, this.props.companies[item[this.props.colorIndex]].color, item[this.props.label])}
             >
                 <Popup>
-                    <div style={{textAlign: "right"}}>
+                    <div style={{ textAlign: "right" }}>
                         {this.createPopup(item)}
                     </div>
                 </Popup>

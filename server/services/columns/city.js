@@ -11,7 +11,13 @@ class City extends Column {
     }
 
     check = function (value) {
-        let city = value.trim();
+        let city;
+        try {
+            city = value.trim();
+        }
+        catch(error) {
+            throw new ColumnError(ERROR_CODES.INPUT_ERROR, `הערך ${value} ב ${this.title} אינו תקין`);
+        }
         if (!isHebrewLetter(value)) {
             throw new ColumnError(ERROR_CODES.INPUT_ERROR, `הערך ${value} ב ${this.title} אינו תקין`);
         }

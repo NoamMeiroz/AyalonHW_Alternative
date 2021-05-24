@@ -11,7 +11,7 @@ module.exports = (sequelize, Sequelize) => {
             }    
         },
         WORKER_ID: {
-            type: Sequelize.INTEGER,
+            type: Sequelize.STRING(80),
             allowNull: false,
         },
         CITY: {

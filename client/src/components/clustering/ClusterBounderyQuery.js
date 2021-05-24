@@ -16,7 +16,7 @@ import requireAuth from '../requireAuth'; //used to check if login successfull
 import * as actions from '../../actions';
 
 const MAX_VALUE = 30;
-const MIN_VALUE = 3;
+const MIN_VALUE = 2;
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -98,7 +98,7 @@ const ClusterComponents = ({ values }) => {
 
 function ClusterBounderyQuery({ qClusterBoundery }) {
 
-    const CITY_NAME_COLUMN = "NAME";
+    //const CITY_NAME_COLUMN = "NAME";
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -115,7 +115,7 @@ function ClusterBounderyQuery({ qClusterBoundery }) {
 
 
     const handleClick = () => {
-        let cityList = qWorkingCityParams.map(city => {
+        /*let cityList = qWorkingCityParams.map(city => {
             return city[CITY_NAME_COLUMN];
         });
         let workingCity = qLivingCityParams.map(city => {
@@ -123,7 +123,7 @@ function ClusterBounderyQuery({ qClusterBoundery }) {
         });
         let companies = qCompanyParams.map(company => {
             return company.id;
-        })
+        })*/
 
         dispatch(actions.calculateCluster(qCompanyParams,
             qLivingCityParams,

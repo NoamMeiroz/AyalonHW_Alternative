@@ -61,6 +61,8 @@ wsServer.on('close', function close() {
 
 const sendMessage = (ip, message ) => {
 	ws = map.get(ip);
+	logger.debug(ip);
+	logger.debug(map);
 	let messageToSend = message;
 	if (typeof message === 'object' && message !== null)
 		messageToSend = JSON.stringify(message);

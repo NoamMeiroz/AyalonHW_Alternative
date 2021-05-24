@@ -19,7 +19,7 @@ const getAll = (callback) => {
         DIRECTION: 'לעבודה'
       },
       order: [
-        ['ID', 'ASC']
+        ['HOUR', 'ASC']
       ]
     }).then(data=>{callback(null, data)})
       .catch(err=>{callback(getMessage(err), false);});
@@ -32,7 +32,7 @@ const getAll = (callback) => {
         DIRECTION: 'הביתה'
       },
       order: [
-        ['ID', 'ASC']
+        ['HOUR', 'ASC']
       ]
     }).then(data=>{callback(null, data)})
       .catch(err=>{callback(getMessage(err), false);});

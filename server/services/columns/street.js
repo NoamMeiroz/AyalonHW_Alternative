@@ -11,7 +11,13 @@ class Street extends Column {
     }
 
     check = function (value) {
-        let street = value.trim();
+        let street;
+        try {
+            street = value.trim();
+        }
+        catch(error) {
+            throw new ColumnError(ERROR_CODES.INPUT_ERROR, `הערך ${value} ב ${this.title} אינו תקין`);
+        }
         street = removeLastWordWithDigits(street).trim();
 
         if (!isHebrewLetter(street)) {

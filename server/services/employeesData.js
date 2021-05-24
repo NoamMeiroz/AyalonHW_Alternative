@@ -26,7 +26,9 @@ async function run(req, employer, employees) {
 			state = employerSchema.STATE.ERROR;
 		}
 		else {
-			let payload = checkResult(result.Employees);
+			//let payload = checkResult(result.Employees);
+			let payload = result.Employees;
+			logger.info(`upload result ${employer.NAME}: ${JSON.stringify(payload)}`);
 			payload.employerID = employer.id;
 			// notify client about the upload result; 
 			sendMessage(ip, {type: "upload_result", payload: payload });

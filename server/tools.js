@@ -5,7 +5,7 @@
  */
 function isHebrewLetter(s) {
    //match=/^([א-ת]+(?:(\. )|- | - | -|-| \(| |'|\"|’|״|\`))*[א-ת]+(?:\))*$/
-   match=/^(([א-ת]+\s*(?:(\.)|-|\(| |'|\"|”|’|״|\`))*\s*[א-ת]+(?:\))*)+$/
+   match=/^(([א-ת]+\s*(?:(\.)|-|\(| |'|\"|”|’|״|\`))*\s*[א-ת]*(?:\))*)+$/
    let result = s.match(match);
    if (result)
       return true;
@@ -126,8 +126,21 @@ function removeLastWordWithDigits(myString) {
    return temp.join(" ");
 }
 
+/**
+ * Return true if string is json string
+ * @param {*} str 
+ */
+function isJsonString(str) {
+   try {
+       JSON.parse(str);
+   } catch (e) {
+       return false;
+   }
+   return true;
+}
+
 
 module.exports = {
    isInteger, getNearestWorkDay, getFirstNumberInString, isHebrewLetter,
-   sleep, convertStringToArray, removeLastWordWithDigits, hasDigits
+   sleep, convertStringToArray, removeLastWordWithDigits, hasDigits, isJsonString
 }; 

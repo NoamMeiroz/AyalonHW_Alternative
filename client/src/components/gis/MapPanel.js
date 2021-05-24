@@ -3,7 +3,9 @@ import { Map, LayerGroup, TileLayer, LayersControl, FeatureGroup } from 'react-l
 import L from 'leaflet';
 import HeatmapLayer from 'react-leaflet-heatmap-layer';
 import Control from 'react-leaflet-control';
-import { EditControl } from "react-leaflet-draw"
+import { EditControl }  from "react-leaflet-draw"
+import 'react-leaflet-markercluster/dist/styles.min.css';
+
 import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
@@ -20,6 +22,7 @@ import MapSidebar from './MapSidebar';
 import MarkerLayer from './MarkerLayer';
 import Legend from './Legend';
 import { template } from '../../utils/string';
+import BubbleMarker from "./BubbleMarker";
 import ShapeLayer from "./ShapeLayer";
 import ClusterLayer from '../clustering/ClusterLayer';
 import ClusterBounderyQuery from '../clustering/ClusterBounderyQuery';
@@ -85,6 +88,11 @@ class MapPanel extends Component {
         this.props.mapChange(this.mapRef.current.viewport.zoom, center);
     };
 
+    /**
+     * For performance update the component only if recieved new data
+     * @param {*} nextProps 
+     * @param {*} nextState 
+     */
     shouldComponentUpdate(nextProps, nextState) {
         return nextProps.timestamp !== this.props.timestamp;
     }
@@ -109,6 +117,7 @@ class MapPanel extends Component {
         let branchLayer = <MarkerLayer key={companyID + "_b"}
             data={branchList}
             icon={"building"}
+            label={"count"}
             companies={this.props.companies}
             colorIndex={"EMPLOYER_ID"}
             popupFields={["COMPANY", "SITE_NAME", "count"]}
@@ -120,6 +129,9 @@ class MapPanel extends Component {
         return <LayerGroup>{jsx}</LayerGroup>;
     }
 
+    /**
+     * create a layer for each company and poistion employees and site as markers
+     */
     createDataLayers() {
         if (!this.props.companies)
             return null;
@@ -133,7 +145,7 @@ class MapPanel extends Component {
     /**
      * save the polygon is state after complition
      * @param {*} e 
-     */
+     */ 
     _onCreatedWork = (e) => {
         const { _leaflet_id } = e.layer;
         if (this.state.selectedArea === "destination") {
@@ -144,6 +156,9 @@ class MapPanel extends Component {
         }
     }
 
+    /**
+     * clear origin and destination polygon query filter
+     */
     deleteAllPolygon() {
         var layerContainer = this.destination.current.leafletElement.options.edit.featureGroup;
         var layers = layerContainer._layers;
@@ -198,6 +213,9 @@ class MapPanel extends Component {
         return <LayerGroup>{jsx}</LayerGroup>;
     }
 
+    /**
+     * show cluster report result a layer
+     */
     createClusterLayer() {
         if (!this.props.clusterReport || this.props.clusterReport.length === 0)
             return null;
@@ -226,7 +244,7 @@ class MapPanel extends Component {
     }
 
     /**
-     * show control 
+     * show origin and destination query filter control 
      */
     drawControl() {
         return <Control position="topleft">
@@ -269,6 +287,26 @@ class MapPanel extends Component {
                 </Tooltip>
             </Box>
         </Control>
+    }
+
+    /**
+     * create a layer for each branch(site) as markers
+     */
+    createSiteBubleLayer() {
+        if (!this.props.branches)
+            return null;
+
+        return <LayersControl.Overlay key={"siteBubble"} name={"סניפים"}>
+            <LayerGroup>
+                <BubbleMarker
+                    data={this.props.branches}
+                    companies={this.props.companies}
+                    colorIndex={"EMPLOYER_ID"}
+                    popupFields={["COMPANY", "SITE_NAME", "count"]}
+                    popupString={template(["", "<br>", "<br>", " עובדים"], "COMPANY", "SITE_NAME", "count")}
+                ></BubbleMarker>
+            </LayerGroup>
+        </LayersControl.Overlay>;
     }
 
     componentDidMount = () => {
@@ -323,6 +361,7 @@ class MapPanel extends Component {
                             intensityExtractor={item => item.intensity}
                         />
                     </LayersControl.Overlay>
+                    {this.createSiteBubleLayer()}
                     {this.createDataLayers()}
                     {this.createClusterLayer()}
                     <LayersControl.Overlay name="תחנות רכבת">
@@ -385,7 +424,6 @@ class MapPanel extends Component {
         </Box>
     }
 }
-
 
 function mapStateToProps(state, ownProps) {
     let data = [];

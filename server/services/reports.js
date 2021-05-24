@@ -103,7 +103,7 @@ const getCluster = (employers, livingCity, workingCity,
 					})
 				};
 				let headers = { 'Content-Type': 'application/json' }
-				let url = `http://${process.env.CLUSTERING_SERVER}:3000`;
+				let url = `http://${process.env.CLUSTERING_SERVER}:${process.env.CLUSTERING_PORT}`;
 				axios.post(url, data, headers)
 					.then(res => {
 						let clusterList = [];
@@ -139,8 +139,10 @@ const getCluster = (employers, livingCity, workingCity,
 									break;
 							}
 						}
-						else
+						else {
 							errorCode = 500;
+							logger.error(error);
+						}
 						reject(new ServerError(errorCode, message));
 					})
 			})
