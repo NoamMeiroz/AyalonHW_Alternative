@@ -16,7 +16,7 @@ import requireAuth from '../requireAuth'; //used to check if login successfull
 import * as actions from '../../actions';
 
 const MAX_VALUE = 30;
-const MIN_VALUE = 3;
+const MIN_VALUE = 2;
 
 const useStyles = makeStyles((theme) => ({
     root: {

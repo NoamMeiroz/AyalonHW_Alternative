@@ -15,6 +15,7 @@ services:
     ports:
       - '3306:3306'
     volumes: 
+      - db-data:/var/lib/mysql
       - ./mysql:/etc/mysql/conf.d
   clustering:
     build:
@@ -24,6 +25,8 @@ services:
       - /clustering/node_modules
       - /clustering
       - ./clustering/logs:/clustering/logs
+    environment:
+      - PORT=${CLUSTERING_PORT}
     restart: always
     stdin_open: true
     tty: true
@@ -41,6 +44,7 @@ services:
       - mysql_server=mysql
       - NODE_ENV=development
       - CLUSTERING_SERVER=clustering
+      - CLUSTERING_PORT=3500
     restart: always
     stdin_open: true
     tty: true
@@ -81,9 +85,13 @@ services:
       - node_server
     command: ["npm", "start"]
   native_laasakim:
+    environment:
+      - REACT_APP_SERVER=ayalon.promise-dev.com
     build:
       context: ./client
       dockerfile: .dockerfile
+      args:
+        - REACT_APP_SERVER=ayalon.promise-dev.com
     stdin_open: true
     tty: true
     depends_on:
@@ -95,13 +103,13 @@ services:
     ports:
       - "8080:80"
       - "443:443"
-    restart: always
     depends_on:
       - native_laasakim_dev
       - node_server
     volumes: 
       - ./secret:/etc/nginx/certs
       - node_logs:/spool/logs
+      - pdf_files:/www/pdf
   nginx:
     build:
       dockerfile: dockerfile_nginx.dev
@@ -115,6 +123,7 @@ services:
     volumes: 
       - ./secret:/etc/nginx/certs
       - node_logs:/spool/logs
+      - pdf_files:/www/pdf
 volumes:
   db-data:
     driver: local
@@ -128,5 +137,10 @@ volumes:
       o: bind
       type: None
       device: ./server/logs
-  
+  pdf_files:
+    driver: local
+    driver_opts:
+      o: bind
+      type: None
+      device: ./pdf
   

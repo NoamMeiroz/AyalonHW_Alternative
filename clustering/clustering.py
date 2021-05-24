@@ -1,4 +1,3 @@
-
 # import libraries
 import numpy as np
 from sklearn.metrics.pairwise import euclidean_distances
@@ -414,7 +413,6 @@ try:
 
 
     # parse json
-    parsedInput = json.loads(rawData)
     employees = pd.DataFrame(parsedInput['employees'])
 
     # find employees who share XY locations
@@ -424,7 +422,7 @@ try:
 
     # split employees
     split = employees[[x.tolist() in split_XY for x in employees[['X','Y']].values]]
-    employees = employees[~employees['Id'].isin(split.Id)]
+    employees = employees[~employees['id'].isin(split.id)]
     scaled = preprocessing.scale(employees[['X','Y']])
 
     # create linkage
@@ -450,13 +448,13 @@ try:
         split_uniqueXY.apply(get_labels,args=(parsedInput['maxCluster'],label_max,labels_split), axis = 1)
         split_uniqueXY['sort_value'] = range(0,split_uniqueXY.shape[0])
         split = split.merge(split_uniqueXY, how='left', on=['X','Y']).sort_values(by=['sort_value']).assign(cluster=labels_split)
-        employees = pd.concat([employees,split])[['Id','EMPLOYER_ID','WORKER_ID','X','Y','cluster']]
+        employees = pd.concat([employees,split])[['id','EMPLOYER_ID','WORKER_ID','X','Y','cluster']]
 
     # eliminate remote employees
     employees.loc[employees.cluster.isin(employees.cluster.value_counts()[employees.cluster.value_counts()<2].index),'cluster'] = -1
 
     # print
-    print(employees.to_json(orient="records"))
+    print(json.dumps(json.loads(employees.to_json(orient="records"))))
 
 except:
     # codes and messages

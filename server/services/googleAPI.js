@@ -98,9 +98,9 @@ const convertLocation = async (cityParam, streetParam, buildingNumber) => {
    return new Promise(function (resolve, reject) {
       let address = "";
       if (buildingNumber === 0)
-         address = `${streetParam}, ${cityParam}`;
+         address = `${streetParam}, ${cityParam}, ישראל`;
       else
-         address = `${streetParam} ${buildingNumber}, ${cityParam}`;
+         address = `${streetParam} ${buildingNumber}, ${cityParam}, ישראל`;
       address = encodeURI(address);
       let key = process.env.GOOGLE_API_KEY;
       url = `https://maps.googleapis.com/maps/api/geocode/json?address=${address}&language=iw&key=${key}`;

@@ -3,8 +3,7 @@ import { Map, LayerGroup, TileLayer, LayersControl, FeatureGroup } from 'react-l
 import L from 'leaflet';
 import HeatmapLayer from 'react-leaflet-heatmap-layer';
 import Control from 'react-leaflet-control';
-import { EditControl } from "react-leaflet-draw"
-import MarkerClusterGroup from 'react-leaflet-markercluster';
+import { EditControl }  from "react-leaflet-draw"
 import 'react-leaflet-markercluster/dist/styles.min.css';
 
 import Box from '@material-ui/core/Box';
@@ -146,7 +145,7 @@ class MapPanel extends Component {
     /**
      * save the polygon is state after complition
      * @param {*} e 
-     */
+     */ 
     _onCreatedWork = (e) => {
         const { _leaflet_id } = e.layer;
         if (this.state.selectedArea === "destination") {
@@ -425,7 +424,6 @@ class MapPanel extends Component {
         </Box>
     }
 }
-
 
 function mapStateToProps(state, ownProps) {
     let data = [];

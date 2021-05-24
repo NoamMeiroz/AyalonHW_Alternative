@@ -21,25 +21,39 @@ app.post('/', (req,res) => {
         var start = performance.now();
         logger.info("Start cluster calculation");
         try {
+            // spawn a process with the python code using the body as input for the code
             const pythonProcess = spawn('python',["clustering.py",JSON.stringify(sample_data)]);
             var length = sample_data.employees.length;
 
+            // save result from the pyhton report
             pythonProcess.stdout.on('data',(data)=>{
                 script_output.push(data);
             });
 
+            // save error message in log
+            pythonProcess.stderr.on('data', (data) => {
+                // 
+                logger.error(`${data}`);
+            });
+
+            // 
             pythonProcess.on("close",(code)=>{
                 let end = performance.now();
                 logger.info(`Number of employees: ${length}, Execution time: ${end - start} ms`);
                 let response = {};
                 let resCode = 200;
+                // if code===0 then it is suceess
                 if(code==0) {
                     // try to parse return result to valid json (list of employees)
                     try {
-                        let result = script_output+"";
+                        let result = script_output.join("");
+                        // in some cases respose has a comma in the end.
+                        // removing the comma will make it a valid json object
                         let index = result.lastIndexOf('],');
                         if (index!==-1)
                             result = result.slice(0, (index+1));
+                        // if response contians code element then there is an error else 
+                        // python code finished with success and returned list of employees with cluster
                         response = JSON.parse(result);
                         if (response.code !==undefined) {
                             resCode = 400;
@@ -56,7 +70,9 @@ app.post('/', (req,res) => {
                     res.status(resCode).json(response);
                 }
                 else {
-                    res.status(500).send("Error!");
+                    let result = script_output+"";
+                    logger.error(result);
+                    res.status(500).send({code: "3000", message: "Python exit with code!=0"});
                 }
                 
             });
@@ -70,6 +86,6 @@ app.post('/', (req,res) => {
 
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT;
 
 var server = app.listen(PORT, () => logger.info(`Listening on port ${PORT}`));

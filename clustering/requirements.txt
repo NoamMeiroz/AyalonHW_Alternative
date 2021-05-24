@@ -5,3 +5,4 @@ joblib
 pandas
 k-means-constrained
 json-schema-matcher
+matplotlib 

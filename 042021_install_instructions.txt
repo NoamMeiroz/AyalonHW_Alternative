@@ -1,4 +1,87 @@
+// update docker-compose-prod
+
+
+// add custom conf to mysql docker
+mkdir mysql
+// create a local file and paste configuration
+/*
+[mysqld]
+key_buffer_size = 256M
+max_allowed_packet=268435456
+table_open_cache = 256
+sort_buffer_size = 1M
+read_buffer_size = 1M
+read_rnd_buffer_size = 4M
+myisam_sort_buffer_size = 64M
+thread_cache_size = 8
+
+default_storage_engine = InnoDB
+innodb_buffer_pool_size = 2G # Use up to 70-80% of RAM & optionally check if /proc/sys/vm/swappiness is set to 0. Use Tuning Primer or MySQL Tuner to adjust accordingly.
+innodb_file_per_table = 1
+innodb_flush_log_at_trx_commit = 0
+innodb_flush_method = O_DIRECT
+innodb_log_buffer_size = 8M
+innodb_log_file_size = 128M # Delete the ib_logfile0 & ib_logfile1 files in /var/lib/mysql whenever you change this, even the first time you set it up, as the default value is 8M. Don't go above 256M.
+
+open_files_limit=10000
+[mysqldump]
+quick
+max_allowed_packet = 16M
+*/
+nano custom.cnf
+
+// stop mysql docker
+docker-compose stop mysql
+
+cd /home/NativeLaasakimAH/datadrive/db-data
+rm ib_logfile0 
+rm ib_logfile1 files
+
+// import muni_vaadim
+// check if geometry_columns exist and add null, null, muni_vaadim SHAPE 3 2039 POLYGON
+
+// resart mysql docker
+docker-compose up -d mysql
+
+//check if cnf was accepted using mysql workbanch
+show variables like "innodb%";
+
 // change WORKER_ID column type from int to string in EMPLOYEES
 -------------
 ALTER TABLE `alternative`.`employees` 
 CHANGE COLUMN `WORKER_ID` `WORKER_ID` VARCHAR(80) NOT NULL ;
+
+// create pdf folder and save privcy.pdf file in it
+mkdir /home/NativeLaasakimAH/datadrive/pdf
+
+
+// run otheker dockers
+
+-----------------------------
+// connect to azure NativeLaasakimCR Container Registry
+// container registry name is allways in small letters! 
+az login
+az acr login --name nativelaasakimcr
+
+docker tag clustering nativelaasakimcr.azurecr.io/clustering:1.2.4
+docker push nativelaasakimcr.azurecr.io/clustering:1.2.4
+
+docker tag node_server nativelaasakimcr.azurecr.io/node_server:1.2.4
+docker push nativelaasakimcr.azurecr.io/node_server:1.2.4
+
+docker tag native_laasakim_dev nativelaasakimcr.azurecr.io/native_laasakim:1.2.4
+docker push nativelaasakimcr.azurecr.io/native_laasakim:1.2.4
+
+docker tag nginx nativelaasakimcr.azurecr.io/nginx:1.2.4
+docker push nativelaasakimcr.azurecr.io/nginx:1.2.4
+
+az login --identity
+az acr login --name nativelaasakimcr
+
+docker pull nativelaasakimcr.azurecr.io/clustering:1.2.4
+docker pull nativelaasakimcr.azurecr.io/node_server:1.2.4
+docker pull nativelaasakimcr.azurecr.io/native_laasakim:1.2.4
+docker pull nativelaasakimcr.azurecr.io/nginx:1.2.4
+
+// add to .env
+CLUSTERING_PORT=3500
