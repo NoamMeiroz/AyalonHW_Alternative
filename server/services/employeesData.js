@@ -26,7 +26,6 @@ async function run(req, employer, employees) {
 			state = employerSchema.STATE.ERROR;
 		}
 		else {
-			//let payload = checkResult(result.Employees);
 			let payload = result.Employees;
 			logger.info(`upload result ${employer.NAME}: ${JSON.stringify(payload)}`);
 			payload.employerID = employer.id;
@@ -49,20 +48,6 @@ async function run(req, employer, employees) {
 			}
 		});
 };
-
-/**
- * Check count employess that have no error in the UPLOAD_ERROR feature.
- * @param {employeesList} employessList 
- */
-const checkResult = (employessList) => {
-	let successCount = 0;
-	let total = employessList.length;
-	for ( emp of employessList ) {
-		if (!emp.dataValues.UPLOAD_ERROR) 
-			successCount = successCount + 1;
-	}
-	return { successCount: successCount, total: total};
-}
 
 /**
  * Check the data of the employer and then insert it to the database
@@ -143,7 +128,7 @@ async function runRecalculate(req, employer, employees) {
 			state = employerSchema.STATE.ERROR;
 		}
 		else {
-			let payload = checkResult(result.Employees);
+			let payload = result.Employees;
 			payload.employerID = employer.id;
 			// notify client about the upload result; 
 			sendMessage(ip, {type: "recalculate_result", payload: payload });

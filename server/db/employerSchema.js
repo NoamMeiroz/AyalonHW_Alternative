@@ -146,7 +146,6 @@ const setEmployeeState = (employerId, state, callback) => {
  * @param {boolean} isReady
  */
 const loadingStatus = (employerId, callback) => {
-  // Save Tutorial in the database
   Employer.findAll({
     where: {
       id: employerId

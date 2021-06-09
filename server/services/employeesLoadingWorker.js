@@ -15,7 +15,7 @@ const { City } = require('./columns/city');
 const { Street } = require('./columns/street');
 const { BuildingNumber } = require('./columns/buildingNumber');
 const { TimeSlot } = require('./columns/timeSlot');
-const { calculateMark } = require('./route');
+const { calculateMark, calculateDurationAndDistance } = require('./route');
 
 
 /**----------------------------------------------------------
@@ -167,15 +167,15 @@ const findCoordinates = async (employee) => {
 }
 
 /**
- * Calcluare for each employee final marks
+ * Calcluare for each employee final marks, distance and duration of routes
  * @param {list of employees} employees 
  * @param {configuration} config 
  */
-const calculateMarks = (employees, config) => {
+const calculateRoutes = (employees, config) => {
    result = employees.map(employee => calculateMark(employee, config));
+   result = result.map(employee => calculateDurationAndDistance(employee));
    return result;
 }
-
 
 /**
  * convert employee address to coordinates using google api
@@ -207,7 +207,7 @@ const insertEmployee = async function (employeeList) {
             });
             Promise.all(promiseList)
                .then(employees => {
-                  let employeesList = calculateMarks(employees, config);
+                  let employeesList = calculateRoutes(employees, config);
                   data = save(employeesList);
                   return resolve(data);
                })
@@ -257,6 +257,7 @@ const runAndWait = async (waitTime, callback, employeeList) => {
    });
 }
 
+
 /**----------------------------------------------------------
  * Main thread
  * -------------------------------------------------------- */
@@ -282,6 +283,7 @@ var EMP_GRADE_COLUMNS = [
    new Column("SHARED_WORKSPACE_GRADE", "עבודה במרכזים שיתופיים", TYPES.INT, 6, false),
    new Column("SHIFTING_WORKING_DAYS_GRADE", "שינוי ימי הגעה לעבודה", TYPES.INT, 6, false)
 ];
+
 var config = [];
 // init configuation from database
 configData.getAllConfig()

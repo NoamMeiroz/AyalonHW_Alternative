@@ -1,12 +1,10 @@
 const axios = require('axios');
 const proj4 = require('proj4');
 const { ServerError, logger } = require('../log');
-const tools = require('../tools');
 const localityService = require('../services/localityData');
 const { ERRORS } = require("./ERRORS");
-
+const { findFastestRoute } = require('./route');
 const LOCATION_TYPE = ["street_address", "route", "establishment", "hospital", "neighborhood", "locality"];
-
 
 /**
  * Convert X,Y in EPSG:4326 (WG84) to EPSG:2039
@@ -98,7 +96,10 @@ const convertLocation = async (cityParam, streetParam, buildingNumber) => {
    return new Promise(function (resolve, reject) {
       let address = "";
       if (buildingNumber === 0)
-         address = `${streetParam}, ${cityParam}, ישראל`;
+         if (streetParam === cityParam )
+            address = `ישוב ${cityParam}`;
+         else
+            address = `${streetParam}, ${cityParam}, ישראל`;
       else
          address = `${streetParam} ${buildingNumber}, ${cityParam}, ישראל`;
       address = encodeURI(address);
@@ -119,7 +120,7 @@ const convertLocation = async (cityParam, streetParam, buildingNumber) => {
                else {
                   const converted = convertCoordinate(result.Y, result.X);
                   findLocality(cityParam, converted.X, converted.Y)
-                  //findLocality(result.X, result.Y)
+                     //findLocality(result.X, result.Y)
                      .then(locality => {
                         if (locality instanceof ServerError) {
                            locality.X = result.X;
@@ -148,42 +149,6 @@ const findLocality = async (city, x, y) => {
    return new Promise(function (resolve, reject) {
       return resolve(localityService.getXYLocality(city, x, y));
 
-   });
-}
-
-/**
- * Find city/settelment name by its coordinates.
- * The function uses the api form:
- * https://data-israeldata.opendata.arcgis.com/datasets/6e653612eece41faa34c1d0fe1bd919c_0/geoservice?geometry=34.3%2C31.593
- * @param {geocoding point} x, y 
- */
-const findLocalityOld = async (x, y) => {
-   return new Promise(function (resolve, reject) {
-      let service = encodeURI('חלקות');
-      let address = `${y},${x}`
-      url = `https://services8.arcgis.com/JcXY3lLZni6BK4El/arcgis/rest/services/${service}/FeatureServer/0/query?where=1%3D1&outFields=LOCALITY_N,LOCALITY_I&geometry=${address}&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelWithin&outSR=4326&f=json`
-      axios.get(url)
-         .then(res => {
-            if (res.data.features.length > 0) {
-               if (res.data.features[0].attributes.LOCALITY_I !== 0)
-                  return localityService.getLocality(res.data.features[0].attributes.LOCALITY_I);
-               else
-                  return (resolve(new ServerError(ERRORS.HELKA_NOT_FOUND, "location is not mapped in service: " + address)));
-            }
-            else
-               return (resolve(new ServerError(ERRORS.HELKA_NOT_FOUND, "location is not mapped in service: " + address)));
-         })
-         .then(result => {
-            if (result instanceof ServerError)
-               return resolve(result)
-            else if (result)
-               return resolve(result.NAME);
-            else
-               return resolve(new ServerError(ERRORS.CITY_CODE_NOT_FOUND, "City name doesn't appear in the db. Adrress:" + address));
-         })
-         .catch((err) => {
-            return reject(err);
-         });
    });
 }
 
@@ -242,9 +207,24 @@ const getRoutes = async (origin, destination, time) => {
       if (destination.buildingNumber === null) {
          return resolve(new ServerError(ERRORS.MISSING_BUILDING_NUMBER_CODE, "missing building number"));
       }
-      let originAddr = origin.street + origin.buildingNumber + ", " + origin.city;
+      let originAddr = "";
+      if (origin.buildingNumber === 0)
+         if (origin.street === origin.city)
+            originAddr = `ישוב ${origin.city}`;
+         else
+            originAddr = origin.street + ", " + origin.city;
+      else
+         originAddr = origin.street + " " + origin.buildingNumber + ", " + origin.city;
       originAddr = encodeURI(originAddr);
-      let destinationAddr = destination.street + destination.buildingNumber + ", " + destination.city;
+
+      let destinationAddr = "";
+      if (destination.buildingNumber === 0)
+         if (destination.street === destination.city)
+            destinationAddr = `ישוב ${destination.city}`;
+         else
+            destinationAddr = destination.street + ", " + destination.city;
+      else
+         destinationAddr = destination.street + " " + destination.buildingNumber + ", " + destination.city;
       destinationAddr = encodeURI(destinationAddr);
 
       let key = process.env.GOOGLE_API_KEY;
@@ -262,7 +242,7 @@ const getRoutes = async (origin, destination, time) => {
             routesResponeList.forEach((res, index, array) => {
                let result = checkRouteResults(res.data);
                if (result === 'OK') {
-                  suggestedRoutes[modeList[index]] = res.data.routes;
+                  suggestedRoutes[modeList[index]] = findFastestRoute(res.data.routes);
                }
                else if (result === "") {
                   suggestedRoutes[modeList[index]] = { error: "לא נמצא מסלול" };

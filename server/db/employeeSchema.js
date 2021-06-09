@@ -46,22 +46,40 @@ const insertBulk = (employees, callback) => {
  */
 const updateBulk = (employees, callback) => {
    // Save  in the database
-   Employee.bulkCreate(employees, {updateOnDuplicate:["BEST_ROUTE_TO_WORK", "BEST_ROUTE_TO_HOME",
-      "FINAL_SHORT_HOURS_GRADE",
-     "FINAL_SHIFTING_HOURS_GRADE",
-      "FINAL_BICYCLE_GRADE",
-      "FINAL_SCOOTER_GRADE",
-      "FINAL_PERSONALIZED_SHUTTLE_GRADE",
-      "FINAL_WORK_SHUTTLE_GRADE",
-      "FINAL_CARSHARE_GRADE",
-      "FINAL_CARPOOL_GRADE",
-      "FINAL_CABSHARE_GRADE",
-      "FINAL_PUBLIC_TRANSPORT_GRADE",
-      "FINAL_WALKING_GRADE",
-      "FINAL_WORKING_FROM_HOME_GRADE",
-      "FINAL_SHARED_WORKSPACE_GRADE",
-      "FINAL_SHIFTING_WORKING_DAYS_GRADE",
-      "updatedAt"]})
+   Employee.bulkCreate(employees, {
+      updateOnDuplicate: ["BEST_ROUTE_TO_WORK", "BEST_ROUTE_TO_HOME",
+         "FINAL_SHORT_HOURS_GRADE",
+         "FINAL_SHIFTING_HOURS_GRADE",
+         "FINAL_BICYCLE_GRADE",
+         "FINAL_SCOOTER_GRADE",
+         "FINAL_PERSONALIZED_SHUTTLE_GRADE",
+         "FINAL_WORK_SHUTTLE_GRADE",
+         "FINAL_CARSHARE_GRADE",
+         "FINAL_CARPOOL_GRADE",
+         "FINAL_CABSHARE_GRADE",
+         "FINAL_PUBLIC_TRANSPORT_GRADE",
+         "FINAL_WALKING_GRADE",
+         "FINAL_WORKING_FROM_HOME_GRADE",
+         "FINAL_SHARED_WORKSPACE_GRADE",
+         "FINAL_SHIFTING_WORKING_DAYS_GRADE",
+         "BEST_ROUTE_TO_HOME_WALKING_DISTANCE",
+         "BEST_ROUTE_TO_HOME_WALKING_DURATION",
+         "BEST_ROUTE_TO_HOME_DRIVING_DISTANCE",
+         "BEST_ROUTE_TO_HOME_DRIVING_DURATION",
+         "BEST_ROUTE_TO_HOME_TRANSIT_DISTANCE",
+         "BEST_ROUTE_TO_HOME_TRANSIT_DURATION",
+         "BEST_ROUTE_TO_HOME_BICYCLING_DISTANCE",
+         "BEST_ROUTE_TO_HOME_BICYCLING_DURATION",
+         "BEST_ROUTE_TO_WORK_WALKING_DISTANCE",
+         "BEST_ROUTE_TO_WORK_WALKING_DURATION",
+         "BEST_ROUTE_TO_WORK_DRIVING_DISTANCE",
+         "BEST_ROUTE_TO_WORK_DRIVING_DURATION",
+         "BEST_ROUTE_TO_WORK_TRANSIT_DISTANCE",
+         "BEST_ROUTE_TO_WORK_TRANSIT_DURATION",
+         "BEST_ROUTE_TO_WORK_BICYCLING_DISTANCE",
+         "BEST_ROUTE_TO_WORK_BICYCLING_DURATION",
+         "updatedAt"]
+   })
       .then(data => { callback(null, data) })
       .catch(err => {
          callback(err, getMessage(err));
@@ -81,25 +99,6 @@ const deleteEmployees = (employerID, callback) => {
       where: { employer_id: employerID }
    })
       .then(data => { callback(null, data) })
-      .catch(err => {
-         callback(err, getMessage(err));
-      });
-}
-
-/**
- * Update a given employee with best route. 
- * @param {*} employee 
- * @param {*} route - json object representing best route
- * @param {*} callback 
- */
-const updateRoute = (employee, to_work_route, to_home_route, callback) => {
-   Employee.update({
-      BEST_ROUTE_TO_WORK: to_work_route,
-      BEST_ROUTE_TO_HOME: to_home_route
-   }, { where: { id: employee.id } })
-      .then(rowsUpdate => {
-         callback(null, rowsUpdate);
-      })
       .catch(err => {
          callback(err, getMessage(err));
       });
@@ -174,7 +173,7 @@ getWhereForDestinationPolygon = (destinationPolygon) => {
    let point = Sequelize.fn('ST_GeomFromText', Sequelize.fn('ST_AsText',
       Sequelize.fn('POINT', Sequelize.col('Site.X'), Sequelize.col('Site.Y'))), 4326);
    if (Object.keys(destinationPolygon).length > 0) {
-        filter = Sequelize.where(Sequelize.fn('ST_CONTAINS', polygon, point), '=', 1);
+      filter = Sequelize.where(Sequelize.fn('ST_CONTAINS', polygon, point), '=', 1);
       //filter = Sequelize.fn('ST_CONTAINS', polygon, point);
    }
    return filter;
@@ -220,14 +219,20 @@ const getEmployees = (employerList, livingCity = [], workingCity = [],
             'WALKING_GRADE',
             'WORKING_FROM_HOME_GRADE',
             'SHARED_WORKSPACE_GRADE',
-            'SHIFTING_WORKING_DAYS_GRADE'
+            'SHIFTING_WORKING_DAYS_GRADE',
+            'updatedAt',
+            'createdAt',
+            'BEST_ROUTE_TO_HOME',
+            'BEST_ROUTE_TO_WORK'
          ]
       },
       where: {
          [Op.and]: [
-         {X: {
-            [Op.ne]: null
-         }}]
+            {
+               X: {
+                  [Op.ne]: null
+               }
+            }]
       }
    };
    // add starting polygon to where clause
@@ -260,9 +265,9 @@ const getEmployees = (employerList, livingCity = [], workingCity = [],
    }
    if (workingCity && workingCity.length > 0) {
       if (include[0].where)
-         include[0].where = {[Op.and]: [ {"ADDRESS_CITY": {[Op.in]: workingCity}}, include[0].where]};
-      else 
-         include[0].where = { "ADDRESS_CITY": {[Op.in]: workingCity} };
+         include[0].where = { [Op.and]: [{ "ADDRESS_CITY": { [Op.in]: workingCity } }, include[0].where] };
+      else
+         include[0].where = { "ADDRESS_CITY": { [Op.in]: workingCity } };
    }
    // combine to create a final where
    whereClause = { ...whereClause, include };
@@ -290,15 +295,39 @@ const getPrecentFinished = (employerID, callback) => {
       else {
          Promise.all([Employee.count({
             where: {
-               EMPLOYER_ID: employerID,
-               [Op.and]: {
-                  UPLOAD_ERROR: {
-                     [db.Sequelize.Op.eq]: null
-                  },
-                  BEST_ROUTE_TO_HOME: {
-                     [db.Sequelize.Op.ne]: null
-                  }
-               }
+               [Op.and]: [
+                  { EMPLOYER_ID: employerID },
+                  {
+                     [Op.or]: [{
+                        [Op.and]: [
+                           {
+                              UPLOAD_ERROR: {
+                                 [db.Sequelize.Op.eq]: null
+                              }
+                           },
+                           {
+                              BEST_ROUTE_TO_HOME: {
+                                 [db.Sequelize.Op.ne]: null
+                              }
+                           }
+                        ]
+                     },
+                     {
+                        [Op.and]: [
+                           {
+                              UPLOAD_ERROR: {
+                                 [db.Sequelize.Op.ne]: null
+                              }
+                           },
+                           {
+                              BEST_ROUTE_TO_HOME: {
+                                 [db.Sequelize.Op.eq]: null
+                              }
+                           }
+                        ]
+                     }
+                     ]
+                  }]
             }
          }), EmployerSites.sum('NUM_OF_EMPLOYEES', {
             where: {
@@ -330,9 +359,27 @@ const getPrecentFinished = (employerID, callback) => {
  */
 const cleanBestRoute = (employerID, callback) => {
    // Save  in the database
-   Employee.update({BEST_ROUTE_TO_HOME: null, 
-      BEST_ROUTE_TO_WORK: null},
-      {where: {EMPLOYER_ID: employerID}})
+   Employee.update({
+      BEST_ROUTE_TO_HOME: null,
+      BEST_ROUTE_TO_HOME_WALKING_DISTANCE: null,
+      BEST_ROUTE_TO_HOME_WALKING_DURATION: null,
+      BEST_ROUTE_TO_HOME_DRIVING_DISTANCE: null,
+      BEST_ROUTE_TO_HOME_DRIVING_DURATION: null,
+      BEST_ROUTE_TO_HOME_TRANSIT_DISTANCE: null,
+      BEST_ROUTE_TO_HOME_TRANSIT_DURATION: null,
+      BEST_ROUTE_TO_HOME_BICYCLING_DISTANCE: null,
+      BEST_ROUTE_TO_HOME_BICYCLING_DURATION: null,
+      BEST_ROUTE_TO_WORK: null,
+      BEST_ROUTE_TO_WORK_WALKING_DISTANCE: null,
+      BEST_ROUTE_TO_WORK_WALKING_DURATION: null,
+      BEST_ROUTE_TO_WORK_DRIVING_DISTANCE: null,
+      BEST_ROUTE_TO_WORK_DRIVING_DURATION: null,
+      BEST_ROUTE_TO_WORK_TRANSIT_DISTANCE: null,
+      BEST_ROUTE_TO_WORK_TRANSIT_DURATION: null,
+      BEST_ROUTE_TO_WORK_BICYCLING_DISTANCE: null,
+      BEST_ROUTE_TO_WORK_BICYCLING_DURATION: null
+   },
+      { where: { EMPLOYER_ID: employerID } })
       .then(data => { callback(null, data) })
       .catch(err => {
          callback(err, getMessage(err));
@@ -341,6 +388,6 @@ const cleanBestRoute = (employerID, callback) => {
 
 
 module.exports = {
-   insertBulk, updateRoute, getEmployeesOfEmployer, getPrecentFinished,
+   insertBulk, getEmployeesOfEmployer, getPrecentFinished,
    getEmployees, updateBulk, cleanBestRoute
 };

@@ -1,9 +1,11 @@
+const ROUTE_COLUMS = ["BEST_ROUTE_TO_HOME", "BEST_ROUTE_TO_WORK"];
+const SOLUTIONS_LIST = ["walking", "bicycling", "driving", "transit"];
 
 /**
  * return the fastest routes
  * @param {array of routes} route 
  */
-findFastestRoute = (route) => {
+const findFastestRoute = (route) => {
     let bestRoute = route[0];
     for (let i = 1; i < route.length; i++) {
         if (route[i].legs[0].duration.value < bestRoute.legs[0].duration.value)
@@ -21,7 +23,7 @@ const getData = (route) => {
         return null;
     if (route.error)
         return null;
-    let bestRoute = findFastestRoute(route);
+    let bestRoute = route; //findFastestRoute(route);
     if (!bestRoute)
         return null;
 
@@ -35,6 +37,30 @@ const getData = (route) => {
 const getConfigValue = (config, name) => {
     return parseInt(config.find(item => item.NAME === name).VALUE);
 }
+
+
+const calculateDurationAndDistance = (employee) => {
+    if (employee.UPLOAD_ERROR === null) {
+       // get distance and duration
+       for (direction of ROUTE_COLUMS) {
+          for (solution of SOLUTIONS_LIST) {
+             let solutionData = null;
+             if (employee[direction])
+                solutionData = getData(employee[direction][solution]);
+             if (solutionData) {
+                employee[`${direction}_${solution.toUpperCase()}_DISTANCE`] = solutionData["distance"];
+                employee[`${direction}_${solution.toUpperCase()}_DURATION`] = solutionData["duration"];
+             }
+             else {
+                employee[`${direction}_${solution.toUpperCase()}_DISTANCE`] = null;
+                employee[`${direction}_${solution.toUpperCase()}_DURATION`] = null;
+             }
+          }
+       }
+    }
+    return employee;
+ }
+
 
 /**
  * if driving is short then fail walking, scooter and bicycle solution if they are taking
@@ -112,4 +138,4 @@ const calculateMark = (employee, config) => {
 }
 
 
-module.exports = { calculateMark, getData };
+module.exports = { calculateMark, getData, calculateDurationAndDistance, findFastestRoute, ROUTE_COLUMS, SOLUTIONS_LIST };

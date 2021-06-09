@@ -2,11 +2,8 @@ const axios = require('axios');
 const { logger, ServerError } = require('../log');
 const employeeSchema = require("../db/employeeSchema");
 const reports = require("../db/reports");
-const { getData } = require('./route');
-
-const ROUTE_COLUMS = ["BEST_ROUTE_TO_HOME", "BEST_ROUTE_TO_WORK"];
-const SOLUTIONS_LIST = ["walking", "bicycling", "driving", "transit"];
-
+const { SOLUTIONS_LIST, ROUTE_COLUMS} = require('./route');
+const { employee } = require('../db/database');
 /**
  * Check the data of the employer and then insert it to the database
  * if data is not valid then reject.
@@ -23,7 +20,7 @@ const getEmployeesOfEmployer = (employers, livingCity, workingCity,
 				}
 				let employeesList = [];
 				for (i in payload) {
-					employee = payload[i];
+					let employee = payload[i];
 					employeesList[i] = employee.dataValues;
 					// set work site information
 					let workSite = employeesList[i].Site.dataValues;
@@ -43,32 +40,20 @@ const getEmployeesOfEmployer = (employers, livingCity, workingCity,
 					timeSLot = employeesList[i].ReturnHourToHome.dataValues;
 					employeesList[i].RETURN_HOUR_TO_HOME = timeSLot.TIME_SLOT;
 
-					if (employee.UPLOAD_ERROR === null) {
+					if (employeesList[i].UPLOAD_ERROR === null) {
 						// get distance and duration
 						for (direction of ROUTE_COLUMS) {
 							for (solution of SOLUTIONS_LIST) {
-								let solutionData = null;
-								if (employeesList[i][direction])
-									solutionData = getData(employeesList[i][direction][solution]);
-								if (solutionData) {
-									employeesList[i][`${direction}_${solution.toUpperCase()}_DISTANCE`] = solutionData["distance"];
-									employeesList[i][`${direction}_${solution.toUpperCase()}_DURATION`] = solutionData["duration"];
-								}
-								else {
+								if (employeesList[i][`${direction}_${solution.toUpperCase()}_DISTANCE`] === null)
 									employeesList[i][`${direction}_${solution.toUpperCase()}_DISTANCE`] = 'נתונים חסרים';
+								if (employeesList[i][`${direction}_${solution.toUpperCase()}_DURATION`] === null)
 									employeesList[i][`${direction}_${solution.toUpperCase()}_DURATION`] = 'נתונים חסרים';
-								}
 							}
 						}
 					}
-
 					// remove unnecsacry columns
-					delete employeesList[i].updatedAt;
-					delete employeesList[i].createdAt;
 					delete employeesList[i].Site;
 					delete employeesList[i].employer;
-					delete employeesList[i].BEST_ROUTE_TO_HOME;
-					delete employeesList[i].BEST_ROUTE_TO_WORK;
 					delete employeesList[i].UPLOAD_ERROR;
 				}
 				resolve(employeesList);

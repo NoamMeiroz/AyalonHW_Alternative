@@ -182,7 +182,71 @@ module.exports = (sequelize, Sequelize) => {
         },
         UPLOAD_ERROR: {
             type: Sequelize.JSON
-        },           
+        }, 
+        BEST_ROUTE_TO_HOME_WALKING_DISTANCE: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        BEST_ROUTE_TO_HOME_WALKING_DURATION: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        BEST_ROUTE_TO_HOME_DRIVING_DISTANCE: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        BEST_ROUTE_TO_HOME_DRIVING_DURATION: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        BEST_ROUTE_TO_HOME_TRANSIT_DISTANCE: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        BEST_ROUTE_TO_HOME_TRANSIT_DURATION: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        BEST_ROUTE_TO_HOME_BICYCLING_DISTANCE: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        BEST_ROUTE_TO_HOME_BICYCLING_DURATION: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        BEST_ROUTE_TO_WORK_WALKING_DISTANCE: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        BEST_ROUTE_TO_WORK_WALKING_DURATION: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        BEST_ROUTE_TO_WORK_DRIVING_DISTANCE: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        BEST_ROUTE_TO_WORK_DRIVING_DURATION: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        BEST_ROUTE_TO_WORK_TRANSIT_DISTANCE: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        BEST_ROUTE_TO_WORK_TRANSIT_DURATION: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        BEST_ROUTE_TO_WORK_BICYCLING_DISTANCE: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        BEST_ROUTE_TO_WORK_BICYCLING_DURATION: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        }         
     });
     return Employee;
   };
