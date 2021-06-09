@@ -1,0 +1,49 @@
+// update tables
+ALTER TABLE `alternative`.`employees` 
+ADD COLUMN `BEST_ROUTE_TO_HOME_WALKING_DISTANCE` INT NULL DEFAULT NULL AFTER `BEST_ROUTE_TO_HOME`,
+ADD COLUMN `BEST_ROUTE_TO_HOME_WALKING_DURATION` INT NULL DEFAULT NULL AFTER `BEST_ROUTE_TO_HOME_WALKING_DISTANCE`,
+ADD COLUMN `BEST_ROUTE_TO_HOME_DRIVING_DISTANCE` INT NULL DEFAULT NULL AFTER `BEST_ROUTE_TO_HOME_WALKING_DURATION`,
+ADD COLUMN `BEST_ROUTE_TO_HOME_DRIVING_DURATION` INT NULL DEFAULT NULL AFTER `BEST_ROUTE_TO_HOME_DRIVING_DISTANCE`,
+ADD COLUMN `BEST_ROUTE_TO_HOME_TRANSIT_DISTANCE` INT NULL DEFAULT NULL AFTER `BEST_ROUTE_TO_HOME_DRIVING_DURATION`,
+ADD COLUMN `BEST_ROUTE_TO_HOME_TRANSIT_DURATION` INT NULL DEFAULT NULL AFTER `BEST_ROUTE_TO_HOME_TRANSIT_DISTANCE`,
+ADD COLUMN `BEST_ROUTE_TO_HOME_BICYCLING_DISTANCE` INT NULL DEFAULT NULL AFTER `BEST_ROUTE_TO_HOME_TRANSIT_DURATION`,
+ADD COLUMN `BEST_ROUTE_TO_HOME_BICYCLING_DURATION` INT NULL AFTER `BEST_ROUTE_TO_HOME_BICYCLING_DISTANCE`,
+ADD COLUMN `BEST_ROUTE_TO_WORK_WALKING_DISTANCE` INT NULL DEFAULT NULL AFTER `BEST_ROUTE_TO_HOME_BICYCLING_DURATION`,
+ADD COLUMN `BEST_ROUTE_TO_WORK_WALKING_DURATION` INT NULL DEFAULT NULL AFTER `BEST_ROUTE_TO_WORK_WALKING_DISTANCE`,
+ADD COLUMN `BEST_ROUTE_TO_WORK_DRIVING_DISTANCE` INT NULL DEFAULT NULL AFTER `BEST_ROUTE_TO_WORK_WALKING_DURATION`,
+ADD COLUMN `BEST_ROUTE_TO_WORK_DRIVING_DURATION` INT NULL DEFAULT NULL AFTER `BEST_ROUTE_TO_WORK_DRIVING_DISTANCE`,
+ADD COLUMN `BEST_ROUTE_TO_WORK_TRANSIT_DISTANCE` INT NULL DEFAULT NULL AFTER `BEST_ROUTE_TO_WORK_DRIVING_DURATION`,
+ADD COLUMN `BEST_ROUTE_TO_WORK_TRANSIT_DURATION` INT NULL DEFAULT NULL AFTER `BEST_ROUTE_TO_WORK_TRANSIT_DISTANCE`,
+ADD COLUMN `BEST_ROUTE_TO_WORK_BICYCLING_DISTANCE` INT NULL DEFAULT NULL AFTER `BEST_ROUTE_TO_WORK_TRANSIT_DURATION`,
+ADD COLUMN `BEST_ROUTE_TO_WORK_BICYCLING_DURATION` INT NULL AFTER `BEST_ROUTE_TO_WORK_BICYCLING_DISTANCE`;
+
+// Upload user manual pdf file to folder nginx-pdf
+
+
+// run the dockers
+
+-----------------------------
+// connect to azure NativeLaasakimCR Container Registry
+// container registry name is allways in small letters! 
+az login
+az acr login --name nativelaasakimcr
+
+docker tag ayalonhw_alternative_clustering nativelaasakimcr.azurecr.io/clustering:1.3.0
+docker push nativelaasakimcr.azurecr.io/clustering:1.3.0
+
+docker tag ayalonhw_alternative_node_server nativelaasakimcr.azurecr.io/node_server:1.3.0
+docker push nativelaasakimcr.azurecr.io/node_server:1.3.0
+
+docker tag ayalonhw_alternative_native_laasakim_dev nativelaasakimcr.azurecr.io/native_laasakim:1.3.0
+docker push nativelaasakimcr.azurecr.io/native_laasakim:1.3.0
+
+docker tag ayalonhw_alternative_nginx nativelaasakimcr.azurecr.io/nginx:1.3.0
+docker push nativelaasakimcr.azurecr.io/nginx:1.3.0
+
+az login --identity
+az acr login --name nativelaasakimcr
+
+docker pull nativelaasakimcr.azurecr.io/clustering:1.3.0
+docker pull nativelaasakimcr.azurecr.io/node_server:1.3.0
+docker pull nativelaasakimcr.azurecr.io/native_laasakim:1.3.0
+docker pull nativelaasakimcr.azurecr.io/nginx:1.3.0

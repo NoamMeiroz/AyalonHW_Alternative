@@ -2,7 +2,7 @@
 version: '3'  
 services:
   mysql:
-    image: mysql
+    image: mysql:8.0.25
     restart: always
     command: --default-authentication-plugin=mysql_native_password
     stdin_open: true
@@ -76,8 +76,6 @@ services:
     volumes:
       - ./client/node_modules:/client/node_modules
       - ./client:/client
-    #  - /client/node_modules
-    #  - /client
     restart: always
     stdin_open: true
     tty: true
@@ -112,7 +110,7 @@ services:
       - pdf_files:/www/pdf
   nginx:
     build:
-      dockerfile: dockerfile_nginx.dev
+      dockerfile: dockerfile
       context: ./nginx
     ports:
       - "8080:80"
@@ -130,7 +128,8 @@ volumes:
     driver_opts:
       o: bind
       type: None
-      device: /home/amit/workspace/employers_program/db-data
+      #device: /home/amit/workspace/employers_program/db-data
+      device: /home/amit/workspace/employers_program/data/db_backup
   node_logs:
     driver: local
     driver_opts:

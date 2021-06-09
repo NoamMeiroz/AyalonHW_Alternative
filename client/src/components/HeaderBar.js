@@ -33,6 +33,7 @@ class HeaderBar extends Component {
                             <Typography variant="subtitle1" color="primary">
                                 {this.props.userName}
                             </Typography>
+                            <Button href="/מדריך למשתמש.pdf">מדריך למשתמש</Button>
                             <Button color="primary" component={Link} to="/signout" >יציאה</Button>
                         </Box>
                     }

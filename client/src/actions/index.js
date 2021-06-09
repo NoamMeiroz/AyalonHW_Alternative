@@ -54,9 +54,9 @@ export const signOut = () => {
 export const connected = (isConnected) => {
     return (dispatch) => {
         if (isConnected){
-            dispatch(getEmployees(null,
-                null,
-                null, null, null));
+            //dispatch(getEmployees(null,
+            //    null,
+            //    null, null, null));
             dispatch(getData());
             dispatch(getSettlementList());
             dispatch(getTimeSlotToHome());

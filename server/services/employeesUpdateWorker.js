@@ -6,7 +6,7 @@ const googleAPI = require("./googleAPI");
 const timeSlotsData = require("./timeSlotsData");
 const { ERRORS } = require("./ERRORS");
 const { ServerError, logger } = require('../log');
-const { calculateMark } = require('./route');
+const { calculateMark, calculateDurationAndDistance } = require('./route');
 
 
 /**----------------------------------------------------------
@@ -89,12 +89,13 @@ const findRoutes = async function (employee) {
 
 
 /**
- * Calcluare for each employee final marks
+ * Calcluare for each employee final marks, distance and duration of routes
  * @param {list of employees} employees 
  * @param {configuration} config 
  */
-const calculateMarks = (employees, config) => {
+const calculateRoutes = (employees, config) => {
    result = employees.map(employee => calculateMark(employee, config));
+   result = result.map(employee => calculateDurationAndDistance(employee));
    return result;
 }
 
@@ -120,7 +121,7 @@ const updateEmployee = async function (employeeList) {
       });
       Promise.all(promiseList)
          .then(employees => {
-            let employeesList = calculateMarks(employees, config);
+            let employeesList = calculateRoutes(employees, config);
             data = save(employeesList);
             return resolve(data);
          })
@@ -144,6 +145,21 @@ const runAndWait = async (waitTime, callback, employeeList) => {
       }, waitTime);
    });
 }
+
+/**
+ * Check count employess that have no error in the UPLOAD_ERROR feature.
+ * @param {employeesList} employessList 
+ */
+const checkResult = (employessList) => {
+   let successCount = 0;
+   let total = employessList.length;
+   for (emp of employessList) {
+      if (!emp.dataValues.UPLOAD_ERROR)
+         successCount = successCount + 1;
+   }
+   return { successCount: successCount, total: total };
+}
+
 
 /**----------------------------------------------------------
  * Main thread
@@ -191,11 +207,14 @@ const main = () => {
          results.forEach((emplyees, index, array) => {
             empList = empList.concat(emplyees);
          });
-         parentPort.postMessage({ Employees: empList });
-
+         let payload = checkResult(empList);
+         parentPort.postMessage({ Employees: payload });
+         logger.info(`Finished update employer ${employer.NAME} with success`);
       })
       .catch(error => {
+         console.log(error);
          logger.error(error);
+         logger.info(`Finished loading employer ${employer.NAME} with error!`);
          // return result to main thread
          parentPort.postMessage({ Employees: null, message: error });
       });

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { CircleMarker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import 'react-leaflet-markercluster/dist/styles.min.css';

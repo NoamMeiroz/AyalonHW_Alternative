@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {
     START_FILE_UPLOAD,
-    LOAD_DATA, EMPLOYEES_DATA,
+    LOAD_DATA,
     ADD_NEW_COMPANY,
     CHECK_PROGRESS, ERROR,
     UPLOAD_RESULT,
@@ -71,7 +71,7 @@ export const getData = () => {
 
 /**
  * return the company list stores in server
- */
+
 export const getEmployeesOfEmployer = (employerId) => {
     return (dispatch) => {
         axios.get(`/api/employer/${employerId}/employee`, actionUtils.getAxiosHeader())
@@ -82,7 +82,7 @@ export const getEmployeesOfEmployer = (employerId) => {
                 dispatch({ type: ERROR, errorMessage: message });
             });
     }
-};
+};*/
 
 /**
  * Check the progress status of uploading a file.

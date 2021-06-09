@@ -50,12 +50,13 @@ class DownloadButton extends Component {
     * @param {array of routes} route 
     */
    findFastestRoute = (route) => {
-      let bestRoute = route[0];
+      /*let bestRoute = route[0];
       for (let i = 1; i < route.length; i++) {
          if (route[i].legs[0].duration.value < bestRoute.legs[0].duration.value)
             bestRoute = route[i];
       }
-      return bestRoute;
+      return bestRoute;*/
+      return route;
    }
 
    /**
@@ -152,7 +153,7 @@ class DownloadButton extends Component {
    getWalkingDescription = (walkingDescription) => {
       if (walkingDescription.error)
          return { description: walkingDescription.error };
-      const steps = walkingDescription[0].legs[0].steps;
+      const steps = walkingDescription.legs[0].steps;
       let walking = [];
       let description = "";
       steps.forEach((step, index, array) => {
@@ -176,9 +177,9 @@ class DownloadButton extends Component {
       //  return "";
 
       // add total length and length
-      description = `סה"כ ${walkingDescription[0].legs[0].duration.text} למרחק של ${walkingDescription[0].legs[0].distance.text}\n`;
+      description = `סה"כ ${walkingDescription.legs[0].duration.text} למרחק של ${walkingDescription.legs[0].distance.text}\n`;
       description = this.translate(description);
-      let result = { description: description, duration: walkingDescription[0].legs[0].duration.value, distance: walkingDescription[0].legs[0].distance.value };
+      let result = { description: description, duration: walkingDescription.legs[0].duration.value, distance: walkingDescription.legs[0].distance.value };
       return result;
    }
 
@@ -235,8 +236,8 @@ class DownloadButton extends Component {
                      emp.transit_distance = temp.distance;
                      temp = this.getBicycleDescription(emp.BEST_ROUTE_TO_WORK.bicycling);
                      emp.bicycling = temp.description;;
-                     emp.bicycling_duration = temp.duration;
-                     emp.bicycling_distance = temp.distance;
+                     emp.bicycling_duration = emp.duration;
+                     emp.bicycling_distance = emp.distance;
                      temp = this.getWalkingDescription(emp.BEST_ROUTE_TO_WORK.walking);
                      emp.walking = temp.description;
                      emp.walking_duration = temp.duration;
