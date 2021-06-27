@@ -1,0 +1,20 @@
+FROM apache/superset:latest
+
+# Switching to root to install the required packages
+USER root
+
+# installing the MySQL driver to connect to the metadata database
+RUN pip install mysqlclient
+
+# Switching back to using the `superset` user
+#USER superset
+
+#ARG BI_ROOT_PASSWORD
+#RUN echo $BI_ROOT_PASSWORD
+
+# Setup your local admin account
+#RUN superset fab create-admin --username admin --firstname Superset --lastname Admin --email amit.brabbing@crg-eng.com --password $BI_ROOT_PASSWORD
+# Migrate local DB to latest
+#RUN superset db upgrade
+# Setup roles
+#RUN superset init
