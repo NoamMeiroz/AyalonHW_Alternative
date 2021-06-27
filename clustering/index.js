@@ -57,8 +57,10 @@ app.post('/', (req,res) => {
                         response = JSON.parse(result);
                         if (response.code !==undefined) {
                             resCode = 400;
+                            logger.error(response);
                         }
-                        logger.info(response);
+                        else
+                            logger.info(response);
                     }
                     // catch error of the parse. This means the return result is an error string
                     catch(error) {

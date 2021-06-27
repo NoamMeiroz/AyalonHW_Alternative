@@ -83,7 +83,8 @@ const getCluster = (employers, livingCity, workingCity,
 							id: employee.id,
 							WORKER_ID: employee.WORKER_ID,
 							EMPLOYER_ID: employee.EMPLOYER_ID,
-							X: employee.X, Y: employee.Y
+							X: employee.X, Y: employee.Y,
+							WORK: {X: employee.WORK_X, Y: employee.WORK_Y}
 						}
 					})
 				};
