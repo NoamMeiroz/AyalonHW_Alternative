@@ -122,14 +122,26 @@ services:
       - ./secret:/etc/nginx/certs
       - node_logs:/spool/logs
       - pdf_files:/www/pdf
+  bi:
+    build:
+      dockerfile: dockerfile_bi
+      context: ./bi
+      args:
+        - BI_ROOT_PASSWORD=${BI_ROOT_PASSWORD}
+    depends_on:
+      - mysql
+    ports:
+      - 8000:8088
+    volumes: 
+      - bi-config:/app/pythonpath/
 volumes:
   db-data:
     driver: local
     driver_opts:
       o: bind
       type: None
-      #device: /home/amit/workspace/employers_program/db-data
-      device: /home/amit/workspace/employers_program/data/db_backup
+      device: /home/amit/workspace/employers_program/db-data
+      #device: /home/amit/workspace/employers_program/data/db_backup
   node_logs:
     driver: local
     driver_opts:
@@ -142,4 +154,9 @@ volumes:
       o: bind
       type: None
       device: ./pdf
-  
+  bi-config:
+    driver: local
+    driver_opts:
+      o: bind
+      type: None
+      device: /home/amit/workspace/employers_program/superset/AyalonHW_Alternative/bi/config

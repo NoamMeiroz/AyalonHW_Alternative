@@ -1,0 +1,49 @@
+// create view for BI 
+CREATE VIEW workers_view AS
+SELECT emp.NAME AS EMPLOYER,
+	wo.CITY as LIVING_CITY,
+    br.ADDRESS_CITY as WORKING_CITY,
+    ts_work.TIME_SLOT AS EXIT_HOUR_TO_WORK,
+    ts_home.TIME_SLOT AS RETURN_HOUR_TO_HOME,
+    wo.BEST_ROUTE_TO_HOME_BICYCLING_DURATION AS HOME_BICYCLING_DURATION,
+	wo.BEST_ROUTE_TO_HOME_TRANSIT_DURATION AS HOME_TRANSIT_DURATION,
+    wo.BEST_ROUTE_TO_HOME_WALKING_DURATION AS HOME_WALKING_DURATION,
+    wo.BEST_ROUTE_TO_HOME_DRIVING_DURATION AS HOME_DRIVING_DURATION,
+	wo.BEST_ROUTE_TO_WORK_BICYCLING_DURATION AS WORK_BICYCLING_DURATION,
+	wo.BEST_ROUTE_TO_WORK_TRANSIT_DURATION AS WORK_TRANSIT_DURATION,
+    wo.BEST_ROUTE_TO_WORK_WALKING_DURATION AS WORK_WALKING_DURATION,
+    wo.BEST_ROUTE_TO_WORK_DRIVING_DURATION AS WORK_DRIVING_DURATION
+FROM alternative.employees wo, 
+	alternative.employers emp, 
+    alternative.employers_sites br,
+    alternative.time_slots ts_home,
+	alternative.time_slots ts_work
+where wo.EMPLOYER_ID = emp.ID
+AND wo.WORK_SITE = br.ID
+AND wo.EMPLOYER_ID = br.EMPLOYER_ID
+AND wo.EXIT_HOUR_TO_WORK = ts_work.ID
+AND wo.RETURN_HOUR_TO_HOME = ts_home.ID
+AND wo.UPLOAD_ERROR IS NULL;
+
+//copy db config to azure bi-config share folder
+
+// upload bi container to the cloud
+az login
+az acr login --name nativelaasakimcr
+
+docker tag ayalonhw_alternative_bi nativelaasakimcr.azurecr.io/bi:1.0.0
+docker push nativelaasakimcr.azurecr.io/bi:1.0.0
+
+// recreate container
+az container delete --name ci-native-laasakim --resource-group rg-native-laasakim
+az container create -g rg-native-laasakim -f azure-deploy.yaml
+
+
+// login to the contianir
+
+# Setup your local admin account
+superset fab create-admin --username admin --firstname Superset --lastname Admin --email amit.brabbing@crg-eng.com --password $BI_ROOT_PASSWORD
+# Migrate local DB to latest
+superset db upgrade
+# Setup roles
+superset init
