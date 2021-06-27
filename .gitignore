@@ -7,3 +7,4 @@ bi/docker-compose.yml
 bi/dockerfile
 bi/dockerignore
 bi/dependencies.txt
+bi/config/__pycache__
