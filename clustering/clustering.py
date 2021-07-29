@@ -412,7 +412,6 @@ try:
         return None
 
 
-    # parse json
     employees = pd.DataFrame(parsedInput['employees'])
 
     # find employees who share XY locations
@@ -423,7 +422,10 @@ try:
     # split employees
     split = employees[[x.tolist() in split_XY for x in employees[['X','Y']].values]]
     employees = employees[~employees['id'].isin(split.id)]
-    scaled = preprocessing.scale(employees[['X','Y']])
+    # scaled = preprocessing.scale(employees[['X','Y']])
+    osrm_command = os.path.join(parsedInput['osrm_server'],'table/v1/driving/',';'.join([f'{x[0]},{x[1]}' for x in zip(employees.Y,employees.X)]))
+    osrm_response =  requests.get(osrm_command)
+    scaled = osrm_response.json()['durations']
 
     # create linkage
     Z = linkage(scaled, 'ward')
