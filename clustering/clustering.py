@@ -374,7 +374,7 @@ class KMeansConstrained(KMeans):
 
 try:
     # check input
-    schema = '{"maxCluster": "int", "employees": [{"id": "int", "EMPLOYER_ID": "int", "WORKER_ID": "str", "X": "float|int", "Y": "float|int"}, "..."]}'
+    schema = '{"osrm_server": "str", "maxCluster": "int", "employees": [{"id": "int", "EMPLOYER_ID": "int", "WORKER_ID": "str", "X": "float|int", "Y": "float|int"}, "..."]}'
     if json_schema.match(sys.argv[1],schema):
         # parse input
         parsedInput = json.loads(sys.argv[1])
