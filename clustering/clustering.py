@@ -21,6 +21,8 @@ from sklearn.metrics import silhouette_score
 import sklearn.preprocessing as preprocessing
 import traceback
 from json_schema import json_schema
+import os
+import requests
 
 # Internal scikit learn methods imported into this project
 from k_means_constrained.sklearn_import.cluster._k_means import _centers_dense, _centers_sparse
