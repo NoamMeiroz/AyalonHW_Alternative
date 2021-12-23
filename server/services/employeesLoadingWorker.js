@@ -72,7 +72,16 @@ const findRoutes = async function (employee, sites) {
       // calculate routes from home to work for the nearest work day at
       // the hour the employee is going to work
       // the hour it utc and not local because of google api 
-      let time = getNearestWorkDay(new Date(), getTimeSlotHour(employee.EXIT_HOUR_TO_WORK));
+      let timeSlot = 0; 
+      try {
+         timeSlot = getTimeSlotHour(employee.EXIT_HOUR_TO_WORK)
+      }
+      catch(error){
+         logger.error(error.stack);
+         employee.UPLOAD_ERROR = { error: "הערך בשעת יציאה ממקום העובדה אינו חוקי." };
+         return resolve(employee);
+      }
+      let time = getNearestWorkDay(new Date(), timeSlot);
       googleAPI.getRoutes(origin, destination, time)
          .then(routeResult => {
             employee.BEST_ROUTE_TO_WORK = routeResult;
@@ -81,19 +90,36 @@ const findRoutes = async function (employee, sites) {
          .then(empl => {
             // calculate routes from home to work for the nearest work day at
             // the hour the employee is going to work
-            // the hour it utc and not local because of google api 
-            let time = getNearestWorkDay(new Date(), getTimeSlotHour(empl.RETURN_HOUR_TO_HOME));
+            // the hour it utc and not local because of google api
+            let timeSlot = 0; 
+            try {
+               timeSlot = getTimeSlotHour(empl.RETURN_HOUR_TO_HOME);
+            }
+            catch(error){
+               logger.error(error.stack);
+               empl.UPLOAD_ERROR = { error: "הערך בשעת הגעה למקום העבודה אינו חוקי." };
+               return resolve(empl);
+            }
+            let time = getNearestWorkDay(new Date(), timeSlot);
             googleAPI.getRoutes(destination, origin, time)
                .then(routeHomeResult => {
                   empl.BEST_ROUTE_TO_HOME = routeHomeResult;
                   return resolve(empl);
                })
                .catch(error => {
+                  if (error instanceof ServerError) {
+                     empl.UPLOAD_ERROR = { error: error.message };
+                     return resolve(empl);
+                  }
                   logger.error(error.stack);
                   return reject(error);
                });
          })
          .catch(error => {
+            if (error instanceof ServerError) {
+               empl.UPLOAD_ERROR = { error: error.message };
+               return resolve(empl);
+            }
             logger.error(error.stack);
             return reject(error);
          });

@@ -24,20 +24,29 @@ const onmessage = (ws, message) => {
 
 // websocket server
 const wsServer = new WebSocket.Server({ noServer: true });
+wsServer.getUniqueID = function () {
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    }
+    return s4() + s4() + '-' + s4();
+};
+
 wsServer.on('connection', (ws, req) => {
 	// store socket in map
 //	const userId = request.session.userId;
-	const ip = req.headers['x-forwarded-for'].split(/\s*,\s*/)[0]; // get the ip of the client
-	map.set(ip, ws);
+	//const ip = req.headers['x-forwarded-for'].split(/\s*,\s*/)[0]; // get the ip of the client
+	ws.uid = wsServer.getUniqueID();
+	map.set(ws.uid, ws);
 
-	logger.info('connected websocket:'+ ip);
+	logger.info('connected websocket:'+ ws.uid);
 	ws.isAlive = true;
 	ws.on('message', message => onmessage(ws, message));
-
 	// remove client from map
 	ws.on('close', function () {
-		map.delete(ip);
-    });
+		logger.info(`Websocket for client ${ws.uid} is closed`);
+		map.delete(ws.uid);
+	});
+	sendMessage(ws.uid, {type: 'uid', payload: ws.uid});
 });
 
 
@@ -59,16 +68,17 @@ wsServer.on('close', function close() {
 	clearInterval(interval);
 });
 
-const sendMessage = (ip, message ) => {
-	ws = map.get(ip);
-	logger.debug(ip);
-	logger.debug(map);
+const sendMessage = (uid, message ) => {
+	ws = map.get(uid);
 	let messageToSend = message;
 	if (typeof message === 'object' && message !== null)
 		messageToSend = JSON.stringify(message);
 	if (message === null)
 		messageToSend = "";
-	ws.send(messageToSend);
+	if (ws)
+		ws.send(messageToSend);
+	else
+		logger.error(`Websocket client is null or invalid for uid: ${uid}`);
 }
 
 module.exports = { wsServer, sendMessage }; 

@@ -5,6 +5,7 @@ USER root
 
 # installing the MySQL driver to connect to the metadata database
 RUN pip install mysqlclient
+RUN pip install mysql-connector-python
 
 # Switching back to using the `superset` user
 #USER superset

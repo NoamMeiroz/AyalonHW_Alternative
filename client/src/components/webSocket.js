@@ -1,6 +1,6 @@
 import React, { createContext } from 'react'
 import { useDispatch } from 'react-redux';
-import { showMessage, connected, uploadResult, recalculateResult } from '../actions/index';
+import { showMessage, connected, uploadResult, recalculateResult, saveUID } from '../actions/index';
 
 const WebSocketContext = createContext(null)
 
@@ -96,6 +96,8 @@ export default ({ children }) => {
 					case 'recalculate_result':
 						dispatch(recalculateResult(data.payload));
 						break;
+					case 'uid':
+						dispatch(saveUID(data.payload));
 					default:
 						break
 				}

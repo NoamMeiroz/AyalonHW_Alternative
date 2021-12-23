@@ -90,7 +90,12 @@ const handleEmployerData = (data) => {
     });
 }
 
-const readSheet = (req, company_sheets) => {
+/**
+ * read an excel sheet and save data of the employer and it's employees in the database
+ * @param {*} uid unique websocket uid of the client
+ * @param {*} company_sheets 
+ */
+const readSheet = (uid, company_sheets) => {
     return new Promise(function (resolve, reject) {
         if (company_sheets == undefined) {
             return reject(new ServerError(status = 400, message = "קובץ אקסל לא תקין"));
@@ -143,7 +148,7 @@ const readSheet = (req, company_sheets) => {
                                 employer.Sites = data;
                                 try {
                                     // handle employees
-                                    employeesData.run(req, employer, employees);
+                                    employeesData.run(uid, employer, employees);
                                     resolve(employer);
                                 }
                                 catch (error) {
@@ -190,10 +195,10 @@ const readSheet = (req, company_sheets) => {
 /**
  * Update walking, driving, bycicle and public transportation suggested routes using google api
  * and update the marks
- * @param {*} req 
+ * @param {*} uid unique websocket id of the client 
  * @param {*} company_sheets 
  */
-const recalculateRoutes = (req, employerId) => {
+const recalculateRoutes = (uid, employerId) => {
     return new Promise(function (resolve, reject) {
         // set state to not ready 
         employerSchema.setEmployeeState(employerId, employerSchema.STATE.NOT_READY, ((error, data) => {
@@ -244,7 +249,7 @@ const recalculateRoutes = (req, employerId) => {
                         }
                         var employeesList = employees.map(employee => { return employee.dataValues });
                         try {
-                            employeesData.runRecalculate(req, employer.dataValues, employeesList);
+                            employeesData.runRecalculate(uid, employer.dataValues, employeesList);
                             return resolve("ok");
                         }
                         catch (error) {

@@ -184,28 +184,28 @@ const checkRouteResults = (payload) => {
 const getRoutes = async (origin, destination, time) => {
    return new Promise(function (resolve, reject) {
       if (!origin) {
-         return resolve(new ServerError(ERRORS.MISSING_ORIGIN_CODE, "missing origin"));
+         return resolve({ error: "לא ניתן לחשב מסלול. נתוני ישוב מגורים חסרים"});
       }
       if (!destination) {
-         return resolve(new ServerError(ERRORS.MISSING_DESTINATION_CODE, "missing destination"));
+         return resolve({ error: "לא ניתן לחשב מסלול. נתוני יעד חסרים"});
       }
       if (!origin.city) {
-         return resolve(new ServerError(ERRORS.MISSING_CITY_CODE, "missing city"));
+         return resolve({ error: "לא ניתן לחשב מסלול. שם ישוב מקום המגורים חסר."});
       }
       if (!origin.street) {
-         return resolve(new ServerError(ERRORS.MISSING_STREET_CODE, "missing street"));
+         return resolve({ error: "לא ניתן לחשב מסלול. שם הרחוב במקום המגורים חסר."});
       }
       if (origin.buildingNumber === null) {
-         return resolve(new ServerError(ERRORS.MISSING_BUILDING_NUMBER_CODE, "missing building number"));
+         return resolve({ error: "לא ניתן לחשב מסלול. מספר בניין חסר במקום המגורים."});
       }
       if (!destination.city) {
-         return resolve(new ServerError(ERRORS.MISSING_CITY_CODE, "missing city"));
+         return resolve({ error: "לא ניתן לחשב מסלול. שם ישוב מקום העבודה חסר."});
       }
       if (!destination.street) {
-         return resolve(new ServerError(ERRORS.MISSING_STREET_CODE, "missing street"));
+         return resolve({ error: "לא ניתן לחשב מסלול. שם הרחוב במקום העבודה חסר."});
       }
       if (destination.buildingNumber === null) {
-         return resolve(new ServerError(ERRORS.MISSING_BUILDING_NUMBER_CODE, "missing building number"));
+         return resolve({ error: "לא ניתן לחשב מסלול. מספר בניין חסר במקום העבודה."});
       }
       let originAddr = "";
       if (origin.buildingNumber === 0)

@@ -1,8 +1,7 @@
 import axios from 'axios';
-import { AUTH_USER, AUTH_ERROR, MESSAGE, CONNECTED } from './types';
+import { AUTH_USER, AUTH_ERROR, MESSAGE, CONNECTED, GET_UID } from './types';
 import * as actionUtils from '../utils/actionsUtil';
 import { getSettlementList, getTimeSlotToWork, getTimeSlotToHome } from './const';
-import { getEmployees} from './report';
 import { getData } from './company';
 
 
@@ -45,6 +44,7 @@ export const signin = (formProps, callback) => {
 export const signOut = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userName');
+    localStorage.removeItem('websocket_uid');
     return { type: AUTH_USER, payload: '', userName: '' };
 }
 
@@ -78,3 +78,21 @@ export const showMessage = (message) => {
     return { type: MESSAGE, message: message };
 }
 
+/**
+ * Save uid websocket in local storage
+ */
+export const saveUID = (uid) => {
+    return (dispatch) => {
+        localStorage.setItem('websocket_uid', uid); // save token use for later
+    }
+};
+
+/**
+ * Get uid websocket from local storage
+ */
+export const getUID = (uid) => {
+    return (dispatch) => {
+        const uid = localStorage.getItem('websocket_uid'); // get token 
+        dispatch({type: GET_UID, value: uid});
+    }
+};

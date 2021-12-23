@@ -8,3 +8,4 @@ bi/dockerfile
 bi/dockerignore
 bi/dependencies.txt
 bi/config/__pycache__
+bi/config

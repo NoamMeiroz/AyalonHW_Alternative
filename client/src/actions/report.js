@@ -147,7 +147,6 @@ export const getEmployees = (employers = [], livingCity = [], workingCity = [],
                     dispatch({ type: MESSAGE, message: "לא נמצאו נתונים לחתך הנבחר" });
                     dispatch({ type: GENERAL_REPORT_RUN, isRunning: false });
             }).catch(err => {
-                console.log(err);
                 let message = actionUtils.handleError(err);
                 dispatch({ type: ERROR, errorMessage: message });
                 dispatch({ type: GENERAL_REPORT_RUN, isRunning: false });

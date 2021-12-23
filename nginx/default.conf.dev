@@ -11,6 +11,10 @@ upstream api {
   server node_server:5000;
 }
 
+#upstream bi {
+#  server bi:8088;
+#}
+
 server {
   listen 443 ssl;
   server_name 127.0.01;
@@ -27,7 +31,6 @@ server {
   }
 
   location /api {
-    # rewrite /api/(.*) /$1 break;
     proxy_pass http://api;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
@@ -37,6 +40,26 @@ server {
     proxy_send_timeout 300;
     proxy_read_timeout 300;
   }
+
+ # location /bi {
+ #   proxy_pass http://bi;
+ #   proxy_set_header Host $host;
+ #   #proxy_set_header X-Scheme $scheme;
+ #   proxy_set_header X-Script-Name /bi;
+ #   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+ #   proxy_set_header X-Forwarded-Proto "https";   
+   # proxy_redirect off;
+ # }
+
+ # location ~ ^/(static|superset|sqllab|dashboard|savedqueryview|druid|tablemodelview|databaseview|databaseasync|dashboardmodelview|slicemodelview|dashboardasync|druiddatasourcemodelview|api|csstemplateasyncmodelview|chart|savedqueryviewapi|r|datasource|sliceaddview) {
+ #   try_files $uri /bi/$uri /bi/$uri?$query_string; # @rules;
+ # }
+
+  #location @rules {
+   # adapt "http://localhost" with your url
+   #return 308 http://$host:8088/$uri$is_args$query_string;
+  # rewrite ^(.*)$ /bi$1 last;
+  #}
 
   location ~ \.(pdf)$ {
     root /www/pdf;

@@ -6,6 +6,8 @@ from sklearn.utils.validation import check_array, check_random_state, as_float_a
 import pandas as pd
 import sklearn.preprocessing as preprocessing
 import json
+import os
+import requests
 import sys
 from scipy.cluster.hierarchy import dendrogram, linkage, cut_tree, fcluster
 from matplotlib import pyplot as plt
@@ -370,14 +372,19 @@ class KMeansConstrained(KMeans):
 
     def fit_predict(self, X, y=None):
         return self.fit(X).labels_
-
+    
+def read_in():
+    lines = sys.stdin.readlines()
+    #Since our input would only be having one line, parse our JSON data from that
+    return lines[0];
 
 try:
     # check input
-    schema = '{"maxCluster": "int", "employees": [{"id": "int", "EMPLOYER_ID": "int", "WORKER_ID": "str", "X": "float|int", "Y": "float|int"}, "..."]}'
-    if json_schema.match(sys.argv[1],schema):
+    inputData = read_in(); 
+    schema = '{"osrm_server": "str", "maxCluster": "int", "employees": [{"id": "int", "EMPLOYER_ID": "int", "WORKER_ID": "str", "X": "float|int", "Y": "float|int"}, "..."]}'
+    if json_schema.match(inputData,schema):
         # parse input
-        parsedInput = json.loads(sys.argv[1])
+        parsedInput = json.loads(inputData)
         # validate maxCluster as positive int
         if (not isinstance(parsedInput['maxCluster'],int)) or (parsedInput['maxCluster'] < 0):
             raise TypeError('maxCluster must be a positive integer')
@@ -412,7 +419,6 @@ try:
         return None
 
 
-    # parse json
     employees = pd.DataFrame(parsedInput['employees'])
 
     # find employees who share XY locations
@@ -423,7 +429,11 @@ try:
     # split employees
     split = employees[[x.tolist() in split_XY for x in employees[['X','Y']].values]]
     employees = employees[~employees['id'].isin(split.id)]
-    scaled = preprocessing.scale(employees[['X','Y']])
+    # scaled = preprocessing.scale(employees[['X','Y']])
+    osrm_command = os.path.join(parsedInput['osrm_server'],'table/v1/driving/',';'.join([f'{x[0]},{x[1]}' for x in zip(employees.Y,employees.X)]))
+    osrm_response =  requests.get(osrm_command)
+    response = osrm_response.json()
+    scaled = response['durations']
 
     # create linkage
     Z = linkage(scaled, 'ward')

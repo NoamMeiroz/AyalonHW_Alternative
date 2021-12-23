@@ -193,13 +193,10 @@ class MapPanel extends Component {
         });
     }
 
-    createClusterGroup(cluster) {
+    createClusterGroup(employees, cluster) {
         let jsx = [];
         let icon = "Cluster";
 
-        let employees = this.props.clusterReport.filter(emp => {
-            return (emp.cluster === cluster)
-        });
         if (cluster === -1)
             icon = "NoCluster";
 
@@ -215,7 +212,7 @@ class MapPanel extends Component {
 
     /**
      * show cluster report result a layer
-     */
+    
     createClusterLayer() {
         if (!this.props.clusterReport || this.props.clusterReport.length === 0)
             return null;
@@ -241,6 +238,31 @@ class MapPanel extends Component {
                 </LayersControl.Overlay>
             }
         });
+    }
+    */
+
+ /**
+     * show cluster report result a layer
+*/    
+    createClusterLayer() {
+        let jsx = [];
+        if (!this.props.clusterReport || this.props.clusterReport.length === 0)
+            return null;
+        let withCluster = this.props.clusterReport.filter(emp=>{
+            return (emp.cluster !== -1 )
+        });
+
+        let withoutCluster = this.props.clusterReport.filter(emp=>{
+            return (emp.cluster === -1 )
+        });
+
+        jsx[0] = <LayersControl.Overlay key={`cluster_with`} name={`דוח צימודים`} checked>
+                    {this.createClusterGroup(withCluster,1)}
+                </LayersControl.Overlay>
+        jsx[1] = <LayersControl.Overlay key={`cluster_without`} name={`ללא צימודים`} checked>
+                    {this.createClusterGroup(withoutCluster,-1)}
+                </LayersControl.Overlay>
+        return jsx;
     }
 
     /**
@@ -344,6 +366,7 @@ class MapPanel extends Component {
                 zoom={this.props.zoom}
                 onmoveend={this.handleMoveEnd}
                 maxZoom={14}
+                preferCanvas={true}
                 ref={this.mapRef}
             >
                 <LayersControl>

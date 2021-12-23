@@ -90,7 +90,7 @@ class Column {
 
     validityCheck(value) {
         // check if missing value
-        if ((!this.isNullable) && ((value === undefined)   || (value === null)))
+        if ((!this.isNullable) && ((value === undefined) || (value === null) || (value === NaN)))
             throw new ColumnError(ERROR_CODES.NULL_ERROR, `עמודה ${this.title} אינה מכילה ערך`);
         // if null value and it is allowed then stop checking
         if ((this.isNullable) && ((value === undefined) || (value === null)))
