@@ -6,6 +6,8 @@ from sklearn.utils.validation import check_array, check_random_state, as_float_a
 import pandas as pd
 import sklearn.preprocessing as preprocessing
 import json
+import os
+import requests
 import sys
 from scipy.cluster.hierarchy import dendrogram, linkage, cut_tree, fcluster
 from matplotlib import pyplot as plt
@@ -372,14 +374,24 @@ class KMeansConstrained(KMeans):
 
     def fit_predict(self, X, y=None):
         return self.fit(X).labels_
-
+    
+def read_in():
+    lines = sys.stdin.readlines()
+    #Since our input would only be having one line, parse our JSON data from that
+    return lines[0];
 
 try:
     # check input
+<<<<<<< HEAD
+    inputData = read_in(); 
+    schema = '{"osrm_server": "str", "maxCluster": "int", "employees": [{"id": "int", "EMPLOYER_ID": "int", "WORKER_ID": "str", "X": "float|int", "Y": "float|int"}, "..."]}'
+    if json_schema.match(inputData,schema):
+=======
     schema = '{"osrm_server": "str", "maxCluster": "int", "employees": [{"id": "int", "EMPLOYER_ID": "int", "WORKER_ID": "str", "X": "float|int", "Y": "float|int"}, "..."]}'
     if json_schema.match(sys.argv[1],schema):
+>>>>>>> 25f3b8a0dec2b77b1954ff3f070e1a4d9b052a0d
         # parse input
-        parsedInput = json.loads(sys.argv[1])
+        parsedInput = json.loads(inputData)
         # validate maxCluster as positive int
         if (not isinstance(parsedInput['maxCluster'],int)) or (parsedInput['maxCluster'] < 0):
             raise TypeError('maxCluster must be a positive integer')
@@ -427,7 +439,8 @@ try:
     # scaled = preprocessing.scale(employees[['X','Y']])
     osrm_command = os.path.join(parsedInput['osrm_server'],'table/v1/driving/',';'.join([f'{x[0]},{x[1]}' for x in zip(employees.Y,employees.X)]))
     osrm_response =  requests.get(osrm_command)
-    scaled = osrm_response.json()['durations']
+    response = osrm_response.json()
+    scaled = response['durations']
 
     # create linkage
     Z = linkage(scaled, 'ward')

@@ -32,3 +32,4 @@ export const MAP_CHANGE = 'map_change'; // saving the map position
 export const DELETE_COMPANY = "delete_company";
 export const RECALCULATE_COMPANY = "recalculate_company";
 export const START_RECALCULATE_COMPANY = 'start_recalculate_company';
+export const GET_UID = 'set_uid';

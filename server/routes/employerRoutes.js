@@ -19,9 +19,27 @@ const requireAuth = passport.authenticate('jwt', { session: false });
 router.post("/upload/", requireAuth, formidableMiddleware(), async (req, res, next) => {
    let url = URL.parse(req.url, true);
    let xlsxSheets;
+
+   let isError = false;
+   let uid = -1;
+   if (req.fields)  {
+      if (req.fields.uid) {
+         uid = req.fields.uid;
+      }
+      else {
+         logger.info("uid is missing.");
+         res.status(400).send("מזהה לקוח חסר.");
+         return;
+      }
+   }
+   else {
+      logger.info("body is missing.");
+      res.status(400).send("מזהה לקוח חסר.");
+      return;
+   }
    xlsxSheets = await excel.post_file(req, res, url.query.f);
    if (xlsxSheets) {
-      companyData.readSheet(req, xlsxSheets).then(data => {
+      companyData.readSheet(uid, xlsxSheets).then(data => {
          res.status(200).json(data);
       }).catch(error => {
          if (error.status)
@@ -158,13 +176,21 @@ router.delete("/:employerId", requireAuth, (req, res, next) => {
 /**
  * run the recalculation procedure to update best routes and marks
  */
-router.get("/:employerId/recalculate", requireAuth, (req, res, next) => {
+router.put("/:employerId/recalculate", requireAuth, (req, res, next) => {
    let errorMessage = "employer id is missing or incorrect";
    let isError = false;
+   let uid = -1;
    if (req.params) {
-      if ((req.params.employerId) && isInteger(req.params.employerId)) {
+      if (req.body.uid) {
+         uid = req.body.uid;
+      }
+      else {
+         isError = true;
+         errorMessage = "Websocket uid is missing";
+      }
+      if (!isError && (req.params.employerId) && isInteger(req.params.employerId)) {
          empId = parseInt(req.params.employerId);
-         companyData.recalculateRoutes(req, empId).then((payload) => {
+         companyData.recalculateRoutes(uid, empId).then((payload) => {
             res.status(200).json(payload);
          }).catch(error => {
             if (error.status)

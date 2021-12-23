@@ -1,0 +1,22 @@
+//create osrm data folder and copy data 
+
+// upload bi container to the cloud
+az login
+az acr login --name nativelaasakimcr
+
+docker tag ayalonhw_alternative_clustering nativelaasakimcr.azurecr.io/clustering:1.4.0
+docker push nativelaasakimcr.azurecr.io/clustering:1.4.0
+
+docker tag ayalonhw_alternative_node_server nativelaasakimcr.azurecr.io/node_server:1.4.0
+docker push nativelaasakimcr.azurecr.io/node_server:1.4.0
+
+docker tag ayalonhw_alternative_native_laasakim nativelaasakimcr.azurecr.io/native_laasakim:1.4.0
+docker push nativelaasakimcr.azurecr.io/native_laasakim:1.4.0
+
+docker tag osrm/osrm-backend nativelaasakimcr.azurecr.io/osrm:1.1.0
+docker push nativelaasakimcr.azurecr.io/osrm:1.1.0
+
+
+// recreate container
+az container delete --name ci-native-laasakim --resource-group rg-native-laasakim
+az container create -g rg-native-laasakim -f azure-deploy.yaml

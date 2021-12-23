@@ -8,8 +8,11 @@ const app = express();
 
 // use middleware
 // app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({limit: '10mb', extended: true}));
+app.use(bodyParser.json({limit: '10mb', extended: true}));
+
+const OSRM_SERVER = process.env.OSRM_SERVER;
+const OSRM_PORT = process.env.OSRM_PORT;
 
 // curl request
 // curl -X POST --header "Content-Type: Application/json" localhost:3000 -d '{"name":"Amit"}'
@@ -17,12 +20,13 @@ app.use(bodyParser.json());
 app.post('/', (req,res) => {
         // parse request body
         var sample_data = req.body;
+        sample_data.osrm_server = `http://${OSRM_SERVER}:${OSRM_PORT}`;
         var script_output = [];
         var start = performance.now();
         logger.info("Start cluster calculation");
         try {
             // spawn a process with the python code using the body as input for the code
-            const pythonProcess = spawn('python',["clustering.py",JSON.stringify(sample_data)]);
+            const pythonProcess = spawn('python',["clustering.py"]); //,JSON.stringify(sample_data)]);
             var length = sample_data.employees.length;
 
             // save result from the pyhton report
@@ -57,8 +61,10 @@ app.post('/', (req,res) => {
                         response = JSON.parse(result);
                         if (response.code !==undefined) {
                             resCode = 400;
+                            logger.error(response);
                         }
-                        logger.info(response);
+                        else
+                            logger.info(response);
                     }
                     // catch error of the parse. This means the return result is an error string
                     catch(error) {
@@ -76,6 +82,10 @@ app.post('/', (req,res) => {
                 }
                 
             });
+
+            // write input to python;
+            pythonProcess.stdin.write(JSON.stringify(sample_data));
+            pythonProcess.stdin.end();
         }
         catch (error) {
             res.status(500).send(error);

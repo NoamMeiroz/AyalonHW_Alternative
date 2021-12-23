@@ -14,6 +14,8 @@ class Street extends Column {
         let street;
         try {
             street = value.trim();
+            if (street.length===0)
+                throw new ColumnError(ERROR_CODES.NULL_ERROR, `עמודה ${this.title} אינה מכילה ערך`);
         }
         catch(error) {
             throw new ColumnError(ERROR_CODES.INPUT_ERROR, `הערך ${value} ב ${this.title} אינו תקין`);

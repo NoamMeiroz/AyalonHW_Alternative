@@ -227,6 +227,7 @@ class DownloadButton extends Component {
             let employeeList = payload.data;
             if (employeeList && !(typeof employeeList === "string")) {
                employeeList.forEach((emp) => {
+                  try{
                   emp.ERROR = "";
                   let temp = {};
                   if (!emp.UPLOAD_ERROR) {
@@ -291,6 +292,11 @@ class DownloadButton extends Component {
                   delete emp.BEST_ROUTE_TO_WORK;
                   delete emp.BEST_ROUTE_TO_HOME;
                   delete emp.UPLOAD_ERROR;
+               }
+               catch(err) {
+                  console.log(err);
+                  console.log(emp);
+               }
                });
                this.exportToCSV(employeeList, fileName);
             }

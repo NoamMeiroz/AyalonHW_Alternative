@@ -27,7 +27,7 @@ class TimeSlot extends Column {
         if ((!this.isNullable) && ((value === undefined)   || (value === null)))
             throw new ColumnError(ERROR_CODES.NULL_ERROR, `עמודה ${this.title} אינה מכילה ערך`);
         // if null value and it is allowed then stop checking
-        if ((this.isNullable) && ((value === undefined) || (value === null)))
+        if ((this.isNullable) && ((value === undefined) || (value === null) || (value === 0) ))
             return this.defaultValue;
         this.checkType(this.type, value);
         this.checkLength(this.length, this.type, value);

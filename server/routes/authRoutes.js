@@ -22,7 +22,7 @@ router.post("/signin/", formidableMiddleware(), function (req, res, next) {
    next();
 }, requireSignin, authenticationService.signin);
 
-router.post("/signup/", authenticationService.singup);
+//router.post("/signup/", authenticationService.singup);
 
 
 module.exports = router;

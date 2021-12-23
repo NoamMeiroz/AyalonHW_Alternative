@@ -17,6 +17,19 @@ services:
     volumes: 
       - db-data:/var/lib/mysql
       - ./mysql:/etc/mysql/conf.d
+  osrm:
+    image: osrm/osrm-backend
+    restart: always
+    volumes:
+      - db-osrm:/data
+    ports:
+      - '6000:4000'
+    stdin_open: true
+    tty: true
+    #command: ["osrm-extract", "-p", "/opt/car.lua", "/data/israel-and-palestine-latest.osm.pbf"] 
+    #command: ["osrm-partition", "/data/israel-and-palestine-latest.osrm"] 
+    #command: ["osrm-customize", "/data/israel-and-palestine-latest.osrm"]
+    command: ["osrm-routed", "--port", "4000", "--max-table-size", "1000000", "--algorithm", "mld", "/data/israel-and-palestine-latest.osrm"]
   clustering:
     build:
       context: ./clustering
@@ -27,10 +40,14 @@ services:
       - ./clustering/logs:/clustering/logs
     environment:
       - PORT=${CLUSTERING_PORT}
+      - OSRM_SERVER=osrm
+      - OSRM_PORT=4000
     restart: always
     stdin_open: true
     tty: true
     command: ["npm", "run", "start"] 
+    depends_on:
+      - osrm
   node_server:
     build:
       context: ./server
@@ -85,6 +102,8 @@ services:
   native_laasakim:
     environment:
       - REACT_APP_SERVER=ayalon.promise-dev.com
+      - IMAGE_INLINE_SIZE_LIMIT=0
+      - INLINE_RUNTIME_CHUNK=false
     build:
       context: ./client
       dockerfile: .dockerfile
@@ -134,14 +153,18 @@ services:
       - 8000:8088
     volumes: 
       - bi-config:/app/pythonpath/
+      - ./secret:/app/secret
+    # command: ["superset", "run", "--cert", "/app/secret/native.crt", "--key", "/app/secret/native.key", -p, "8088", -h, "0.0.0.0"]
+    command: ["gunicorn", "-w 8", "--timeout", "120", "-b 0.0.0.0:8088", "--limit-request-line", "0", "--limit-request-field_size", "0", "--certfile", "/app/secret/native.crt", "--keyfile", "/app/secret/native.key", "superset.app:create_app()"]
+    # command: ["flask", "run", "-p", "8088", "--with-threads", "--reload", "--cert=/app/secret/native.crt", "--key=/app/secret/native.key", "--host=0.0.0.0"]
 volumes:
   db-data:
     driver: local
     driver_opts:
       o: bind
       type: None
-      device: /home/amit/workspace/employers_program/db-data
-      #device: /home/amit/workspace/employers_program/data/db_backup
+      #device: /home/amit/workspace/employers_program/db-data
+      device: /home/amit/workspace/employers_program/data/db_backup
   node_logs:
     driver: local
     driver_opts:
@@ -154,9 +177,15 @@ volumes:
       o: bind
       type: None
       device: ./pdf
+  db-osrm:
+    driver: local
+    driver_opts: 
+      o: bind
+      type: None
+      device: /home/amit/workspace/employers_program/db-osrm
   bi-config:
     driver: local
     driver_opts:
       o: bind
       type: None
-      device: /home/amit/workspace/employers_program/superset/AyalonHW_Alternative/bi/config
+      device: /home/amit/workspace/employers_program/reports/AyalonHW_Alternative/bi/config

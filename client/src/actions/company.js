@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {getUID} from './index';
 import {
     START_FILE_UPLOAD,
     LOAD_DATA,
@@ -19,6 +20,7 @@ import * as actionUtils from '../utils/actionsUtil';
  */
 export const upload = (file) => {
     const form = new FormData();
+    form.append("uid", localStorage.getItem('websocket_uid'));
     form.append("file", file);
     return (dispatch) => {
         axios.post(`/api/employer/upload/`,
@@ -143,7 +145,9 @@ export const deleteCompany = (employerId) => {
  */
 export const recalculate = (employerId) => {
     return (dispatch) => {
-        axios.get(`/api/employer/${employerId}/recalculate`, actionUtils.getAxiosHeader())
+        axios.put(`/api/employer/${employerId}/recalculate`,
+            {"uid": localStorage.getItem('websocket_uid')}, 
+            actionUtils.getAxiosHeader())
             .then(() => {
                 dispatch({ type: START_RECALCULATE_COMPANY, isSuccess: true, employerID: employerId });
                 dispatch({ type: RECALCULATE_COMPANY, employerID: employerId});

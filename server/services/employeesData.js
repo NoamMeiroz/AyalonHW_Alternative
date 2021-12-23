@@ -16,9 +16,14 @@ function employeesService(workerData) {
 	})
 }
 
-async function run(req, employer, employees) {
+/**
+ * 
+ * @param {*} uid 
+ * @param {*} employer 
+ * @param {*} employees 
+ */
+async function run(uid, employer, employees) {
 	logger.info(employer.NAME + ": saving employees information...");
-	const ip = req.headers['x-forwarded-for'].split(/\s*,\s*/)[0]; // get the ip of the client
 	let state = employerSchema.STATE.READY;
 	try {
 		result = await employeesService({ employer, employees });
@@ -30,7 +35,7 @@ async function run(req, employer, employees) {
 			logger.info(`upload result ${employer.NAME}: ${JSON.stringify(payload)}`);
 			payload.employerID = employer.id;
 			// notify client about the upload result; 
-			sendMessage(ip, {type: "upload_result", payload: payload });
+			sendMessage(uid, {type: "upload_result", payload: payload });
 		}
 	}
 	catch (error) {
@@ -118,9 +123,8 @@ function recalculateService(workerData) {
 }
 
 
-async function runRecalculate(req, employer, employees) {
+async function runRecalculate(uid, employer, employees) {
 	logger.info(employer.NAME + ": updating employees routes and marks...");
-	const ip = req.headers['x-forwarded-for'].split(/\s*,\s*/)[0]; // get the ip of the client
 	let state = employerSchema.STATE.READY;
 	try {
 		result = await recalculateService({ employer, employees });
@@ -131,7 +135,7 @@ async function runRecalculate(req, employer, employees) {
 			let payload = result.Employees;
 			payload.employerID = employer.id;
 			// notify client about the upload result; 
-			sendMessage(ip, {type: "recalculate_result", payload: payload });
+			sendMessage(uid, {type: "recalculate_result", payload: payload });
 		}
 	}
 	catch (error) {
