@@ -4,6 +4,7 @@ const router = express.Router();
 const { logger } = require("../log");
 const localityData = require("../services/localityData");
 const timeSlotsData = require("../services/timeSlotsData");
+const siteData = require("../services/siteData");
 
 
 /**
@@ -53,6 +54,24 @@ router.get("/returnToHomeTimeSlots", requireAuth, (req, res, next) => {
  */
 router.get("/locality", requireAuth, (req, res, next) => {
     localityData.getAllLocality()
+        .then(payload => {
+            res.status(200).json(payload);
+        })
+        .catch(error => {
+            if (error.status)
+                res.status(error.status).send(error.message);
+            else {
+                logger.error(error.stack);
+                res.status(500).send("Internal Error");
+            }
+        });
+});
+
+/**
+ * return list of distinct compounds
+ */
+router.get("/compounds", requireAuth, (req, res, next) => {
+    siteData.getUniqueCompounds()
         .then(payload => {
             res.status(200).json(payload);
         })

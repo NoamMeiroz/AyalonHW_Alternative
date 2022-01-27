@@ -123,6 +123,7 @@ const getEmployeesOfEmployer = (employerId, livingCity = [], workingCity = [], c
    { model: TimeSlots, as: "ExitHourToWork" }, { model: TimeSlots, as: "ReturnHourToHome" }];
    if (workingCity && workingCity.length > 0)
       include[0].where = { ADDRESS_CITY: { [Op.in]: workingCity } };
+   
    whereClause = { ...whereClause, include };
    Employee.findAll(
       whereClause
@@ -195,12 +196,19 @@ getWhereForStartingPolygon = (startingPolygon) => {
 
 /**
  * Return any employee working in one of the a given employers
- * @param {[]]} employerId- list of employer ids.
- * @param {[]} livingCity  - list of cities names where employees live
- * @param {[]} workingCity  - list of cities names where employees works
+ * @param {*} employerList 
+ * @param {*} livingCity 
+ * @param {*} workingCity 
+ * @param {*} compounds 
+ * @param {*} timeSlotWork 
+ * @param {*} timeSlotHome 
+ * @param {*} marks 
+ * @param {*} destinationPolygon 
+ * @param {*} startingPolygon 
  * @param {*} callback 
  */
 const getEmployees = (employerList, livingCity = [], workingCity = [],
+   compounds = [],
    timeSlotWork = [], timeSlotHome = [], marks = {},
    destinationPolygon = {}, startingPolygon = {}, callback) => {
    let whereClause = {
@@ -263,12 +271,23 @@ const getEmployees = (employerList, livingCity = [], workingCity = [],
          include[0].where = filter;//{...whereClause.where, ...filter};
       }
    }
+   
+   // working city where condition (in site)
    if (workingCity && workingCity.length > 0) {
       if (include[0].where)
          include[0].where = { [Op.and]: [{ "ADDRESS_CITY": { [Op.in]: workingCity } }, include[0].where] };
       else
          include[0].where = { "ADDRESS_CITY": { [Op.in]: workingCity } };
    }
+
+   // compound where condition (in site)
+   if (compounds && compounds.length > 0) {
+      if (include[0].where)
+         include[0].where = { [Op.and]: [{ "COMPOUND": { [Op.in]: compounds } }, include[0].where] };
+      else
+         include[0].where = { "COMPOUND": { [Op.in]: compounds } };
+   } 
+
    // combine to create a final where
    whereClause = { ...whereClause, include };
    Employee.findAll(

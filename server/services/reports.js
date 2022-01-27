@@ -10,9 +10,10 @@ const { employee } = require('../db/database');
  * @param {} data 
  */
 const getEmployeesOfEmployer = (employers, livingCity, workingCity,
+	compounds,
 	timeSlotWork, timeSlotHome, marks, destinationPolygon, startingPolygon) => {
 	return new Promise(function (resolve, reject) {
-		employeeSchema.getEmployees(employers, livingCity, workingCity,
+		employeeSchema.getEmployees(employers, livingCity, workingCity, compounds,
 			timeSlotWork, timeSlotHome, marks, destinationPolygon, startingPolygon, (err, payload) => {
 				if (err) {
 					logger.error(err.stack);
@@ -67,17 +68,17 @@ const getEmployeesOfEmployer = (employers, livingCity, workingCity,
  * @param {} data 
  */
 const getCluster = (employers, livingCity, workingCity,
+	compounds,
 	timeSlotWork, timeSlotHome, marks, destinationPolygon, startingPolygon, clusterBoundery) => {
 	return new Promise(function (resolve, reject) {
 		getEmployeesOfEmployer(employers, livingCity, workingCity,
+			compounds,
 			timeSlotWork, timeSlotHome, marks, destinationPolygon, startingPolygon)
 			.then(empList => {
 				if (empList.length === 0)
 					return resolve(empList);
 				let data = {
 					maxCluster: clusterBoundery,
-					//maxCluster: clusterBoundery[1],
-					// minCluster: clusterBoundery[0], 
 					employees: empList.map(employee => {
 						return {
 							id: employee.id,

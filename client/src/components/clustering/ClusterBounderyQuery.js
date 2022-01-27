@@ -112,22 +112,14 @@ function ClusterBounderyQuery({ qClusterBoundery }) {
     const qStartingPolygon = useSelector(state => state.reportParams.qStartingPolygonParams.polygon);
     const qClusterBounderyParams = useSelector(state => state.reportParams.qClusterBoundery);
     const isClusterReportRunnig = useSelector(state => state.reports.isClusterReportRunnig);
+    const qCompoundParams = useSelector(state => state.reportParams.qCompoundParams);
 
 
     const handleClick = () => {
-        /*let cityList = qWorkingCityParams.map(city => {
-            return city[CITY_NAME_COLUMN];
-        });
-        let workingCity = qLivingCityParams.map(city => {
-            return city[CITY_NAME_COLUMN];
-        });
-        let companies = qCompanyParams.map(company => {
-            return company.id;
-        })*/
-
         dispatch(actions.calculateCluster(qCompanyParams,
             qLivingCityParams,
             qWorkingCityParams,
+            qCompoundParams,
             qTimeSlotToWork,
             qTimeSlotToHome,
             qSelectedMarks,

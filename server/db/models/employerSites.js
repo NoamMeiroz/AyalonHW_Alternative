@@ -41,7 +41,10 @@ module.exports = (sequelize, Sequelize) => {
         NUM_OF_EMPLOYEES: {
             type: Sequelize.INTEGER,
             allowNull: false,
-        }
+        },
+        COMPOUND: {
+            type: Sequelize.STRING(50),
+        },
     }
     );
     return EmployerSites;

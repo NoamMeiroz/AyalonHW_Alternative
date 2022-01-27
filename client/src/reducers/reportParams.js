@@ -3,7 +3,7 @@ import {
     QUERY_TIME_SLOT_HOME, QUERY_TIME_SLOT_WORK,
     QUERY_COMPANY, QUERY_LIVING_CITY, QUERY_WORKING_CITY, QUERY_MARK,
     QUERY_STARTING_POLYGON, QUERY_DESTINATION_POLYGON,
-    QUERY_CLUSTRING_BOUNDERY
+    QUERY_CLUSTRING_BOUNDERY, QUERY_COMPOUNDS
 } from '../actions/types';
 const MIN_MARK = -1;
 const MAX_MARK = 16;
@@ -12,6 +12,7 @@ const INITIAL_STATE = {
     qTimeSlotHomeParams: [],
     qTimeSlotWorkParams: [],
     qCompanyParams: [],
+    qCompoundParams: [],
     qSelectedMarks: {
         FINAL_SHORT_HOURS_GRADE: [MIN_MARK, MAX_MARK],
         FINAL_SHIFTING_HOURS_GRADE: [MIN_MARK, MAX_MARK],
@@ -92,6 +93,12 @@ export default function (state = INITIAL_STATE, action) {
             return {
                 ...state,
                 qStartingPolygonParams: action.value,
+                timestamp: new Date()
+            }
+        case QUERY_COMPOUNDS:
+            return {
+                ...state,
+                qCompoundParams: action.compoundList,
                 timestamp: new Date()
             }
         default:
