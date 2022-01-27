@@ -8,24 +8,26 @@ const getMessage = require("./errorCode").getMessage;
  * @param {*} callback 
  */
 const insertBulk = (sites, callback) => {
-  
-    // Save in the database
-    EmployerSites.bulkCreate(sites)
-      .then(data=>{callback(null, data)})
-      .catch(err=>{ 
-          callback(err, getMessage(err));});
-  };
+
+  // Save in the database
+  EmployerSites.bulkCreate(sites)
+    .then(data => { callback(null, data) })
+    .catch(err => {
+      callback(err, getMessage(err));
+    });
+};
 
 /**
  * Delete all sites of employer
- * @param {*} employerID
+ * @param {*} employerId
  * @param {*} callback 
  */
-const deleteSites = (employerID, callback) => {
-    EmployerSites.destroy({ where: { employer_id: employerID }})
-        .then(data=>{callback(null, data)})
-        .catch(err=>{ 
-            callback(err, getMessage(err));});
+const deleteSites = (employerId, callback) => {
+  EmployerSites.destroy({ where: { employer_id: employerId } })
+    .then(data => { callback(null, data) })
+    .catch(err => {
+      callback(err, getMessage(err));
+    });
 }
 
 /**
@@ -35,14 +37,14 @@ const deleteSites = (employerID, callback) => {
  * @param {*} callback (err, result)
  */
 const insertSites = (employerId, sites, callback) => {
-    // Save Tutorial in the database
-    deleteSites(employerId, (err, data) => {
-        if (!err)
-            insertBulk(sites, callback);
-        else
-            callback(err, data);
-    });
-  };
+  // Save Tutorial in the database
+  deleteSites(employerId, (err, data) => {
+    if (!err)
+      insertBulk(sites, callback);
+    else
+      callback(err, data);
+  });
+};
 
 /**
  * Get all companies
@@ -50,9 +52,20 @@ const insertSites = (employerId, sites, callback) => {
  */
 const getAllSites = (employerId, callback) => {
   // find emp in the database
-  EmployerSites.findAll({ where : { employer_id: employerId }})
-    .then(data=>{callback(null, data)})
-    .catch(err=>{callback(err, getMessage(err));});
+  EmployerSites.findAll({ where: { employer_id: employerId } })
+    .then(data => { callback(null, data) })
+    .catch(err => { callback(err, getMessage(err)); });
 };
 
-module.exports = { insertSites, getAllSites, deleteSites};
+const getUniqueCompounds = (callback) => {
+  EmployerSites.findAll({
+    attributes: [[db.sequelize.fn('DISTINCT', 
+      db.sequelize.col('compound')), 
+      'NAME']],
+    order: ['compound']
+  })
+  .then(data => { callback(null, data) })
+  .catch(err => { callback(err, getMessage(err)); });
+}
+
+module.exports = { insertSites, getAllSites, deleteSites, getUniqueCompounds };

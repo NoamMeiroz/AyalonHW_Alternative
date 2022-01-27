@@ -15,6 +15,7 @@ const SITE_COLUMNS = [
     new City("ADDRESS_CITY", "עיר"),
     new Street("ADDRESS_STREET", "רחוב"),
     new BuildingNumber("ADDRESS_BUILDING_NUMBER", "מספר"),
+    new Column("COMPOUND", "מתחם", TYPES.STRING, 50, false),
 ];
 
 
@@ -162,4 +163,24 @@ const handleBranchData = (branches, emploeesList) => {
             });
     });
 }
-module.exports = { handleBranchData, saveSites };
+
+/**
+ * get list of all distinctCompunds
+ * @param {} data 
+ */
+const getUniqueCompounds = () => {
+    return new Promise(function (resolve, reject) {
+        employerSitesSchema.getUniqueCompounds((err, data) => {
+            if (err) {
+                logger.error(err);
+                return reject(new ServerError(500, err));
+            }
+            let compoundList = [];
+            if (data)
+                compoundList = data.map(compound => compound.dataValues);
+            resolve(compoundList);
+        });
+    });
+}
+
+module.exports = { handleBranchData, saveSites, getUniqueCompounds };

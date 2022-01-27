@@ -6,6 +6,7 @@ import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
 import HomeIcon from '@material-ui/icons/Home';
 import EmojiTransportationIcon from '@material-ui/icons/EmojiTransportation';
+import AssessmentIcon from '@material-ui/icons/Assessment';
 import RoomIcon from '@material-ui/icons/Room';
 import lime from '@material-ui/core/colors/lime';
 
@@ -19,6 +20,7 @@ class SideBar extends Component {
             map: false,
             clustering: false,
             companies: false,
+            bi: false
         }
     };
 
@@ -78,6 +80,18 @@ class SideBar extends Component {
                                 component={Link} to="/companies">
                                 <EmojiTransportationIcon />
                                 רשימת החברות
+                            </IconButton>
+                        </div>
+                        <div>
+                            <IconButton edge="start" style={{ color: lime[50] }} aria-label="BI"
+                                className={this.state.active.bi ? "active" : null}
+                                onClick={(e) => {
+                                    this.setActive("bi");
+                                }}
+                                target="_blank"
+                                href="https://ayalon.promise-dev.com:8088/superset/dashboard/1/">
+                                <AssessmentIcon />
+                                BI
                             </IconButton>
                         </div>
                     </div>

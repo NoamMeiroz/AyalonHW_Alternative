@@ -43,6 +43,7 @@ class Column {
                 else
                     // convert number values as string
                     result = "" + value;
+                result = result.trim();
                 break;
             default:
                 break;

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { AUTH_USER, AUTH_ERROR, MESSAGE, CONNECTED, GET_UID } from './types';
 import * as actionUtils from '../utils/actionsUtil';
-import { getSettlementList, getTimeSlotToWork, getTimeSlotToHome } from './const';
+import { getSettlementList, getTimeSlotToWork, getTimeSlotToHome, getCompundList } from './const';
 import { getData } from './company';
 
 
@@ -62,6 +62,7 @@ export const connected = (isConnected) => {
             dispatch(getTimeSlotToHome());
             dispatch(getTimeSlotToWork());
             dispatch(getSettlementList());
+            dispatch(getCompundList());
 
         }
         else 

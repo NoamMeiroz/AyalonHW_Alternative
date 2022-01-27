@@ -73,9 +73,11 @@ router.post("/employee", requireAuth, (req, res, next) => {
             let timeSlotHome = req.body.timeSlotHome;
             let destinationPolygon = req.body.destinationPolygon;
             let startingPolygon = req.body.startingPolygon;
+            let compounds = req.body.compounds;
 
             let marks = req.body.marks;
             reports.getEmployeesOfEmployer(companies, livingCity, workingCity, 
+                compounds,
                 timeSlotWork, timeSlotHome, marks, 
                 destinationPolygon, startingPolygon).then((payload) => {
                 res.status(200).json(payload);
@@ -129,9 +131,11 @@ router.post("/cluster", requireAuth, (req, res, next) => {
             let destinationPolygon = req.body.destinationPolygon;
             let startingPolygon = req.body.startingPolygon;
             let clusterBoundery = req.body.clusterBoundery;
+            let compounds = req.body.compounds;
 
             let marks = req.body.marks;
             reports.getCluster(companies, livingCity, workingCity, 
+                compounds,
                 timeSlotWork, timeSlotHome, marks, 
                 destinationPolygon, startingPolygon, clusterBoundery).then((payload) => {
                 res.status(200).json(payload);

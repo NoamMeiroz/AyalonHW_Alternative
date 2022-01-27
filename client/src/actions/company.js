@@ -11,7 +11,7 @@ import {
     RECALCULATE_COMPANY,
     START_RECALCULATE_COMPANY
 } from './types';
-import {UPLOAD_FAILED} from './const';
+import {UPLOAD_FAILED, getCompundList} from './const';
 import * as actionUtils from '../utils/actionsUtil';
 
 /**
@@ -52,6 +52,7 @@ export const uploadResult = (result) => {
     return (dispatch) => {
         dispatch({ type: UPLOAD_RESULT, result: result });
         dispatch({ type: MESSAGE, message: `תהליך הטעינה הסתיים: נטענו בהצלחה ${result.successCount} מתוך ${result.total}` })
+        dispatch(getCompundList());
     }
 };
 
@@ -131,7 +132,7 @@ export const deleteCompany = (employerId) => {
             .then(() => {
                 dispatch({ type: DELETE_COMPANY, isSuccess: true, employerID: employerId });
                 dispatch({ type: MESSAGE, message: `מחיקת החברה הסתיימה בהצלחה` });
-                
+                dispatch(getCompundList());
             }).catch(err => {
                 let message = actionUtils.handleError(err);
                 dispatch({ type: ERROR, errorMessage: message });

@@ -163,8 +163,8 @@ volumes:
     driver_opts:
       o: bind
       type: None
-      #device: /home/amit/workspace/employers_program/db-data
-      device: /home/amit/workspace/employers_program/data/db_backup
+      device: /home/amit/workspace/employers_program/db-data
+      #device: /home/amit/workspace/employers_program/data/db_backup
   node_logs:
     driver: local
     driver_opts:

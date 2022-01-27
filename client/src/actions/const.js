@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as actionUtils from '../utils/actionsUtil';
 import {
-    ERROR, SETTLEMENT_LIST, TIME_SLOT_TO_HOME, TIME_SLOT_TO_WORK
+    ERROR, SETTLEMENT_LIST, TIME_SLOT_TO_HOME, TIME_SLOT_TO_WORK, COMPOUND_LIST
 } from './types';
 
 export const UPLOAD_IN_PROGRESS = 0;
@@ -47,6 +47,21 @@ export const getTimeSlotToHome = () => {
         axios.get("/api/const/returnToHomeTimeSlots", actionUtils.getAxiosHeader() )
             .then(payload => {
                 dispatch({ type: TIME_SLOT_TO_HOME, timeSlotList: payload.data });
+            }).catch(err => {
+                let message = actionUtils.handleError(err);
+                dispatch({ type: ERROR, errorMessage: message });
+            });
+    }
+}
+
+/**
+ * return list of compounds
+ */
+export const getCompundList = () => {
+    return (dispatch) => {
+        axios.get("/api/const/compounds", actionUtils.getAxiosHeader() )
+            .then(payload => {
+                dispatch({ type: COMPOUND_LIST, compoundList: payload.data });
             }).catch(err => {
                 let message = actionUtils.handleError(err);
                 dispatch({ type: ERROR, errorMessage: message });

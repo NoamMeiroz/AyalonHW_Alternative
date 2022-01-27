@@ -1,0 +1,45 @@
+sudo update-locale 
+sudo update-locale LANG=he_IL.utf8
+ LANG=he_IL.utf8 LANGUAGE="he_IL:h
+
+// connect to mysql
+mysql --default-character-set=utf8mb4 -u root -p
+
+// update db 
+ALTER TABLE `alternative`.`employers_sites` 
+ADD COLUMN `COMPOUND` VARCHAR(50) NULL AFTER `Y`;
+
+ set character_set_results=utf8;
+
+// remove spaces
+UPDATE employers_sites set NAME = trim(name);
+
+// update data
+UPDATE employers_sites set COMPOUND = 'פארק תמר - רחובות';
+
+UPDATE employers_sites set COMPOUND = 'הראשונים' where name = 'ראשון לציון';
+
+UPDATE employers_sites set COMPOUND = 'שיבא תל השומר' where  name = 'בית חולים שיבא תל השומר';
+
+UPDATE employers_sites set COMPOUND = 'בדיקה' where  name = 'נאות תחב''''צ';
+
+
+
+
+// upload bi container to the cloud
+az login
+az acr login --name nativelaasakimcr
+
+// create docker images
+docker tag ayalonhw_alternative_node_server nativelaasakimcr.azurecr.io/node_server:1.5.0
+docker push nativelaasakimcr.azurecr.io/node_server:1.5.0
+
+docker tag ayalonhw_alternative_native_laasakim nativelaasakimcr.azurecr.io/native_laasakim:1.5.0
+docker push nativelaasakimcr.azurecr.io/native_laasakim:1.5.0
+
+
+// recreate container
+az container delete --name ci-native-laasakim --resource-group rg-native-laasakim
+az container create -g rg-native-laasakim -f azure-deploy.yaml
+
+
