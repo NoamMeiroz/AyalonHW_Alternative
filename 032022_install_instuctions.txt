@@ -1,0 +1,13 @@
+// upload bi container to the cloud
+az login
+az acr login --name nativelaasakimcr
+
+docker tag ayalonhw_alternative_native_laasakim nativelaasakimcr.azurecr.io/native_laasakim:1.5.1
+docker push nativelaasakimcr.azurecr.io/native_laasakim:1.5.1
+
+
+// recreate container
+az container delete --name ci-native-laasakim --resource-group rg-native-laasakim
+az container create -g rg-native-laasakim -f azure-deploy.yaml
+
+
