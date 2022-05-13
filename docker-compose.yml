@@ -101,14 +101,14 @@ services:
     command: ["npm", "start"]
   native_laasakim:
     environment:
-      - REACT_APP_SERVER=ayalon.promise-dev.com
+      - REACT_APP_SERVER=www.nativapp.co.il
       - IMAGE_INLINE_SIZE_LIMIT=0
       - INLINE_RUNTIME_CHUNK=false
     build:
       context: ./client
       dockerfile: .dockerfile
       args:
-        - REACT_APP_SERVER=ayalon.promise-dev.com
+        - REACT_APP_SERVER=www.nativapp.co.il
     stdin_open: true
     tty: true
     depends_on:
@@ -163,8 +163,8 @@ volumes:
     driver_opts:
       o: bind
       type: None
-      device: /home/amit/workspace/employers_program/db-data
-      #device: /home/amit/workspace/employers_program/data/db_backup
+      #device: /home/amit/workspace/employers_program/db-data
+      device: /home/amit/workspace/employers_program/data/db_backup
   node_logs:
     driver: local
     driver_opts:

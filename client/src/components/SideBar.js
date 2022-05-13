@@ -89,7 +89,7 @@ class SideBar extends Component {
                                     this.setActive("bi");
                                 }}
                                 target="_blank"
-                                href="https://ayalon.promise-dev.com:8088/superset/dashboard/1/">
+                                href="https://www.nativapp.co.il:8088/superset/dashboard/1/">
                                 <AssessmentIcon />
                                 BI
                             </IconButton>

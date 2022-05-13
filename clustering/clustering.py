@@ -382,14 +382,9 @@ def read_in():
 
 try:
     # check input
-<<<<<<< HEAD
     inputData = read_in(); 
     schema = '{"osrm_server": "str", "maxCluster": "int", "employees": [{"id": "int", "EMPLOYER_ID": "int", "WORKER_ID": "str", "X": "float|int", "Y": "float|int"}, "..."]}'
     if json_schema.match(inputData,schema):
-=======
-    schema = '{"osrm_server": "str", "maxCluster": "int", "employees": [{"id": "int", "EMPLOYER_ID": "int", "WORKER_ID": "str", "X": "float|int", "Y": "float|int"}, "..."]}'
-    if json_schema.match(sys.argv[1],schema):
->>>>>>> 25f3b8a0dec2b77b1954ff3f070e1a4d9b052a0d
         # parse input
         parsedInput = json.loads(inputData)
         # validate maxCluster as positive int
