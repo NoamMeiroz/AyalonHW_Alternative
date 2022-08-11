@@ -3,11 +3,11 @@ import { connect } from 'react-redux';
 
 import requireAuth from '../requireAuth'; //used to check if login successfull
 import * as actions from '../../actions';
-import Button from '@material-ui/core/Button';
-import Box from '@material-ui/core/Box';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 import OverideAlert from './OverideAlert';
 import * as excelUtil from '../../utils/excelUtil';
-import CloudUploadIcon from '@material-ui/icons/CloudUpload';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 const labelText = "טעינת נתוני חברה";
 const acceptFiles = ".xlsx, .xls";

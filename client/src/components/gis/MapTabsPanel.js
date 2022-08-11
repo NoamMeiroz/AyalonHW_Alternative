@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
-import Paper from '@material-ui/core/Paper';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Box from '@material-ui/core/Box';
+import { makeStyles } from '@mui/styles';
+import Paper from '@mui/material/Paper';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Box from '@mui/material/Box';
 import MapPanel from './MapPanel';
 import ResultTable from './ResultTable';
 import DownloadButton from './DownloadButton';
@@ -12,7 +12,7 @@ import DownloadButton from './DownloadButton';
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
-        backgroundColor: theme.palette.background.paper,
+       // backgroundColor: theme.palette.background.paper,
     },
     tabs: {
         display: 'flex',

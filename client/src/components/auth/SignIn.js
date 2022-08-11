@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import { reduxForm, Field } from 'redux-form';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import Container from '@material-ui/core/Container';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import { styled } from '@material-ui/core/styles';
+import Container from '@mui/material/Container';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import { styled } from '@mui/material/styles';
 
 
 import * as actions from '../../actions';

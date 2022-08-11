@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../../actions';
-import IconButton from '@material-ui/core/IconButton';
-import DeleteForeverRoundedIcon from '@material-ui/icons/DeleteForeverRounded';
+import IconButton from '@mui/material/IconButton';
+import DeleteForeverRoundedIcon from '@mui/icons-material/DeleteForeverRounded';
 import DeleteAlert from './DeleteAlert';
-import Tooltip from '@material-ui/core/Tooltip';
+import Tooltip from '@mui/material/Tooltip';
 
 class DeleteButton extends Component {
 
@@ -28,7 +28,7 @@ class DeleteButton extends Component {
 
     render() {
         let jsx = {};
-        if (this.props.csvData.EMPLOYEES_READY === 1) {
+        if (this.props.employeesReady === 1) {
             jsx = <div>
                 <Tooltip title="מחיקת חברה">
                     <IconButton color="primary" aria-label="delete company" component="span" style={{ padding: '2px' }}

@@ -70,6 +70,7 @@ export default ({ children }) => {
 
 			// start reconnect;
 			webSocket.onclose = (event) => {
+				console.log(event);
 				timeout = timeout * 2; //increment retry interval
 				connectInterval = setTimeout(check, Math.min(MAX_TIMEOUT, timeout)); //call check function after timeout 
 				if (lastState===WebSocket.OPEN) {

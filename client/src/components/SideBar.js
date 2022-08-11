@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import Drawer from '@material-ui/core/Drawer';
-import IconButton from '@material-ui/core/IconButton';
-import HomeIcon from '@material-ui/icons/Home';
-import EmojiTransportationIcon from '@material-ui/icons/EmojiTransportation';
-import AssessmentIcon from '@material-ui/icons/Assessment';
-import RoomIcon from '@material-ui/icons/Room';
-import lime from '@material-ui/core/colors/lime';
+import Drawer from '@mui/material/Drawer';
+import IconButton from '@mui/material/IconButton';
+import HomeIcon from '@mui/icons-material/Home';
+import EmojiTransportationIcon from '@mui/icons-material/EmojiTransportation';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import RoomIcon from '@mui/icons-material/Room';
+import lime from '@mui/material/colors/lime';
 
 import './SideBar.css';
 

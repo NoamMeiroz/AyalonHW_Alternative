@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { MTableToolbar } from "material-table";
+import { MTableToolbar } from "@material-table/core";
 import Sites from './Sites';
 import DownloadButton from './DownloadButton';
 import DeleteButton from './DeleteButton';
@@ -7,7 +7,7 @@ import RecalculateButton from './RecalculateButton';
 import CompanyUploadButton from './CompanyUploadButton';
 import TemplateButton from './TemplateButton';
 import Table from '../common/Table';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 
 
 import './CompanyTable.css';
@@ -42,7 +42,7 @@ class CompanyTable extends Component {
                     tooltip: 'אתרי החברה',
                     render: rowData => {
                         return (
-                            <Sites sites={rowData.Sites} style={{ padding: 0 }} />)
+                            <Sites sites={rowData.rowData.Sites} style={{ padding: 0 }} />)
                     },
                 }
             ]}
@@ -56,7 +56,8 @@ class CompanyTable extends Component {
                 Action: props => (
                     <Grid container direction="row" spacing={1} style={{width:'80px'}}>
                         <Grid item xs={4}>
-                            <DownloadButton fontSize="small" csvData={props.data} fileName={props.data.NAME} />
+                            <DownloadButton key= {`downloadButton_${props.data.id}`}
+                                id={`downloadButton_${props.data.id}`} fontSize="small" csvData={props.data} fileName={props.data.NAME} />
                         </Grid>
                         <Grid item xs={4}>
                             <RecalculateButton id={`recalcButton_${props.data.id}`}

@@ -5,13 +5,13 @@ import * as actions from '../../actions';
 
 
 import './ResultTable.css';
-import CssBaseline from '@material-ui/core/CssBaseline'
-import { makeStyles } from '@material-ui/core/styles';
-import MaUTable from '@material-ui/core/Table'
-import TableBody from '@material-ui/core/TableBody'
-import TableCell from '@material-ui/core/TableCell'
-import TableHead from '@material-ui/core/TableHead'
-import TableRow from '@material-ui/core/TableRow'
+import CssBaseline from '@mui/material/CssBaseline'
+import { makeStyles } from '@mui/styles';
+import MaUTable from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableHead from '@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
 
 import { useTable, usePagination, useSortBy } from 'react-table'
 import ReportSelection from './ReportSelection';

@@ -8,12 +8,13 @@ import * as actions from '../../actions';
 import * as actionsUtil from '../../utils/actionsUtil';
 import { timeConvert } from '../../utils/time';
 
-import IconButton from '@material-ui/core/IconButton';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
-import SaveRoundedIcon from '@material-ui/icons/SaveRounded';
-import { Tooltip } from '@material-ui/core';
+import IconButton from '@mui/material/IconButton';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
+import { Tooltip } from '@mui/material';
+import Grid from '@mui/material/Grid'
 
 //const MAX_WALK_TIME = 30;
 //const MAX_BICYCLE_TIME = 60;
@@ -28,7 +29,7 @@ class DownloadButton extends Component {
       super();
       this.fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
       this.fileExtension = '.xlsx';
-      this.state = { uploadProgess: 0, isWorkerStarted: false };
+      this.state = { uploadProgess: 0, isWorkerStarted: false, isEmployeesReady: null };
 
    }
 
@@ -421,7 +422,7 @@ class DownloadButton extends Component {
 
    render() {
       let jsx = {};
-      if (this.props.csvData.EMPLOYEES_READY === 1)
+      if (this.props.employeesReady === 1)
          jsx = <div>
             <Tooltip title="דוח טעינה">
                <IconButton color="primary" aria-label="upload picture" component="span" style={{ padding: '2px' }}
@@ -430,11 +431,14 @@ class DownloadButton extends Component {
                </IconButton>
             </Tooltip>
          </div>;
-      else if (this.props.csvData.EMPLOYEES_READY === 0) {
-         jsx = <div>
+      else if (this.props.employeesReady === 0) {
+         jsx =  <Grid container>
+         <Grid item xs={12}>
             <Typography variant="caption" color="textSecondary">טעינת עובדים</Typography>
-            <Box position="relative" display="inline-flex">
-               <CircularProgress variant="determinate" value={this.props.csvData.UPLOAD_PROGRESS} />
+            </Grid>
+			<Grid item xs={12}>
+            <Box sx={{position:"relative", display:"inline-flex"}}>
+               <CircularProgress variant="determinate" value={this.props.uploadPrecent} />
                <Box
                   top={0}
                   left={0}
@@ -445,10 +449,11 @@ class DownloadButton extends Component {
                   alignItems="center"
                   justifyContent="center"
                >
-                  <Typography variant="caption" component="div" color="textSecondary">{`${this.props.csvData.UPLOAD_PROGRESS}%`}</Typography>
+                  <Typography variant="caption" component="div" color="textSecondary">{`${this.props.uploadPrecent}%`}</Typography>
                </Box>
             </Box>
-         </div>
+			</Grid>
+         </Grid>
       }
       else
          jsx = null;
@@ -456,11 +461,5 @@ class DownloadButton extends Component {
    }
 }
 
-const mapStateToProps = (state, ownProps) => {
-   //  if (state.employeesData.employerID === ownProps.csvData.id){
-   //     return { uploadProgess: state.employeesData.uploadProgess };
-   // }
-   return {};
-};
 
-export default connect(mapStateToProps, actions)(DownloadButton);
+export default connect(null, actions)(DownloadButton);

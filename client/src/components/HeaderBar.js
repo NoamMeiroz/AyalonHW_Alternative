@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
-import Box from '@material-ui/core/Box';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 
 import './headerBar.css';
 
@@ -33,7 +33,7 @@ class HeaderBar extends Component {
                             <Typography variant="subtitle1" color="primary">
                                 {this.props.userName}
                             </Typography>
-                            <Button href="/מדריך למשתמש.pdf">מדריך למשתמש</Button>
+                            <Button href="/מדריך למשתמש.pdf" download>מדריך למשתמש</Button>
                             <Button color="primary" component={Link} to="/signout" >יציאה</Button>
                         </Box>
                     }

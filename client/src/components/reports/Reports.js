@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 
 import requireAuth from '../requireAuth'; //used to check if login successfull
 import ReportCard from './ReportCard';

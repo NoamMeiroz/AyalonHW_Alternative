@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import MaterialTable from 'material-table';
+import MaterialTable from '@material-table/core';
 
 import './Table.css';
 

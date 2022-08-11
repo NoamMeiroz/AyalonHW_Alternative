@@ -5,8 +5,8 @@ import ExcelJS from 'exceljs';
 import * as reportTypes from '../reports/types';
 import * as actions from '../../actions';
 
-import IconButton from '@material-ui/core/IconButton';
-import SaveRoundedIcon from '@material-ui/icons/SaveRounded';
+import IconButton from '@mui/material/IconButton';
+import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 
 
 class DownloadButton extends Component {

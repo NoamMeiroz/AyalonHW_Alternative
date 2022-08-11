@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from '../../actions';
-import IconButton from '@material-ui/core/IconButton';
-import DonutLargeIcon from '@material-ui/icons/DonutLarge';
-import Tooltip from '@material-ui/core/Tooltip';
+import IconButton from '@mui/material/IconButton';
+import DonutLargeIcon from '@mui/icons-material/DonutLarge';
+import Tooltip from '@mui/material/Tooltip';
 import RecalculateAlert from './RecalculateAlert';
 
 

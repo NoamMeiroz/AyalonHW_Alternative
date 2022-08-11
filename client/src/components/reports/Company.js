@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import IconButton from '@material-ui/core/IconButton';
-import PeopleOutlineRoundedIcon from '@material-ui/icons/PeopleOutlineRounded';
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-import Badge from '@material-ui/core/Badge';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import IconButton from '@mui/material/IconButton';
+import PeopleOutlineRoundedIcon from '@mui/icons-material/PeopleOutlineRounded';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+import Badge from '@mui/material/Badge';
 
 
 class Company extends Component {

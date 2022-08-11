@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect, useDispatch, useSelector} from 'react-redux';
 
-import ToggleButton from '@material-ui/lab/ToggleButton';
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup';
-import { makeStyles } from '@material-ui/core/styles';
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import { makeStyles } from '@mui/styles';
 import requireAuth from '../requireAuth'; //used to check if login successfull
 import * as reportTypes from '../reports/types';
 import * as actions from '../../actions';
