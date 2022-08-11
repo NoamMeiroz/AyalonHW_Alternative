@@ -55,25 +55,6 @@ function DrawControl({
    */
   function deleteAllPolygon() {
     deleteClicked();
-    //drawRef._toolbars.edit._modes.remove.handler.options.featureGroup.clearLayers();
-
-    // var layerContainer =
-    //   destination.current.leafletElement.options.edit.featureGroup;
-    // var layers = layerContainer._layers;
-    // var layer_ids = Object.keys(layers);
-    // // remove previous destination area
-    // layer_ids.forEach((id) => {
-    //   let layer = layers[id];
-    //   layerContainer.removeLayer(layer);
-    // });
-
-    // if (this.state.startGeoJSON !== null)
-    //   removeLayer(map, this.state.startGeoJSON);
-    // if (this.state.destinationGeoJSON !== null)
-    //   removeLayer(map, this.state.destinationGeoJSON);
-
-    // this.props.setDestinationPolygonQuery({});
-    // this.props.setStartingPolygonQuery({});
   }
 
   // Memoize the minimap so it's not affected by position changes
@@ -82,27 +63,12 @@ function DrawControl({
       <Box className="drawBox">
         <Tooltip title="מקור" placement="right">
           <IconButton
-		  onMouseDown={(e) => {
-			startDrawClicked();
-		  }}
-		  onMouseUp={(e) => {
-			startDrawClicked();
-		  }}
-            //onClick={() => {
-             // startDrawClicked();
-              //setSelectedArea("starting");
-              // var layerContainer = starting._container.children[1].children[0].children[1];
-              // let targetId = startPolygon.id;
-              // removeLayer(layerContainer, targetId);
-              // if (startGeoJSON !== null)
-              //   removeLayer(
-              //     map,
-              //     startGeoJSON
-              //   );
-
-              //this.props.setStartingPolygonQuery([]);
-              //  starting.current.leafletElement._toolbars.draw._modes.polygon.handler.enable();
-           //
+            onMouseDown={(e) => {
+              startDrawClicked();
+            }}
+            onMouseUp={(e) => {
+              startDrawClicked();
+            }}
           >
             <RadioButtonUncheckedIcon />
           </IconButton>
@@ -115,22 +81,6 @@ function DrawControl({
             onMouseUp={(e) => {
               destinationDrawClicked();
             }}
-            /*           onClick={() => {
-				destinationDrawClicked();
-              this.setState({ selectedArea: "destination" });
-              var layerContainer =
-                this.destination.current.leafletElement.options.edit
-                  .featureGroup;
-              let targetId = this.props.destinationPolygon.id;
-              this.removeLayer(layerContainer, targetId);
-              if (this.state.destinationGeoJSON !== null)
-                this.removeLayer(
-                  this.mapRef.current.leafletElement,
-                  this.state.destinationGeoJSON
-                );
-              this.props.setDestinationPolygonQuery([]);
-              this.destination.current.leafletElement._toolbars.draw._modes.polygon.handler.enable();
-            }}*/
           >
             <RoomIcon />
           </IconButton>

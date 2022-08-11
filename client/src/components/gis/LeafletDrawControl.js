@@ -13,23 +13,13 @@ function LeafletDrawControl({
   onCreated,
   deletePolygon,
   onRemovePolygon,
+  initialValue,
 }) {
   const context = useLeafletContext();
 
   const [drawRef, setDraw] = useState(null);
   const [polygonLayer, setPolygonLayer] = useState({});
   const [featureGroup, setFeatureGroup] = useState(null);
-
-  // useEffect(() => {
-  //   if (drawPolygon !== "stop") {
-  //     if (drawPolygon === "startPolygon" && featureGroup && startPolygonLayer)
-  //       featureGroup.removeLayer(startPolygonLayer);
-  //     if (drawPolygon === "destinationPolygon" && featureGroup && destinationPolygonLayer )
-  //   	featureGroup.removeLayer(destinationPolygonLayer);
-  //   if (name===drawPolygon)
-  //     	drawRef._toolbars.draw._modes.polygon.handler.enable();
-  //   }
-  // }, [drawPolygon]);
 
   useEffect(() => {
     if (drawPolygon) {
@@ -81,6 +71,12 @@ function LeafletDrawControl({
       }
     });
 
+    if (initialValue !== "") {
+      initialValue.addTo(layerContainer);
+      var updatePolygonLayer = { ...polygonLayer };
+      updatePolygonLayer[name] = initialValue;
+      setPolygonLayer(updatePolygonLayer);
+    }
     return () => {
       map.removeControl(drawControl);
     };

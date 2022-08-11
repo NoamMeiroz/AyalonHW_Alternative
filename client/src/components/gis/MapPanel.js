@@ -4,8 +4,7 @@ import {
   LayerGroup,
   TileLayer,
   LayersControl,
-  FeatureGroup,
-  Circle,
+  FeatureGroup,  
 } from "react-leaflet";
 import HeatmapLayer from "./HeatmapLayer";
 //import HeatmapLayer from 'react-leaflet-heatmap-layer';
@@ -36,6 +35,7 @@ import trainStationUrl from "./railstations.zip";
 import "./MapPanel.css";
 import { useThemeVariants } from "@mui/styles";
 import { Button } from "@mui/material";
+import MapEvents from "./MapEvents";
 
 const DESTINATION_POLYGON_NAME = "destinationPolygon";
 const START_POLYGON_NAME = "startPolygon";
@@ -88,6 +88,8 @@ class MapPanel extends Component {
     startPolygonClicked: false,
     destinationPolygonClicked: false,
     deletePolygons: false,
+    startGeoJSON: "",
+    destinationGeoJSON: ""
   };
 
   mapRef = createRef();
@@ -95,8 +97,8 @@ class MapPanel extends Component {
   starting = createRef();
 
   handleMoveEnd = (e) => {
-    let center = this.mapRef.current.viewport.center;
-    this.props.mapChange(this.mapRef.current.viewport.zoom, center);
+    let center = e.target._zoom; 
+    this.props.mapChange(e.target._zoom, e.target._animateToCenter );
   };
 
   /**
@@ -110,7 +112,9 @@ class MapPanel extends Component {
       nextState.startPolygonClicked !== this.state.startPolygonClicked ||
       nextState.destinationPolygonClicked !==
         this.state.destinationPolygonClicked ||
-      nextState.deletePolygons !== this.state.deletePolygons
+      nextState.deletePolygons !== this.state.deletePolygons ||
+      nextState.destinationGeoJSON !== this.state.destinationGeoJSON ||
+      nextState.startPolygon !== this.state.startGeoJSON
     );
   }
 
@@ -317,8 +321,9 @@ class MapPanel extends Component {
       };
       let geoJSON = new L.GeoJSON(this.props.destinationPolygon.polygon, {
         style: myStyle,
-      }).addTo(this.mapRef.current.leafletElement);
-      this.setState({ destinationGeoJSON: geoJSON._leaflet_id });
+      });
+      this.setState( {destinationGeoJSON: geoJSON});
+      //this.setState({ destinationGeoJSON: geoJSON._leaflet_id });
     }
     if (this.props.startPolygon.id) {
       let myStyle = {
@@ -329,8 +334,9 @@ class MapPanel extends Component {
       };
       let geoJSON = new L.GeoJSON(this.props.startPolygon.polygon, {
         style: myStyle,
-      }).addTo(this.mapRef.current.leafletElement);
-      this.setState({ startGeoJSON: geoJSON._leaflet_id });
+      });
+      //th  is.setState({ startGeoJSON: geoJSON._leaflet_id });
+      this.setState({ startGeoJSON: geoJSON });
     }
   };
 
@@ -357,10 +363,10 @@ class MapPanel extends Component {
         <MapContainer
           center={this.props.position}
           zoom={this.props.zoom}
-          onmoveend={this.handleMoveEnd}
           maxZoom={14}
           preferCanvas={true}
         >
+          <MapEvents onmoveend={this.handleMoveEnd}/>
           <LayersControl>
             <LayersControl.BaseLayer name="מפה" checked>
               <TileLayer
@@ -399,6 +405,7 @@ class MapPanel extends Component {
               deletePolygon={this.state.deletePolygons}
               key={"destinationDrawControl"}
               name={DESTINATION_POLYGON_NAME}
+              initialValue={this.state.destinationGeoJSON}
               draw={{
                 rectangle: false,
                 polyline: false,
@@ -427,6 +434,7 @@ class MapPanel extends Component {
               onRemovePolygon={this._removePolygon}
               key={"startDrawControl"}
               name={START_POLYGON_NAME}
+              initialValue={this.state.startGeoJSON}
               draw={{
                 rectangle: false,
                 polyline: false,
@@ -488,7 +496,7 @@ function mapStateToProps(state, ownProps) {
       // handle employee
       employee.lat = employee.X;
       employee.lng = employee.Y;
-      employee.intensity = 0.5;
+      employee.intensity = 0.8;
 
       // find the employee's working place and add it the branch list
       // If already in branch list then add employee to the counter of employees.
