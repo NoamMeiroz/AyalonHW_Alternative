@@ -22,8 +22,10 @@ function HeatmapLayer({
         intensityExtractor(p),
       ];
     });
-    if (heatmap && heatmap._map)
+    if (heatmap && heatmap._map) {
+      console.log(newPoints.length);
       heatmap.setLatLngs(newPoints);
+    }
   }, [points]);
 
   useEffect(() => {
@@ -35,6 +37,8 @@ function HeatmapLayer({
       ];
     });
 
+ 
+    console.log(newPoints.length);
     const heatmap = new L.heatLayer(newPoints);
     setHeatmap(heatmap);
     const container = context.layerContainer || context.map;

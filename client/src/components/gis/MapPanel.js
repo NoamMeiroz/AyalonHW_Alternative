@@ -4,14 +4,11 @@ import {
   LayerGroup,
   TileLayer,
   LayersControl,
-  FeatureGroup,  
+  FeatureGroup,
 } from "react-leaflet";
-import HeatmapLayer from "./HeatmapLayer";
-//import HeatmapLayer from 'react-leaflet-heatmap-layer';
-//import Control from 'react-leaflet-control';
-//import { EditControl } from "react-leaflet-draw";
+//import HeatmapLayer from "./HeatmapLayer";
+import { HeatmapLayer } from "react-leaflet-heatmap-layer-v3";
 import LeafletDrawControl from "./LeafletDrawControl";
-//import 'react-leaflet-markercluster/dist/styles.min.css';
 import L from "leaflet";
 import Box from "@mui/material/Box";
 
@@ -39,6 +36,10 @@ import MapEvents from "./MapEvents";
 
 const DESTINATION_POLYGON_NAME = "destinationPolygon";
 const START_POLYGON_NAME = "startPolygon";
+const gradient = {
+  0.1: '#89BDE0', 0.2: '#96E3E6', 0.4: '#82CEB6',
+  0.6: '#FAF3A5', 0.8: '#F5D98B', '1.0': '#DE9A96'
+};
 
 /**
  * Return list of companies. for each company has a unique color
@@ -89,7 +90,7 @@ class MapPanel extends Component {
     destinationPolygonClicked: false,
     deletePolygons: false,
     startGeoJSON: "",
-    destinationGeoJSON: ""
+    destinationGeoJSON: "",
   };
 
   mapRef = createRef();
@@ -97,8 +98,8 @@ class MapPanel extends Component {
   starting = createRef();
 
   handleMoveEnd = (e) => {
-    let center = e.target._zoom; 
-    this.props.mapChange(e.target._zoom, e.target._animateToCenter );
+    let center = e.target._zoom;
+    this.props.mapChange(e.target._zoom, e.target._animateToCenter);
   };
 
   /**
@@ -114,7 +115,8 @@ class MapPanel extends Component {
         this.state.destinationPolygonClicked ||
       nextState.deletePolygons !== this.state.deletePolygons ||
       nextState.destinationGeoJSON !== this.state.destinationGeoJSON ||
-      nextState.startPolygon !== this.state.startGeoJSON
+      nextState.startPolygon !== this.state.startGeoJSON ||
+      nextProps.data !== this.props.data
     );
   }
 
@@ -187,9 +189,9 @@ class MapPanel extends Component {
    * @param {*} e
    */
   _removePolygon = (name) => {
-    if (name===DESTINATION_POLYGON_NAME)
+    if (name === DESTINATION_POLYGON_NAME)
       this.props.setDestinationPolygonQuery({});
-    else if (name===START_POLYGON_NAME)
+    else if (name === START_POLYGON_NAME)
       this.props.setStartingPolygonQuery({});
     else if (!name) {
       this._removePolygon(DESTINATION_POLYGON_NAME);
@@ -296,21 +298,6 @@ class MapPanel extends Component {
     );
   }
 
-  // _onFeatureGroupReady = (reactFGref) => {
-  //   // populate the leaflet FeatureGroup with the geoJson layers
-
-  //   let leafletGeoJSON = new L.GeoJSON(getGeoJson());
-  //   let leafletFG = reactFGref;
-
-  //   leafletGeoJSON.eachLayer((layer) => {
-  //     leafletFG.addLayer(layer);
-  //   });
-
-  //   // store the ref for future access to content
-
-  //   this._editableFG = reactFGref;
-  // };
-
   componentDidMount = () => {
     if (this.props.destinationPolygon.id) {
       let myStyle = {
@@ -322,7 +309,7 @@ class MapPanel extends Component {
       let geoJSON = new L.GeoJSON(this.props.destinationPolygon.polygon, {
         style: myStyle,
       });
-      this.setState( {destinationGeoJSON: geoJSON});
+      this.setState({ destinationGeoJSON: geoJSON });
       //this.setState({ destinationGeoJSON: geoJSON._leaflet_id });
     }
     if (this.props.startPolygon.id) {
@@ -366,7 +353,7 @@ class MapPanel extends Component {
           maxZoom={14}
           preferCanvas={true}
         >
-          <MapEvents onmoveend={this.handleMoveEnd}/>
+          <MapEvents onmoveend={this.handleMoveEnd} />
           <LayersControl>
             <LayersControl.BaseLayer name="מפה" checked>
               <TileLayer
@@ -381,6 +368,8 @@ class MapPanel extends Component {
                   longitudeExtractor={(item) => item.lng}
                   latitudeExtractor={(item) => item.lat}
                   intensityExtractor={(item) => item.intensity}
+                  max={3}
+                  //gradient={gradient}
                 />
               }
             </LayersControl.Overlay>
@@ -466,12 +455,11 @@ class MapPanel extends Component {
               deleteClicked={this.onDeletePolygons}
             />
           }
-          {/*          <Control position="bottomright">
-            <Legend
-              data={this.props.data}
-              companies={this.props.companies}
-            ></Legend>
-          </Control> */}
+          <Legend
+            position="bottomright"
+            data={this.props.data}
+            companies={this.props.companies}
+          ></Legend>
         </MapContainer>
       </Box>
     );
@@ -496,7 +484,7 @@ function mapStateToProps(state, ownProps) {
       // handle employee
       employee.lat = employee.X;
       employee.lng = employee.Y;
-      employee.intensity = 0.8;
+      employee.intensity = 100;
 
       // find the employee's working place and add it the branch list
       // If already in branch list then add employee to the counter of employees.

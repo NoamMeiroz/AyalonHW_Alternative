@@ -7,7 +7,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Grid from '@mui/material/Grid';
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import PrintRoundedIcon from '@mui/icons-material/PrintRounded';
-import Autocomplete from '@mui/lab/Autocomplete';
+import Autocomplete from "@mui/material/Autocomplete";
 import * as FileSaver from 'file-saver';
 import ExcelJS from 'exceljs';
 import ReactToPrint from 'react-to-print';

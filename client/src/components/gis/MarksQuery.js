@@ -12,6 +12,7 @@ import Slider from '@mui/material/Slider';
 import requireAuth from '../requireAuth'; //used to check if login successfull
 import * as actions from '../../actions';
 import './MarksQuery.css';
+import { styled } from '@mui/material/styles';
 
 const MAX_VALUE = 16;
 const MIN_VALUE = -1;
@@ -36,11 +37,11 @@ const useStyles = makeStyles((theme) => ({
 /**
  * make Slider with small font labels
  */
-const MarksSlider = withStyles({
-    markLabel: {
-        fontSize: '0.5rem'
-    }
-})(Slider);
+const MarksSlider = styled(Slider)(({ theme }) => ({
+    "& .MuiSlider-markLabel": {
+      fontSize: "0.6rem",
+    },
+  }));
 
 /**
  * return marks label (tiks)

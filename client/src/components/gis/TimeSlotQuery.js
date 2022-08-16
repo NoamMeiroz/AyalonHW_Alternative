@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Grid from '@mui/material/Grid'
 import TextField from '@mui/material/TextField'
-import Autocomplete from '@mui/lab/Autocomplete';
+import Autocomplete from "@mui/material/Autocomplete";
 import requireAuth from '../requireAuth'; //used to check if login successfull
 import * as actions from '../../actions';
 
