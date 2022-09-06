@@ -1,6 +1,6 @@
-const { ServerError, logger } = require('../log');
-const localitySchema = require("../db/localitySchema");
-const { ERRORS } = require("./ERRORS");
+const { ServerError, logger } = require('../../log');
+const localitySchema = require("../../db/localitySchema");
+const { ERRORS } = require("../ERRORS");
 
 /**
  * get list of all localities

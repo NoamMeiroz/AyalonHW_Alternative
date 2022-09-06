@@ -1,8 +1,8 @@
 const { Worker } = require('worker_threads');
-const { logger, ServerError } = require('../log');
-const employeeSchema = require("../db/employeeSchema");
-const employerSchema = require("../db/employerSchema");
-const { sendMessage } = require('../websocket');
+const { logger, ServerError } = require('../../log');
+const employeeSchema = require("../../db/employeeSchema");
+const employerSchema = require("../../db/employerSchema");
+const { sendMessage } = require('../../websocket');
 
 function employeesService(workerData) {
 	return new Promise((resolve, reject) => {

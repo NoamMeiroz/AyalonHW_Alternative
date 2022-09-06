@@ -5,9 +5,9 @@ const passport = require('passport');
 const router = express.Router();
 const { logger } = require("../log");
 const excel = require("../db/excel");
-const companyData = require("../services/companyData");
+const companyData = require("../services/data/companyData");
 const loadData = require("../services/loadData");
-const employeesData = require("../services/employeesData");
+const employeesData = require("../services/data/employeesData");
 const { isInteger } = require("../tools");
 
 /**

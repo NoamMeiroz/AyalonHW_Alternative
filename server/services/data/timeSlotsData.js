@@ -1,5 +1,5 @@
-const { ServerError, logger } = require('../log');
-const timeSlotsSchema = require("../db/timeSlotsSchema");
+const { ServerError, logger } = require('../../log');
+const timeSlotsSchema = require("../../db/timeSlotsSchema");
 
 /**
  * get list of all timeSlots

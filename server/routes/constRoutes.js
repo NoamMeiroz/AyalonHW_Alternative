@@ -2,9 +2,9 @@ const express = require('express');
 const passport = require('passport');
 const router = express.Router();
 const { logger } = require("../log");
-const localityData = require("../services/localityData");
-const timeSlotsData = require("../services/timeSlotsData");
-const siteData = require("../services/siteData");
+const localityData = require("../services/data/localityData");
+const timeSlotsData = require("../services/data/timeSlotsData");
+const siteData = require("../services/data/siteData");
 
 
 /**

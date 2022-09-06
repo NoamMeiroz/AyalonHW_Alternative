@@ -1,9 +1,9 @@
 const { workerData, parentPort } = require('worker_threads')
 const employeeSchema = require('../db/employeeSchema');
-const configData = require("./configData");
+const configData = require("./data/configData");
 const { getNearestWorkDay } = require('../tools');
 const googleAPI = require("./googleAPI");
-const timeSlotsData = require("./timeSlotsData");
+const timeSlotsData = require("./data/timeSlotsData");
 const { ERRORS } = require("./ERRORS");
 const { ServerError, logger } = require('../log');
 const { calculateMark, calculateDurationAndDistance } = require('./route');

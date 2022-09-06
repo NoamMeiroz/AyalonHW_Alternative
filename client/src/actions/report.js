@@ -8,6 +8,8 @@ import {
 import * as actionUtils from '../utils/actionsUtil';
 
 
+const API_SERVER = process.env.REACT_APP_API_SERVER || `/api`;
+
 /**
  * 
  */
@@ -154,7 +156,7 @@ export const getEmployees = (employers = [], livingCity = [], workingCity = [],
     headers = { ...{ 'Content-Type': 'application/json' }, headers }
     return (dispatch) => {
         dispatch({ type: GENERAL_REPORT_RUN, isRunning: true });
-        axios.post(`/api/reports/employee`, data, headers)
+        axios.post(`${API_SERVER}/reports/employee`, data, headers)
             .then(payload => {
                 dispatch({ type: GENERAL_REPORT_RUN, isRunning: false });
                 dispatch({ type: GENERAL_REPORT_RESULT, employeesList: payload.data });
@@ -228,7 +230,7 @@ export const calculateCluster = (employers = [], livingCity = [], workingCity = 
             compoundsList,
             qTimeSlotWork, qTimeSlotHome, qSelectedMarks,
             qDestinationPolygon, qStartingPolygon));
-        axios.post(`/api/reports/cluster`, data, headers)
+        axios.post(`${API_SERVER}/reports/cluster`, data, headers)
             .then(payload => {
                 dispatch({ type: CLUSTER_REPORT_RUN, isRunning: false });
                 dispatch({ type: CLUSTER_REPORT_RESULT, employeesList: payload.data });
@@ -257,7 +259,7 @@ export const clearClusterReport = () => {
  */
 export const getSharePotential = (employerId) => {
     return (dispatch) => {
-        axios.get(`/api/reports/share_potential/employer/${employerId}`, actionUtils.getAxiosHeader())
+        axios.get(`${API_SERVER}/reports/share_potential/employer/${employerId}`, actionUtils.getAxiosHeader())
             .then(payload => {
                 dispatch({ type: SHARE_POTENTIAL, isSuccess: true, report: payload.data });
             }).catch(err => {

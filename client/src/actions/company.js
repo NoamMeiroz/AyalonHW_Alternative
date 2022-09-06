@@ -14,6 +14,8 @@ import {
 import {UPLOAD_FAILED, getCompundList} from './const';
 import * as actionUtils from '../utils/actionsUtil';
 
+const API_SERVER = process.env.REACT_APP_API_SERVER || `/api`;
+
 /**
  * Upload xlsx file into the server
  * @param {*} file 
@@ -23,7 +25,7 @@ export const upload = (file) => {
     form.append("uid", localStorage.getItem('websocket_uid'));
     form.append("file", file);
     return (dispatch) => {
-        axios.post(`/api/employer/upload/`,
+        axios.post(`${API_SERVER}/employer/upload/`,
             form,
             {
                 headers: {
@@ -62,7 +64,7 @@ export const uploadResult = (result) => {
  */
 export const getData = () => {
     return (dispatch) => {
-        axios.get(`/api/employer/`, actionUtils.getAxiosHeader())
+        axios.get(`${API_SERVER}/employer/`, actionUtils.getAxiosHeader())
             .then(payload => {
                 dispatch({ type: LOAD_DATA, isSuccess: true, sectorList: payload.data.sectors, companyList: payload.data.companies });
             }).catch(err => {
@@ -93,7 +95,7 @@ export const getEmployeesOfEmployer = (employerId) => {
  */
 export const checkProgress = (employerId) => {
     return (dispatch) => {
-        axios.get(`/api/employer/${employerId}/employee/precentReady`, actionUtils.getAxiosHeader())
+        axios.get(`${API_SERVER}/employer/${employerId}/employee/precentReady`, actionUtils.getAxiosHeader())
             .then(payload => {
                 if (payload.data.precent || payload.data.precent >= 0) {
                     dispatch({
@@ -128,7 +130,7 @@ export const checkProgress = (employerId) => {
  */
 export const deleteCompany = (employerId) => {
     return (dispatch) => {
-        axios.delete(`/api/employer/${employerId}`, actionUtils.getAxiosHeader())
+        axios.delete(`${API_SERVER}/employer/${employerId}`, actionUtils.getAxiosHeader())
             .then(() => {
                 dispatch({ type: DELETE_COMPANY, isSuccess: true, employerID: employerId });
                 dispatch({ type: MESSAGE, message: `מחיקת החברה הסתיימה בהצלחה` });
@@ -146,7 +148,7 @@ export const deleteCompany = (employerId) => {
  */
 export const recalculate = (employerId) => {
     return (dispatch) => {
-        axios.put(`/api/employer/${employerId}/recalculate`,
+        axios.put(`${API_SERVER}/employer/${employerId}/recalculate`,
             {"uid": localStorage.getItem('websocket_uid')}, 
             actionUtils.getAxiosHeader())
             .then(() => {

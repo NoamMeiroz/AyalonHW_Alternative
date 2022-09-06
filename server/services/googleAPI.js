@@ -1,7 +1,7 @@
 const axios = require('axios');
 const proj4 = require('proj4');
 const { ServerError, logger } = require('../log');
-const localityService = require('../services/localityData');
+const localityService = require('./data/localityData');
 const { ERRORS } = require("./ERRORS");
 const { findFastestRoute } = require('./route');
 const LOCATION_TYPE = ["street_address", "route", "establishment", "hospital", "neighborhood", "locality"];

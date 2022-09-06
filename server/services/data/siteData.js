@@ -1,13 +1,13 @@
-const { ServerError, logger } = require('../log');
-const employerSitesSchema = require("../db/employerSitesSchema");
-const { employeeFieldsName } = require("../config/config");
-const googleAPI = require('./googleAPI');
-const { ERRORS } = require("./ERRORS");
+const { ServerError, logger } = require('../../log');
+const employerSitesSchema = require("../../db/employerSitesSchema");
+const { employeeFieldsName } = require("../../config/config");
+const googleAPI = require('../googleAPI');
+const { ERRORS } = require("../ERRORS");
 
-const { Column, TYPES } = require('./columns/column');
-const { City } = require('./columns/city');
-const { Street } = require('./columns/street');
-const { BuildingNumber } = require('./columns/buildingNumber');
+const { Column, TYPES } = require('../columns/column');
+const { City } = require('../columns/city');
+const { Street } = require('../columns/street');
+const { BuildingNumber } = require('../columns/buildingNumber');
 
 const SITE_COLUMNS = [
     new Column("SITE_ID", "מספר סניף", TYPES.INT, 8, false),

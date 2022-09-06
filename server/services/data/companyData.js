@@ -1,14 +1,14 @@
-const { ServerError, logger } = require('../log');
-const employerSchema = require("../db/employerSchema");
-const empFields = require("../config/config").employerFieldsName;
+const { ServerError, logger } = require('../../log');
+const employerSchema = require("../../db/employerSchema");
+const empFields = require("../../config/config").employerFieldsName;
 const siteData = require("./siteData");
 const employeesData = require("./employeesData");
-const { branchesFieldsName, employeeFieldsName } = require('../config/config');
+const { branchesFieldsName, employeeFieldsName } = require('../../config/config');
 
-const { Column, TYPES } = require('./columns/column');
-const { YesNoColumn } = require('./columns/yesno');
-const { Sector } = require('./columns/sector');
-const employeeSchema = require('../db/employeeSchema');
+const { Column, TYPES } = require('../columns/column');
+const { YesNoColumn } = require('../columns/yesno');
+const { Sector } = require('../columns/sector');
+const employeeSchema = require('../../db/employeeSchema');
 
 const EMP_COLUMNS = [
     new Column("NAME", "שם חברה", TYPES.STRING, 50, false),

@@ -9,6 +9,8 @@ export * from './report';
 export * from './company';
 export * from './map';
 
+const API_SERVER = process.env.REACT_APP_API_SERVER || `/api`;
+
 /**
  * Signin method.If success then store user token localy
  * @param {*} formProps 
@@ -19,7 +21,7 @@ export const signin = (formProps, callback) => {
     form.append("userId", formProps.userId);
     form.append("password", formProps.password);
     return (dispatch) => {
-        axios.post(`/api/signin/`,
+        axios.post(`${API_SERVER}/signin/`,
             form,
             {
                 headers: {

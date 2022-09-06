@@ -1,5 +1,5 @@
-const { ServerError, logger } = require('../log');
-const configSchema = require("../db/configSchema");
+const { ServerError, logger } = require('../../log');
+const configSchema = require("../../db/configSchema");
 
 /**
  * get list of all localities

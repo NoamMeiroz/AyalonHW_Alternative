@@ -56,8 +56,8 @@ export default ({ children }) => {
 
 	const connect = () => {
 		if (!socket) {
-			let webSocket = new WebSocket(`wss://${process.env.REACT_APP_SERVER}/api`);
-
+			//let webSocket = new WebSocket(`wss://${process.env.REACT_APP_SERVER}/api`);
+			let webSocket = new WebSocket(`ws://${process.env.REACT_APP_SERVER}/api`);
 			webSocket.onopen = () => {
 				//setWS( { socket: webSocket, sendMessage });
 				ws = { socket: webSocket, sendMessage };
