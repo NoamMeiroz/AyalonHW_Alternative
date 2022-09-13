@@ -1,12 +1,13 @@
 import axios from 'axios';
 
+const API_SERVER = process.env.REACT_APP_API_SERVER || `/api`;
 
 export default function checkProgress() {
     var progress = {};
     var employerId = -1;
 
     const addProgress = () => {
-        axios.get(`/api/employer/${employerId}/employee/precentReady`)
+        axios.get(`${API_SERVER}/employer/${employerId}/employee/precentReady`)
             .then(payload => {
                 if (payload.precent) {
                     if (payload.precent === 100) {

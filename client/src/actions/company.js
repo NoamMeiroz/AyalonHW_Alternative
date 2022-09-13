@@ -1,5 +1,4 @@
 import axios from 'axios';
-import {getUID} from './index';
 import {
     START_FILE_UPLOAD,
     LOAD_DATA,
@@ -73,21 +72,6 @@ export const getData = () => {
             });
     }
 };
-
-/**
- * return the company list stores in server
-
-export const getEmployeesOfEmployer = (employerId) => {
-    return (dispatch) => {
-        axios.get(`/api/employer/${employerId}/employee`, actionUtils.getAxiosHeader())
-            .then(payload => {
-                dispatch({ type: EMPLOYEES_DATA, isSuccess: true, employeesList: payload.data });
-            }).catch(err => {
-                let message = actionUtils.handleError(err);
-                dispatch({ type: ERROR, errorMessage: message });
-            });
-    }
-};*/
 
 /**
  * Check the progress status of uploading a file.

@@ -9,8 +9,8 @@ const VALUE_FIELD_NAME = "VALUE";
 /**
  * convert solutionPropertyValues from rows to an object that each item is an property.
  * In each property each item is a category with the Value.
- * @param {*} propertyValues 
- * @returns 
+ * @param {*} propertyValues
+ * @returns
  */
 const populatePropertyValues = (propertyValues) => {
   let propertyList = {};
@@ -24,6 +24,16 @@ const populatePropertyValues = (propertyValues) => {
     ] = property.dataValues[VALUE_FIELD_NAME];
   });
   return propertyList;
+};
+
+const populateLimits = (limits) => {
+  let limitObject = {};
+  if (!limits) return null;
+
+  limits.forEach((limit) => {
+    limitObject[limit.dataValues.LIMIT_NAME] = limit.dataValues.VALUE;
+  });
+  return limitObject;
 };
 
 /**
@@ -42,7 +52,8 @@ const getAllSolutions = () => {
         resultList = data.map((solution) => {
           item = solution.dataValues;
           item.markInformation = solution.markInformation.dataValues;
-          item.limits = solution.limits.map((limit) => limit.dataValues);
+          //item.limits = solution.limits.map((limit) => limit.dataValues);
+          item.limits = populateLimits(solution.limits);
           item.propertyValues = populatePropertyValues(solution.propertyValues);
           return item;
         });

@@ -22,7 +22,7 @@ const { ServerError, logger } = require("../log");
 const { Column, TYPES } = require("./columns/column");
 const { CityCode } = require("./columns/cityCode");
 const { calculateDurationAndDistance } = require("./route");
-const { calculateMarks } = require("./algorithmService");
+const { calculateMarks } = require("./algorithm/algorithmService");
 
 /**----------------------------------------------------------
  * Healper functions
@@ -214,6 +214,7 @@ const calculateRoutes = (employees) => {
     calculateMarks(
       employee,
       cityCount,
+      hoursCount,
       config,
       solutions,
       surveyAnswerCode,
@@ -269,6 +270,16 @@ const insertEmployee = async function (employeeList) {
 const getSiteID = (workSite, siteList) => {
   let currentSite = siteList.filter((site) => site.SITE_ID === workSite);
   return currentSite[0].id;
+};
+
+const getSiteCity = (workSite, siteList) => {
+  let currentSite = siteList.filter((site) => site.SITE_ID === workSite);
+  return currentSite[0].ADDRESS_CITY;
+};
+
+const getSiteStreet = (workSite, siteList) => {
+  let currentSite = siteList.filter((site) => site.SITE_ID === workSite);
+  return currentSite[0].ADDRESS_STREET;
 };
 
 /**
@@ -330,30 +341,15 @@ var surveyAnswerCode = [];
 var employeeProperties = [];
 var propertiesCategories = [];
 var cityCount = {};
+var hoursCount = { exitToWork: {}, returnToHome: {} };
 
 var EMP_COLUMNS = [];
-// var EMP_GRADE_COLUMNS = [
-//    new Column("SHORT_HOURS_GRADE", "קיצור שעות העבודה", TYPES.INT, 6, false),
-//    new Column("SHIFTING_HOURS_GRADE", "הזזת זמן הגעה לעבודה", TYPES.INT, 6, false),
-//    new Column("BICYCLE_GRADE", "דו גלגלי-אופניים", TYPES.INT, 6, false),
-//    new Column("SCOOTER_GRADE", "דו גלגלי-קורקינט", TYPES.INT, 6, false),
-//    new Column("PERSONALIZED_SHUTTLE_GRADE", "Shuttle On Demand", TYPES.INT, 6, false),
-//    new Column("WORK_SHUTTLE_GRADE", "שאטלים מטעם העבודה", TYPES.INT, 6, false),
-//    new Column("CARSHARE_GRADE", "Carshare/Vanshare", TYPES.INT, 6, false),
-//    new Column("CARPOOL_GRADE", "Carpool/Vanpool", TYPES.INT, 6, false),
-//    new Column("CABSHARE_GRADE", "מוניות שיתופיות", TYPES.INT, 6, false),
-//    new Column("PUBLIC_TRANSPORT_GRADE", "תחבורה ציבורית (רכבת/רכבת קלה/אוטובוס/מונית שירות)", TYPES.INT, 6, false),
-//    new Column("WALKING_GRADE", "הגעה רגלית", TYPES.INT, 6, false),
-//    new Column("WORKING_FROM_HOME_GRADE", "עבודה מהבית", TYPES.INT, 6, false),
-//    new Column("SHARED_WORKSPACE_GRADE", "עבודה במרכזים שיתופיים", TYPES.INT, 6, false),
-//    new Column("SHIFTING_WORKING_DAYS_GRADE", "שינוי ימי הגעה לעבודה", TYPES.INT, 6, false)
-// ];
 
 var EMP_SURVEY_QUESTION = [
   new Column("SEX", "מהו המגדר שלך?", TYPES.INT, 1, true),
   new Column("AGE", "מהו גילך?", TYPES.INT, 3, true),
   new Column("PARKING", "מהו הסדר החניה שלך בעבודה?", TYPES.INT, 2, true),
-  new Column("DRIVING_LICENSE", "האם יש לך רישיון נהיגה?", TYPES.INT, 1),
+  new Column("DRIVING_LICENSE", "האם יש לך רישיון נהיגה?", TYPES.INT, 1, true),
   new Column(
     "PICKUP_DISTANCE",
     "מהו מרחק סביר מבחינתך לתחנת איסוף, במידה ומתקיימות הסעות / נסיעות שיתופיות?",
@@ -455,19 +451,14 @@ const main = () => {
       WORK_SITE: getSiteID(emp[empFields.BRANCH_ID], sites),
       CITY: "",
       STREET: "",
+      WORK_CITY: getSiteCity(emp[empFields.BRANCH_ID], sites),
+      WORK_STREET: getSiteStreet(emp[empFields.BRANCH_ID], sites),
       BUILDING_NUMBER: 0,
       UPLOAD_ERROR: null,
       BEST_ROUTE_TO_WORK: null,
       BEST_ROUTE_TO_HOME: null,
       EXIT_HOUR_TO_WORK: DEFAULT_EXIT_HOUR,
       RETURN_HOUR_TO_HOME: DEFAULT_RETURN_HOUR,
-    //   FINAL_BICYCLE_GRADE: null,
-    //   FINAL_WORK_SHUTTLE_GRADE: null,
-    //   FINAL_COMPOUND_SHUTTLE_GRADE: null,
-    //   FINAL_CARPOOL_GRADE: null,
-    //   FINAL_PUBLIC_TRANSPORT_GRADE: null,
-    //   FINAL_WALKING_GRADE: null,
-    //   FINAL_WORKING_FROM_HOME_GRADE: null,
       TOP_SOLUTION_1: null,
       TOP_SOLUTION_2: null,
       TOP_SOLUTION_3: null,
@@ -478,14 +469,14 @@ const main = () => {
 
     // add solution columns marks
     solutions.forEach( solution => {
-        emp[solution.OBJ_COLUMN_NAME] = null;
+      employee[solution.OBJ_COLUMN_NAME] = null;
     })
 
     //let allColumns = EMP_COLUMNS.concat(EMP_GRADE_COLUMNS);
     let allColumns = EMP_COLUMNS.concat(EMP_SURVEY_QUESTION);
     for (const column of allColumns) {
       try {
-        employee[column.name] = column.validityCheck(emp[column.title]);
+        employee[column.name] = column.validityCheck(emp[column.title]) ?? employee[column.name];
       } catch (err) {
         error = err.message;
       }
@@ -496,6 +487,18 @@ const main = () => {
         cityCount[employee.CITY] = cityCount[employee.CITY] + 1;
       else cityCount[employee.CITY] = 1;
     }
+    // update hoursCount 
+    if (employee.EXIT_HOUR_TO_WORK) {
+      if (hoursCount.exitToWork[employee.EXIT_HOUR_TO_WORK])
+        hoursCount.exitToWork[employee.EXIT_HOUR_TO_WORK] = hoursCount.exitToWork[employee.EXIT_HOUR_TO_WORK]+1;
+      else hoursCount.exitToWork[employee.EXIT_HOUR_TO_WORK] = 1;
+    }
+    if (employee.RETURN_HOUR_TO_HOME) {
+      if (hoursCount.returnToHome[employee.RETURN_HOUR_TO_HOME])
+        hoursCount.returnToHome[employee.RETURN_HOUR_TO_HOME] = hoursCount.returnToHome[employee.RETURN_HOUR_TO_HOME]+1;
+      else hoursCount.returnToHome[employee.RETURN_HOUR_TO_HOME] = 1;
+    }
+
     if (error !== "") employee.UPLOAD_ERROR = { error: error };
     else {
       // translate street name
@@ -505,10 +508,12 @@ const main = () => {
           emp["Q359|מה העיר ורחוב המגורים שלך? (עיר)"],
           emp["Q359|רחוב"]
         );
-        if (!employee.STREET)
-          employee.UPLOAD_ERROR = `הערך ${
+        if (!employee.STREET)  {
+          employee.STREET = "";
+          error = `הערך ${
             emp["Q359|רחוב"]
           } ב ${"Q359|רחוב"} אינו תקין`;
+        }
       } catch (err) {
         error = err.message;
       }

@@ -16,12 +16,12 @@ import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import { Tooltip } from '@mui/material';
 import Grid from '@mui/material/Grid'
 
-//const MAX_WALK_TIME = 30;
-//const MAX_BICYCLE_TIME = 60;
 const MARK_COLUMNS = {
    I: 'J', K: 'L', M: 'N', O: 'P', Q: 'R', S: 'T', U: 'V', W: 'X',
    Y: 'Z', AA: 'AB', AC: 'AD', AE: 'AF', AG: 'AH', AI: 'AJ'
 };
+
+const API_SERVER = process.env.REACT_APP_API_SERVER || `/api`;
 
 class DownloadButton extends Component {
 
@@ -136,10 +136,6 @@ class DownloadButton extends Component {
       if (bicycle.length === 0)
          return "";
 
-      // 90 minute ride is not recommended
-      //if ((bicycleDescription[0].legs[0].duration.value / 60) > MAX_BICYCLE_TIME)
-      //   return "";
-
       // add total length and length
       description = `סה"כ ${bestRoute.legs[0].duration.text} למרחק של ${bestRoute.legs[0].distance.text}\n`;
       description = this.translate(description);
@@ -172,10 +168,6 @@ class DownloadButton extends Component {
       // no bicycle ride is suggested
       if (walking.length === 0)
          return "";
-
-      // 60 minute walking is not recommended
-      //if ((walkingDescription[0].legs[0].duration.value / 60) > MAX_WALK_TIME)
-      //  return "";
 
       // add total length and length
       description = `סה"כ ${walkingDescription.legs[0].duration.text} למרחק של ${walkingDescription.legs[0].distance.text}\n`;
@@ -220,7 +212,7 @@ class DownloadButton extends Component {
    }
 
    saveEmployeesList = (employerId, fileName) => {
-      axios.get(`/api/employer/${employerId}/employee`, {
+      axios.get(`${API_SERVER}/employer/${employerId}/employee`, {
          headers:
             { 'authorization': localStorage.getItem('token') }
       })
@@ -238,8 +230,8 @@ class DownloadButton extends Component {
                      emp.transit_distance = temp.distance;
                      temp = this.getBicycleDescription(emp.BEST_ROUTE_TO_WORK.bicycling);
                      emp.bicycling = temp.description;;
-                     emp.bicycling_duration = emp.duration;
-                     emp.bicycling_distance = emp.distance;
+                     emp.bicycling_duration = temp.duration;
+                     emp.bicycling_distance = temp.distance;
                      temp = this.getWalkingDescription(emp.BEST_ROUTE_TO_WORK.walking);
                      emp.walking = temp.description;
                      emp.walking_duration = temp.duration;

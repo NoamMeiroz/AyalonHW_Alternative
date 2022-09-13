@@ -1,6 +1,5 @@
 import React from "react";
 import { VariableSizeList as List } from "react-window";
-import Typography from "@mui/material/Typography";
 
 function renderRow(props) {
   const { data, index, style } = props;
