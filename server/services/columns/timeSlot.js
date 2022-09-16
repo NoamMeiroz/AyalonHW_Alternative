@@ -3,10 +3,12 @@ const { ColumnError, ERROR_CODES } = require("./columnError");
 
 class TimeSlot extends Column {
 
-    constructor(name, title, timeSlots, defaultValue) {
+    constructor(name, title, timeSlots, propertiesCategories, category, defaultValue) {
         super(name, title, TYPES.STRING, 45, true);
         this.timeSlots = timeSlots;
         this.defaultValue = defaultValue;
+        this.propertiesCategories = propertiesCategories;
+        this.category = category;
     }
 
 
@@ -38,7 +40,8 @@ class TimeSlot extends Column {
         // convert exit_hour_to_work to id
         let slot = value;
         if (slot) {
-            slot = this.getTimeSlotID(value);
+            slot = this.propertiesCategories[this.category][slot]["NAME"];
+            slot = this.getTimeSlotID(slot);
             if (!slot) {
                 throw new ColumnError(ERROR_CODES.INPUT_ERROR, `הערך ${value} ב ${this.title} אינו תקין`);
             }

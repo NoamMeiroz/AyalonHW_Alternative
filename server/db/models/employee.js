@@ -68,98 +68,102 @@ module.exports = (sequelize, Sequelize) => {
                 key: 'ID'
             }            
         },
-        SHORT_HOURS_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        SHIFTING_HOURS_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        BICYCLE_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        SCOOTER_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        PERSONALIZED_SHUTTLE_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        WORK_SHUTTLE_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        CARSHARE_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        CARPOOL_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        CABSHARE_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        PUBLIC_TRANSPORT_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        WALKING_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        WORKING_FROM_HOME_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        SHARED_WORKSPACE_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        SHIFTING_WORKING_DAYS_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        FINAL_SHORT_HOURS_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        FINAL_SHIFTING_HOURS_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
+        // SHORT_HOURS_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // SHIFTING_HOURS_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // BICYCLE_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // SCOOTER_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // PERSONALIZED_SHUTTLE_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // WORK_SHUTTLE_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // CARSHARE_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // CARPOOL_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // CABSHARE_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // PUBLIC_TRANSPORT_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // WALKING_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // WORKING_FROM_HOME_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // SHARED_WORKSPACE_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // SHIFTING_WORKING_DAYS_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // FINAL_SHORT_HOURS_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // FINAL_SHIFTING_HOURS_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
         FINAL_BICYCLE_GRADE: {
             type: Sequelize.INTEGER,
             allowNull: true,
         },
-        FINAL_SCOOTER_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        FINAL_PERSONALIZED_SHUTTLE_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
+        // FINAL_SCOOTER_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // FINAL_PERSONALIZED_SHUTTLE_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
         FINAL_WORK_SHUTTLE_GRADE: {
             type: Sequelize.INTEGER,
             allowNull: true,
         },
-        FINAL_CARSHARE_GRADE: {
+        FINAL_COMPOUND_SHUTTLE_GRADE: {
             type: Sequelize.INTEGER,
             allowNull: true,
         },
+        // FINAL_CARSHARE_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
         FINAL_CARPOOL_GRADE: {
             type: Sequelize.INTEGER,
             allowNull: true,
         },
-        FINAL_CABSHARE_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
+        // FINAL_CABSHARE_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
         FINAL_PUBLIC_TRANSPORT_GRADE: {
             type: Sequelize.INTEGER,
             allowNull: true,
@@ -172,14 +176,14 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.INTEGER,
             allowNull: true,
         },
-        FINAL_SHARED_WORKSPACE_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
-        FINAL_SHIFTING_WORKING_DAYS_GRADE: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-        },
+        // FINAL_SHARED_WORKSPACE_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
+        // FINAL_SHIFTING_WORKING_DAYS_GRADE: {
+        //     type: Sequelize.INTEGER,
+        //     allowNull: true,
+        // },
         UPLOAD_ERROR: {
             type: Sequelize.JSON
         }, 
@@ -246,7 +250,97 @@ module.exports = (sequelize, Sequelize) => {
         BEST_ROUTE_TO_WORK_BICYCLING_DURATION: {
             type: Sequelize.INTEGER,
             allowNull: true,
-        }         
+        },
+        TOP_SOLUTION_1: {
+            type: Sequelize.STRING(45),
+            allowNull: true 
+        },
+        TOP_SOLUTION_2: {
+            type: Sequelize.STRING(45),
+            allowNull: true 
+        },
+        TOP_SOLUTION_3: {
+            type: Sequelize.STRING(45),
+            allowNull: true 
+        },
+        TOP_SOLUTION_4: {
+            type: Sequelize.STRING(45),
+            allowNull: true 
+        },
+        TOP_SOLUTION_5: {
+            type: Sequelize.STRING(45),
+            allowNull: true 
+        },
+        BICYCLE_DISQUALIFY_REASON: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            references: {
+                // This is a reference to another model
+                model: 'SoltionDisqualifyReason',
+                // This is the column name of the referenced model
+                key: 'ID'
+            }            
+        },
+        WORK_SHUTTLE_DISQUALIFY_REASON: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            references: {
+                // This is a reference to another model
+                model: 'SoltionDisqualifyReason',
+                // This is the column name of the referenced model
+                key: 'ID'
+            } 
+        },
+        COMPOUND_SHUTTLE_DISQUALIFY_REASON: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            references: {
+                // This is a reference to another model
+                model: 'SoltionDisqualifyReason',
+                // This is the column name of the referenced model
+                key: 'ID'
+            } 
+        },
+        CARPOOL_DISQUALIFY_REASON: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            references: {
+                // This is a reference to another model
+                model: 'SoltionDisqualifyReason',
+                // This is the column name of the referenced model
+                key: 'ID'
+            } 
+        },
+        PUBLIC_TRANSPORT_DISQUALIFY_REASON: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            references: {
+                // This is a reference to another model
+                model: 'SoltionDisqualifyReason',
+                // This is the column name of the referenced model
+                key: 'ID'
+            } 
+        },
+        WALKING_DISQUALIFY_REASON: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            references: {
+                // This is a reference to another model
+                model: 'SoltionDisqualifyReason',
+                // This is the column name of the referenced model
+                key: 'ID'
+            } 
+        },
+        WORKING_FROM_HOME_DISQUALIFY_REASON: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+            references: {
+                // This is a reference to another model
+                model: 'SoltionDisqualifyReason',
+                // This is the column name of the referenced model
+                key: 'ID'
+            }
+        },
     });
     return Employee;
   };

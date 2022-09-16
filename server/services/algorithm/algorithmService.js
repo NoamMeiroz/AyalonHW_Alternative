@@ -92,9 +92,9 @@ const translatePreferedSolutions = (
       (property) => property.OBJ_COLUMN_NAME === "PREFERED_SULOTIONS"
     );
     if (property) {
-      try {
-        preferedSolutions = employee.PREFERED_SULOTIONS.split(", ").map(
-          (answer) => {
+      preferedSolutions = employee.PREFERED_SULOTIONS.split(/[,]\s*|[\|]+/).map(
+        (answer) => {
+          try {
             category = convertAnswerToCategory(
               property[0].CODE,
               property[0].OBJ_COLUMN_NAME,
@@ -106,17 +106,20 @@ const translatePreferedSolutions = (
             return propertiesCategories[property[0].CODE].filter(
               (propertyCategory) => propertyCategory.CATEGORY_CODE === category
             )[0];
+          } catch (error) {
+            logger.error(error.stack);
+            return null;
           }
-        );
-      } catch (error) {
-        logger.error(error.stack);
-        employee.UPLOAD_ERROR = {error: `הערך ${
-          employee.PREFERED_SULOTIONS
-        } ב ${"פתרונות תחבורה אותם אהיה מוכנ/ה לשקול כדי להגיע ולחזור ממקום העבודה"} אינו תקין`};
-      }
+        }
+      );
     } else
-      throw new ServerError(ERRORS.MISSING_EMPLOYEE_PROPERTIES, "PREFERED_SULOTIONS");
+      throw new ServerError(
+        ERRORS.MISSING_EMPLOYEE_PROPERTIES,
+        "PREFERED_SULOTIONS"
+      );
   }
+  // remove null elements;
+  preferedSolutions = preferedSolutions.filter((solution) => solution !== null);
   return preferedSolutions;
 };
 
@@ -158,8 +161,7 @@ const findTopFiveSolutions = (
       );
       if (solution) {
         if (
-          employee[solution[0].OBJ_COLUMN_NAME] !==
-          getConfigValue(config, "failed grade")
+          employee[solution[0].OBJ_COLUMN_NAME] >= 0
         ) {
           solutionList.push(solution[0]);
           isIncluded[solution[0].NAME] = 1;
@@ -179,8 +181,7 @@ const findTopFiveSolutions = (
   solutionList = [];
   solutions.forEach((solution) => {
     if (
-      employee[solution.OBJ_COLUMN_NAME] !==
-        getConfigValue(config, "failed grade") &&
+      employee[solution.OBJ_COLUMN_NAME] >= 0 &&
       !isIncluded[solution.NAME]
     ) {
       solutionList.push(solution);
@@ -189,14 +190,23 @@ const findTopFiveSolutions = (
   });
   // sort by mark and SURVY RANK
   solutionList.sort((a, b) => {
-    let result = employee[a.OBJ_COLUMN_NAME] > employee[b.OBJ_COLUMN_NAME] ? -1 : employee[b.OBJ_COLUMN_NAME] > employee[a.OBJ_COLUMN_NAME] ? 1 : 0;
+    let result =
+      employee[a.OBJ_COLUMN_NAME] > employee[b.OBJ_COLUMN_NAME]
+        ? -1
+        : employee[b.OBJ_COLUMN_NAME] > employee[a.OBJ_COLUMN_NAME]
+        ? 1
+        : 0;
     if (result === 0)
-      result = a.SURVAY_RANK > b.SURVAY_RANK ? -1 : b.SURVAY_RANK > a.SURVAY_RANK ? 1 : 0;
-    return result
-    }
-  )
+      result =
+        a.SURVAY_RANK > b.SURVAY_RANK
+          ? -1
+          : b.SURVAY_RANK > a.SURVAY_RANK
+          ? 1
+          : 0;
+    return result;
+  });
   initTop5Solutions();
-  
+
   return employee;
 
   function initTop5Solutions() {

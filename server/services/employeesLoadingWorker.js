@@ -4,6 +4,10 @@ const empFields = require("../config/config").employeeFieldsName;
 const DEFAULT_EXIT_HOUR = require("../config/config").DEFAULT_EXIT_HOUR_TO_WORK;
 const DEFAULT_RETURN_HOUR =
   require("../config/config").DEFAULT_RETURN_HOUR_TO_HOME;
+const EXIT_HOUR_TO_WORK_CATEGORY =
+  require("../config/config").EXIT_HOUR_TO_WORK_CATEGORY;
+const RETURN_HOUR_TO_HOME_CATEGORY =
+  require("../config/config").RETURN_HOUR_TO_HOME_CATEGORY;
 
 const { getNearestWorkDay } = require("../tools");
 const googleAPI = require("./googleAPI");
@@ -16,11 +20,12 @@ const surveyAnswerCodesData = require("./data/surveyAnswerCodesData");
 const solutionsData = require("./data/solutionsData");
 const propertyCategoriesData = require("./data/propertyCategoriesData");
 
-
 const { ERRORS } = require("./ERRORS");
 const { ServerError, logger } = require("../log");
 const { Column, TYPES } = require("./columns/column");
 const { CityCode } = require("./columns/cityCode");
+const { TimeSlot } = require("./columns/timeSlot");
+
 const { calculateDurationAndDistance } = require("./route");
 const { calculateMarks } = require("./algorithm/algorithmService");
 
@@ -202,14 +207,14 @@ const findCoordinates = async (employee) => {
 /**
  * Calcluare for each employee final marks, distance and duration of routes
  * @param {list of employees} employees
- * @param {count employees in each city} cityCount
- * @param {configuration} config
  */
 const calculateRoutes = (employees) => {
-  //result = employees.map((employee) => calculateMark(employee, config));
-
   result = employees.map((employee) => calculateDurationAndDistance(employee));
 
+  return result;
+};
+
+function runCalculateMarks(employees) {
   result = result.map((employee) =>
     calculateMarks(
       employee,
@@ -222,9 +227,8 @@ const calculateRoutes = (employees) => {
       propertiesCategories
     )
   );
-
   return result;
-};
+}
 
 /**
  * convert employee address to coordinates using google api
@@ -254,6 +258,7 @@ const insertEmployee = async function (employeeList) {
         Promise.all(promiseList)
           .then((employees) => {
             let employeesList = calculateRoutes(employees);
+            employeeList = runCalculateMarks(employeeList);
             data = save(employeesList);
             return resolve(data);
           })
@@ -326,6 +331,50 @@ const getStreetName = (streets, locality, streetCode) => {
   else null;
 };
 
+/**
+ *
+ */
+const updateTransportProblem = (reportedProblems, transportProblem) => {
+  reportedProblems.split(/[,]\s*|[\|]+/).forEach((problem) => {
+    if (!(/^-?\d+$/.test(problem)))
+      return;
+    problemName = surveyAnswerCode["TRANSPORT_PROBLEM"][problem]["NAME"];
+    fieldToUpdate = null;
+    switch (problemName) {
+      case "פקקי תנועה":
+        fieldToUpdate = "TRAFFIC_JAMS";
+        break;
+      case "עלות נסיעה":
+        fieldToUpdate = "TRAVEL_COSTS";
+        break;
+      case "חוסר בחניה":
+        fieldToUpdate = "LACK_OF_PARKING";
+        break;
+      case "עלות חניה":
+        fieldToUpdate = "PARKING_COSTS";
+        break;
+      case "אי יכולת לנצל את זמן הנסיעה":
+        fieldToUpdate = "WASTED_TRAVEL_TIME";
+        break;
+      case "היעדר תחבורה ציבורית למקום העבודה":
+        fieldToUpdate = "LACK_OF_PUBLIC_TRANSPORT";
+        break;
+      case "תדירות תחבורה ציבורית":
+        fieldToUpdate = "PUBLIC_TRANSPORT_FREQUENCY";
+        break;
+      case "אחר":
+        fieldToUpdate = "OTHER";
+        break;
+      default:
+        break;
+    }
+    if (!transportProblem[fieldToUpdate])
+      transportProblem[fieldToUpdate] = 0;
+    transportProblem[fieldToUpdate] = transportProblem[fieldToUpdate] + 1;
+  });
+  return transportProblem;
+};
+
 /**----------------------------------------------------------
  * Main thread
  * -------------------------------------------------------- */
@@ -341,44 +390,11 @@ var surveyAnswerCode = [];
 var employeeProperties = [];
 var propertiesCategories = [];
 var cityCount = {};
+var transportProblem = {};
 var hoursCount = { exitToWork: {}, returnToHome: {} };
 
 var EMP_COLUMNS = [];
-
-var EMP_SURVEY_QUESTION = [
-  new Column("SEX", "מהו המגדר שלך?", TYPES.INT, 1, true),
-  new Column("AGE", "מהו גילך?", TYPES.INT, 3, true),
-  new Column("PARKING", "מהו הסדר החניה שלך בעבודה?", TYPES.INT, 2, true),
-  new Column("DRIVING_LICENSE", "האם יש לך רישיון נהיגה?", TYPES.INT, 1, true),
-  new Column(
-    "PICKUP_DISTANCE",
-    "מהו מרחק סביר מבחינתך לתחנת איסוף, במידה ומתקיימות הסעות / נסיעות שיתופיות?",
-    TYPES.INT,
-    1,
-    true
-  ),
-  new Column(
-    "PREFERED_SULOTIONS",
-    "לפנייך רשימת פתרונות הנוגעים לאופן ההגעה והחזרה. אנא סמן פתרונות בהם תשקול להשתמש אילו היו זמינים במקום העבודה שלך (ניתן לבחור יותר מתשובה אחת)",
-    TYPES.STRING,
-    20,
-    true
-  ),
-  new Column(
-    "EXIT_HOUR_TO_WORK",
-    "מתי אתה מגיע מהבית לעבודה?",
-    TYPES.INT,
-    1,
-    true
-  ),
-  new Column(
-    "RETURN_HOUR_TO_HOME",
-    "מתי אתה יוצא מהעבודה לכיוון הבית?",
-    TYPES.INT,
-    1,
-    true
-  ),
-];
+var EMP_SURVEY_QUESTION = [];
 
 var config = [];
 // init configuation from database
@@ -408,7 +424,7 @@ configData
     solutions = data;
     return propertyCategoriesData.getAllProperties();
   })
-  // init properties categories 
+  // init properties categories
   .then((data) => {
     propertiesCategories = data;
     return employeePropertiesData.getAllProperties();
@@ -431,6 +447,69 @@ configData
       ),
       new CityCode("CITY", "Q359|מה העיר ורחוב המגורים שלך? (עיר)", locality),
       new Column("STREET", "Q359|רחוב", TYPES.INT, 5, true),
+    ];
+    EMP_SURVEY_QUESTION = [
+      new Column("SEX", "מהו המגדר שלך?", TYPES.INT, 1, true),
+      new Column("AGE", "מהו גילך?", TYPES.INT, 3, true),
+      new Column("PARKING", "מהו הסדר החניה שלך בעבודה?", TYPES.INT, 2, true),
+      new Column(
+        "DRIVING_LICENSE",
+        "האם יש לך רישיון נהיגה?",
+        TYPES.INT,
+        1,
+        true
+      ),
+      new Column(
+        "PICKUP_DISTANCE",
+        "מהו מרחק סביר מבחינתך לתחנת איסוף, במידה ומתקיימות הסעות / נסיעות שיתופיות?",
+        TYPES.INT,
+        1,
+        true
+      ),
+      new Column(
+        "PREFERED_SULOTIONS",
+        "לפנייך רשימת פתרונות הנוגעים לאופן ההגעה והחזרה. אנא סמן פתרונות בהם תשקול להשתמש אילו היו זמינים במקום העבודה שלך (ניתן לבחור יותר מתשובה אחת)",
+        TYPES.STRING,
+        20,
+        true
+      ),
+      new Column(
+        "exitHourToWork",
+        "מתי אתה מגיע מהבית לעבודה?",
+        TYPES.INT,
+        1,
+        true
+      ),
+      new Column(
+        "returnHourToHome",
+        "מתי אתה יוצא מהעבודה לכיוון הבית?",
+        TYPES.INT,
+        1,
+        true
+      ),
+      new TimeSlot(
+        "EXIT_HOUR_TO_WORK",
+        "מתי אתה מגיע מהבית לעבודה?",
+        timeSlots,
+        propertiesCategories,
+        EXIT_HOUR_TO_WORK_CATEGORY,
+        DEFAULT_EXIT_HOUR
+      ),
+      new TimeSlot(
+        "RETURN_HOUR_TO_HOME",
+        "מתי אתה יוצא מהעבודה לכיוון הבית?",
+        timeSlots,
+        propertiesCategories,
+        RETURN_HOUR_TO_HOME_CATEGORY,
+        DEFAULT_RETURN_HOUR
+      ),
+      new Column(
+        "TRANSPORT_PROBLEM",
+        "מהם הקשיים שאתה חווה בהגעה ובחזרה מהעבודה? (ניתן לבחור יותר מתשובה אחת)",
+        TYPES.STRING,
+        20,
+        true
+      ),
     ];
     main();
   })
@@ -468,15 +547,16 @@ const main = () => {
     };
 
     // add solution columns marks
-    solutions.forEach( solution => {
+    solutions.forEach((solution) => {
       employee[solution.OBJ_COLUMN_NAME] = null;
-    })
+    });
 
     //let allColumns = EMP_COLUMNS.concat(EMP_GRADE_COLUMNS);
     let allColumns = EMP_COLUMNS.concat(EMP_SURVEY_QUESTION);
     for (const column of allColumns) {
       try {
-        employee[column.name] = column.validityCheck(emp[column.title]) ?? employee[column.name];
+        employee[column.name] =
+          column.validityCheck(emp[column.title]) ?? employee[column.name];
       } catch (err) {
         error = err.message;
       }
@@ -487,17 +567,22 @@ const main = () => {
         cityCount[employee.CITY] = cityCount[employee.CITY] + 1;
       else cityCount[employee.CITY] = 1;
     }
-    // update hoursCount 
+    // update hoursCount
     if (employee.EXIT_HOUR_TO_WORK) {
       if (hoursCount.exitToWork[employee.EXIT_HOUR_TO_WORK])
-        hoursCount.exitToWork[employee.EXIT_HOUR_TO_WORK] = hoursCount.exitToWork[employee.EXIT_HOUR_TO_WORK]+1;
+        hoursCount.exitToWork[employee.EXIT_HOUR_TO_WORK] =
+          hoursCount.exitToWork[employee.EXIT_HOUR_TO_WORK] + 1;
       else hoursCount.exitToWork[employee.EXIT_HOUR_TO_WORK] = 1;
     }
     if (employee.RETURN_HOUR_TO_HOME) {
       if (hoursCount.returnToHome[employee.RETURN_HOUR_TO_HOME])
-        hoursCount.returnToHome[employee.RETURN_HOUR_TO_HOME] = hoursCount.returnToHome[employee.RETURN_HOUR_TO_HOME]+1;
+        hoursCount.returnToHome[employee.RETURN_HOUR_TO_HOME] =
+          hoursCount.returnToHome[employee.RETURN_HOUR_TO_HOME] + 1;
       else hoursCount.returnToHome[employee.RETURN_HOUR_TO_HOME] = 1;
     }
+    // update transport problem
+    if (employee.TRANSPORT_PROBLEM)
+      transportProblem = updateTransportProblem(employee.TRANSPORT_PROBLEM, transportProblem);
 
     if (error !== "") employee.UPLOAD_ERROR = { error: error };
     else {
@@ -508,11 +593,9 @@ const main = () => {
           emp["Q359|מה העיר ורחוב המגורים שלך? (עיר)"],
           emp["Q359|רחוב"]
         );
-        if (!employee.STREET)  {
+        if (!employee.STREET) {
           employee.STREET = "";
-          error = `הערך ${
-            emp["Q359|רחוב"]
-          } ב ${"Q359|רחוב"} אינו תקין`;
+          error = `הערך ${emp["Q359|רחוב"]} ב ${"Q359|רחוב"} אינו תקין`;
         }
       } catch (err) {
         error = err.message;

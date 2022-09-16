@@ -37,6 +37,8 @@ db.solutions = require("./models/algorithm/solutions.js")(sequelize, Sequelize);
 db.solutionMarks = require("./models/algorithm/solutionMarks.js")(sequelize, Sequelize);
 db.solutionLimits = require("./models/algorithm/solutionLimits.js")(sequelize, Sequelize);
 db.solutionPropertyValues = require("./models/algorithm/solutionPropertiesValues.js")(sequelize, Sequelize);
+db.solutionDisqualifyReasons = require("./models/algorithm/solutionDisqualifyReasons.js")(sequelize, Sequelize);
+
 
 db.employer.hasMany(db.employerSites, {foreignKey: "EMPLOYER_ID", as: "Sites"});
 db.employerSites.belongsTo(db.employer, { foreignKey: "EMPLOYER_ID", as: 'employer' });
@@ -46,6 +48,14 @@ db.employee.belongsTo(db.employer, { foreignKey: "EMPLOYER_ID", as: 'employer' }
 db.employee.belongsTo(db.employerSites, { foreignKey: "WORK_SITE", as: 'Site' });
 db.employee.belongsTo(db.timeSlots, { foreignKey: "EXIT_HOUR_TO_WORK", as: 'ExitHourToWork' });
 db.employee.belongsTo(db.timeSlots, { foreignKey: "RETURN_HOUR_TO_HOME", as: 'ReturnHourToHome' });
+db.employee.belongsTo(db.solutionDisqualifyReasons, { foreignKey: "BICYCLE_DISQUALIFY_REASON", as: 'BicycleDisqualifyReason' });
+db.employee.belongsTo(db.solutionDisqualifyReasons, { foreignKey: "WORK_SHUTTLE_DISQUALIFY_REASON", as: 'WorkShuttleDisqualifyReason' });
+db.employee.belongsTo(db.solutionDisqualifyReasons, { foreignKey: "COMPOUND_SHUTTLE_DISQUALIFY_REASON", as: 'CompoundShuttleDisqualifyReason' });
+db.employee.belongsTo(db.solutionDisqualifyReasons, { foreignKey: "CARPOOL_DISQUALIFY_REASON", as: 'CarpoolDisqualifyReason' });
+db.employee.belongsTo(db.solutionDisqualifyReasons, { foreignKey: "PUBLIC_TRANSPORT_DISQUALIFY_REASON", as: 'PublicTransportDisqualifyReason' });
+db.employee.belongsTo(db.solutionDisqualifyReasons, { foreignKey: "WALKING_DISQUALIFY_REASON", as: 'WalkingDisqualifyReason' });
+db.employee.belongsTo(db.solutionDisqualifyReasons, { foreignKey: "WORKING_FROM_HOME_DISQUALIFY_REASON", as: 'WorkingFromHomeDisqualifyReason' });
+
 
 db.surveyAnswerCode.belongsTo(db.propertyCategories, {foreignKey: "PROPERTY_CATEGORIES", as: 'PropertyCategory' });
 

@@ -81,91 +81,90 @@ const calculate = (employee, direction, config) => {
   const transitData = getData(employee[direction].transit);
   const walkingData = getData(employee[direction].walking);
   const bicyclingData = getData(employee[direction].bicycling);
-  const scooterData = getData(employee[direction].bicycling);
   // if driving is short then calcalute short threshold
   if (drivingData.duration <= getConfigValue(config, "short driving limit")) {
     if (
-      transitData &&
+      transitData && employee.FINAL_PUBLIC_TRANSPORT_GRADE !== failedGrade &&
       transitData.duration - drivingData.duration >
         getConfigValue(config, "transport limit short")
-    )
+    ) {
       employee.FINAL_PUBLIC_TRANSPORT_GRADE = failedGrade;
+      employee.PUBLIC_TRANSPORT_DISQUALIFY_REASON = 5;
+    }
     if (
-      walkingData &&
+      walkingData && employee.FINAL_WALKING_GRADE !== failedGrade &&
       walkingData.duration - drivingData.duration >
         getConfigValue(config, "walking limit short")
-    )
+    ) {
       employee.FINAL_WALKING_GRADE = failedGrade;
+      employee.WALKING_DISQUALIFY_REASON = 5;
+    }
     if (
-      bicyclingData &&
+      bicyclingData && employee.FINAL_BICYCLE_GRADE !== failedGrade &&
       bicyclingData.duration - drivingData.duration >
         getConfigValue(config, "bicycle limit short")
-    )
+    ) {
       employee.FINAL_BICYCLE_GRADE = failedGrade;
-    if (
-      scooterData &&
-      scooterData.duration - drivingData.duration >
-        getConfigValue(config, "scooter limit short")
-    )
-      employee.FINAL_SCOOTER_GRADE = failedGrade;
+      employee.BICYCLE_DISQUALIFY_REASON = 5;
+    }
   }
   // if driving is short then calcalute medium threshold
   else if (
     drivingData.duration <= getConfigValue(config, "medium driving limit")
   ) {
     if (
-      transitData &&
+      transitData && employee.FINAL_PUBLIC_TRANSPORT_GRADE !== failedGrade &&
       transitData.duration - drivingData.duration >
         getConfigValue(config, "transport limit medium")
-    )
+    ) {
       employee.FINAL_PUBLIC_TRANSPORT_GRADE = failedGrade;
+      employee.PUBLIC_TRANSPORT_DISQUALIFY_REASON = 5;
+    }
     if (
-      walkingData &&
+      walkingData && employee.FINAL_WALKING_GRADE !== failedGrade &&
       walkingData.duration - drivingData.duration >
         getConfigValue(config, "walking limit medium")
-    )
+    ) {
       employee.FINAL_WALKING_GRADE = failedGrade;
+      employee.WALKING_DISQUALIFY_REASON = 5;
+    }
     if (
-      bicyclingData &&
+      bicyclingData && employee.FINAL_BICYCLE_GRADE !== failedGrade &&
       bicyclingData.duration - drivingData.duration >
         getConfigValue(config, "bicycle limit medium")
-    )
+    ) {
       employee.FINAL_BICYCLE_GRADE = failedGrade;
-    if (
-      scooterData &&
-      scooterData.duration - drivingData.duration >
-        getConfigValue(config, "scooter limit medium")
-    )
-      employee.FINAL_SCOOTER_GRADE = failedGrade;
+      employee.BICYCLE_DISQUALIFY_REASON = 5;
+    }
   }
   // if driving is short then calcalute long threshold
   else if (
     drivingData.duration >= getConfigValue(config, "long driving limit")
   ) {
     if (
-      transitData &&
+      transitData && employee.FINAL_PUBLIC_TRANSPORT_GRADE !== failedGrade &&
       transitData.duration - drivingData.duration >
         getConfigValue(config, "transport limit long")
-    )
+    ) {
       employee.FINAL_PUBLIC_TRANSPORT_GRADE = failedGrade;
+      employee.PUBLIC_TRANSPORT_DISQUALIFY_REASON = 5;
+    }
     if (
-      walkingData &&
+      walkingData && employee.FINAL_WALKING_GRADE !== failedGrade &&
       walkingData.duration - drivingData.duration >
         getConfigValue(config, "walking limit long")
-    )
+    ) {
       employee.FINAL_WALKING_GRADE = failedGrade;
+      employee.WALKING_DISQUALIFY_REASON = 5;
+    }
     if (
-      bicyclingData &&
+      bicyclingData && employee.FINAL_BICYCLE_GRADE !== failedGrade &&
       bicyclingData.duration - drivingData.duration >
         getConfigValue(config, "bicycle limit long")
-    )
+    ) {
       employee.FINAL_BICYCLE_GRADE = failedGrade;
-    if (
-      scooterData &&
-      scooterData.duration - drivingData.duration >
-        getConfigValue(config, "scooter limit long")
-    )
-      employee.FINAL_SCOOTER_GRADE = failedGrade;
+      employee.BICYCLE_DISQUALIFY_REASON = 5;
+    }
   }
 
   return employee;

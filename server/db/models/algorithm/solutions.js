@@ -13,7 +13,11 @@ module.exports = (sequelize, Sequelize) => {
             allowNull: false,    
         },
         OBJ_COLUMN_NAME: {
-            type: Sequelize.STRING(45),
+            type: Sequelize.STRING(100),
+            allowNull: false
+        },
+        DISQUALIFY_COLUMN_NAME: {
+            type: Sequelize.STRING(100),
             allowNull: false
         },
     },
