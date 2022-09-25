@@ -45,6 +45,38 @@ module.exports = (sequelize, Sequelize) => {
         COMPOUND: {
             type: Sequelize.STRING(50),
         },
+        TRAFFIC_JAMS: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        TRAVEL_COSTS: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        LACK_OF_PARKING: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        PARKING_COSTS: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        WASTED_TRAVEL_TIME: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        LACK_OF_PUBLIC_TRANSPORT: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        PUBLIC_TRANSPORT_FREQUENCY: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
+        OTHER: {
+            type: Sequelize.INTEGER,
+            allowNull: true,
+        },
     }
     );
     return EmployerSites;

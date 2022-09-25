@@ -30,27 +30,19 @@ class DownloadButton extends Component {
          { header: 'מזהה עובד', key: 'WORKER_ID', width: 20 },
          { header: 'ישוב', key: 'CITY', width: 20 },
          { header: 'רחוב', key: 'STREET', width: 20 },
-         { header: 'מספר בניין', key: 'BUILDING_NUMBER', width: 12 },
          { header: "סניף", key: 'SITE_NAME', width: 20 },
          { header: "מקום עבודה-ישוב", key: 'WORK_CITY', width: 20 },
          { header: "מקום עבודה-רחוב", key: 'WORK_STREET', width: 20 },
          { header: "מקום עבודה-מספר בנין", key: 'WORK_BUILDING', width: 12 },
          { header: 'שעת הגעה למקום העבודה', key: 'EXIT_HOUR_TO_WORK', width: 15 },
          { header: 'שעת היציאה ממקום העבודה', key: 'RETURN_HOUR_TO_HOME', width: 15 },
-         { header: 'ציון מחושב\nקיצור שעות העבודה', key: 'FINAL_SHORT_HOURS_GRADE', width: 15 },
-         { header: 'ציון מחושב\nהזזת זמן הגעה לעבודה', key: 'FINAL_SHIFTING_HOURS_GRADE', width: 15 },
-         { header: 'ציון מחושב\nדו גלגלי-אופניים', key: 'FINAL_BICYCLE_GRADE', width: 15 },
-         { header: 'ציון מחושב\nדו גלגלי-קורקינט', key: 'FINAL_SCOOTER_GRADE', width: 15 },
-         { header: 'ציון מחושב\nShuttle On Demand', key: 'FINAL_PERSONALIZED_SHUTTLE_GRADE', width: 15 },
+         { header: 'ציון מחושב\nמיקרומוביליטי', key: 'FINAL_BICYCLE_GRADE', width: 15 },
          { header: 'ציון מחושב\nשאטלים מטעם העבודה', key: 'FINAL_WORK_SHUTTLE_GRADE', width: 15 },
-         { header: 'ציון מחושב\nCarshare/Vanshare', key: 'FINAL_CARSHARE_GRADE', width: 15 },
+         { header: 'ציון מחושב\nשאטל במתחם העבודה', key: 'FINAL_COMPOUND_SHUTTLE_GRADE', width: 15 },
          { header: 'ציון מחושב\nCarpool/Vanpool', key: 'FINAL_CARPOOL_GRADE', width: 15 },
-         { header: 'ציון מחושב\nמוניות שיתופיות', key: 'FINAL_CABSHARE_GRADE', width: 15 },
          { header: 'ציון מחושב\nתחבורה ציבורית', key: 'FINAL_PUBLIC_TRANSPORT_GRADE', width: 15 },
          { header: 'ציון מחושב\nהגעה רגלית', key: 'FINAL_WALKING_GRADE', width: 15 },
-         { header: 'ציון מחושב\nעבודה מהבית', key: 'FINAL_WORKING_FROM_HOME_GRADE', width: 15 },
-         { header: 'ציון מחושב\nעבודה במרכזים שיתופיים', key: 'FINAL_SHARED_WORKSPACE_GRADE', width: 15 },
-         { header: 'ציון מחושב\nשינוי ימי הגעה לעבודה', key: 'FINAL_SHIFTING_WORKING_DAYS_GRADE', width: 15 },
+         { header: 'ציון מחושב\nעבודה מרחוק', key: 'FINAL_WORKING_FROM_HOME_GRADE', width: 15 },
          { header: 'זמני הגעה למשרד בדקות\nרכב פרטי', key: 'BEST_ROUTE_TO_WORK_DRIVING_DURATION', width: 15 },
          { header: 'זמני הגעה למשרד בדקות\nהליכה', key: 'BEST_ROUTE_TO_WORK_WALKING_DURATION', width: 15 },
          { header: 'זמני הגעה למשרד בדקות\nתחבורה ציבורית', key: 'BEST_ROUTE_TO_WORK_TRANSIT_DURATION', width: 15 },
@@ -133,7 +125,7 @@ class DownloadButton extends Component {
                   {
                      type: 'expression',
                      formulae: [`IF(ISNUMBER(C${rowNumber}), IF(${column}${rowNumber}<=C${rowNumber}, 1, 0), 0)`],
-                     style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFFFF00' } } },
+                     style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: '99EDC3' } } },
                   }
                ]
             })
@@ -146,7 +138,7 @@ class DownloadButton extends Component {
                   {
                      type: 'expression',
                      formulae: [`IF(ISNUMBER(G${rowNumber}), IF(${column}${rowNumber}<=G${rowNumber}, 1, 0), 0)`],
-                     style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFFFF00' } } },
+                     style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: '99EDC3' } } },
                   }
                ]
             })
@@ -170,16 +162,11 @@ class DownloadButton extends Component {
       ws.columns = [
          { header: 'שם חברה', key: 'COMPANY', width: 20 },
          { header: 'מזהה עובד', key: 'WORKER_ID', width: 20 },
-         { header: 'דרוג 1-פתרון', key: 'SOLUTION_1', width: 20 },
-         { header: 'דרוג 1-ציון', key: 'GRADE_1', width: 10 },
-         { header: 'דרוג 2-פתרון', key: 'SOLUTION_2', width: 20 },
-         { header: 'דרוג 2-ציון', key: 'GRADE_2',  width: 10 },
-         { header: 'דרוג 3-פתרון', key: 'SOLUTION_3', width: 20 },
-         { header: 'דרוג 3-ציון', key: 'GRADE_3', width: 10 },
-         { header: 'דרוג 4-פתרון', key: 'SOLUTION_4', width: 20 },
-         { header: 'דרוג 4-ציון', key: 'GRADE_4', width: 10 },
-         { header: 'דרוג 5-פתרון', key: 'SOLUTION_5', width: 20 },
-         { header: 'דרוג 5-ציון', key: 'GRADE_5',  width: 10 }
+         { header: 'דרוג 1', key: 'TOP_SOLUTION_1', width: 20 },
+         { header: 'דרוג 2', key: 'TOP_SOLUTION_2', width: 20 },
+         { header: 'דרוג 3', key: 'TOP_SOLUTION_3', width: 20 },
+         { header: 'דרוג 4', key: 'TOP_SOLUTION_4', width: 20 },
+         { header: 'דרוג 5', key: 'TOP_SOLUTION_5', width: 20 },
        ];
 
       // make header bold
@@ -214,14 +201,11 @@ class DownloadButton extends Component {
          { header: 'שם חברה', key: 'COMPANY', width: 20 },
          { header: 'מזהה עובד', key: 'WORKER_ID', width: 20 },
          { header: 'קבוצה', key: 'cluster', width: 20 },
-         { header: 'ציון מחושב\nShuttle On Demand', key: 'FINAL_PERSONALIZED_SHUTTLE_GRADE', width: 15 },
          { header: 'ציון מחושב\nשאטלים מטעם העבודה', key: 'FINAL_WORK_SHUTTLE_GRADE', width: 15 },
-         { header: 'ציון מחושב\nCarshare/Vanshare', key: 'FINAL_CARSHARE_GRADE', width: 15 },
+         { header: 'ציון מחושב\nשאטל במתחם העבודה', key: 'FINAL_COMPOUND_SHUTTLE_GRADE', width: 15 },
          { header: 'ציון מחושב\nCarpool/Vanpool', key: 'FINAL_CARPOOL_GRADE', width: 15 },
-         { header: 'ציון מחושב\nמוניות שיתופיות', key: 'FINAL_CABSHARE_GRADE', width: 15 },
          { header: 'ישוב', key: 'CITY', width: 20 },
          { header: 'רחוב', key: 'STREET', width: 20 },
-         { header: 'מספר בניין', key: 'BUILDING_NUMBER', width: 12 },
          { header: "סניף", key: 'SITE_NAME', width: 20 },
          { header: "מקום עבודה-ישוב", key: 'WORK_CITY', width: 20 },
          { header: "מקום עבודה-רחוב", key: 'WORK_STREET', width: 20 },

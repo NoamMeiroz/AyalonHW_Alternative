@@ -1,157 +1,221 @@
-const { Worker } = require('worker_threads');
-const { logger, ServerError } = require('../../log');
+const { Worker } = require("worker_threads");
+const { logger, ServerError } = require("../../log");
 const employeeSchema = require("../../db/employeeSchema");
 const employerSchema = require("../../db/employerSchema");
-const { sendMessage } = require('../../websocket');
+const { sendMessage } = require("../../websocket");
 
 function employeesService(workerData) {
-	return new Promise((resolve, reject) => {
-		const worker = new Worker('./services/employeesLoadingWorker.js', { workerData });
-		worker.on('message', resolve);
-		worker.on('error', reject);
-		worker.on('exit', (code) => {
-			if (code !== 0)
-				return reject(new ServerError(500, `Worker stopped with exit code ${code}`));
-		})
-	})
+  return new Promise((resolve, reject) => {
+    const worker = new Worker("./services/employeesLoadingWorker.js", {
+      workerData,
+    });
+    worker.on("message", resolve);
+    worker.on("error", reject);
+    worker.on("exit", (code) => {
+      if (code !== 0)
+        return reject(
+          new ServerError(500, `Worker stopped with exit code ${code}`)
+        );
+    });
+  });
 }
 
 /**
- * 
- * @param {*} uid 
- * @param {*} employer 
- * @param {*} employees 
+ *
+ * @param {*} uid
+ * @param {*} employer
+ * @param {*} employees
  */
 async function run(uid, employer, employees) {
-	logger.info(employer.NAME + ": saving employees information...");
-	let state = employerSchema.STATE.READY;
-	try {
-		result = await employeesService({ employer, employees });
-		if (!result.Employees) {
-			state = employerSchema.STATE.ERROR;
-		}
-		else {
-			let payload = result.Employees;
-			logger.info(`upload result ${employer.NAME}: ${JSON.stringify(payload)}`);
-			payload.employerID = employer.id;
-			// notify client about the upload result; 
-			sendMessage(uid, {type: "upload_result", payload: payload });
-		}
-	}
-	catch (error) {
-		logger.error(employer.NAME + ": saving employees information failed." + error.stack);
-		state = employerSchema.STATE.ERROR;
-	}
-	// finish working on employees
-	employerSchema.setEmployeeState(employer.id, state,
-		(err, result) => {
-			if (result)
-				logger.debug("employee state is " + JSON.stringify(result));
-			else {
-				
-				logger.error(err)
-			}
-		});
-};
+  logger.info(employer.NAME + ": saving employees information...");
+  let state = employerSchema.STATE.READY;
+  try {
+    result = await employeesService({ employer, employees });
+    if (!result.Employees) {
+      state = employerSchema.STATE.ERROR;
+    } else {
+      let payload = result.Employees;
+      logger.info(`upload result ${employer.NAME}: ${JSON.stringify(payload)}`);
+      payload.employerID = employer.id;
+      // notify client about the upload result;
+      sendMessage(uid, { type: "upload_result", payload: payload });
+    }
+  } catch (error) {
+    logger.error(
+      employer.NAME + ": saving employees information failed." + error.stack
+    );
+    state = employerSchema.STATE.ERROR;
+  }
+  // finish working on employees
+  employerSchema.setEmployeeState(employer.id, state, (err, result) => {
+    if (result) logger.debug("employee state is " + JSON.stringify(result));
+    else {
+      logger.error(err);
+    }
+  });
+}
 
 /**
  * Check the data of the employer and then insert it to the database
  * if data is not valid then reject.
- * @param {} data 
+ * @param {} data
  */
 const getEmployeesOfEmployer = (empId) => {
-	return new Promise(function (resolve, reject) {
-		employeeSchema.getEmployeesOfEmployer(empId, [], [], (err, payload) => {
-			if (err) {
-				logger.error(err.stack);
-				return reject(new ServerError(500, "internal error"))
-			}
-			let employeesList = [];
-			for (i in payload) {
-				employee = payload[i];
-				employeesList[i] = employee.dataValues;
-				let workSite = employeesList[i].Site.dataValues
-				employeesList[i].WORK_SITE = workSite.ADDRESS_STREET + " " +
-					workSite.ADDRESS_BUILDING_NUMBER + ", " + workSite.ADDRESS_CITY;
+  return new Promise(function (resolve, reject) {
+    employeeSchema.getEmployeesOfEmployer(empId, [], [], (err, payload) => {
+      if (err) {
+        logger.error(err.stack);
+        return reject(new ServerError(500, "internal error"));
+      }
+      let employeesList = [];
+      for (i in payload) {
+        employee = payload[i];
+        employeesList[i] = employee.dataValues;
+        let workSite = employeesList[i].Site.dataValues;
+        employeesList[i].WORK_SITE =
+          workSite.ADDRESS_STREET +
+          " " +
+          workSite.ADDRESS_BUILDING_NUMBER +
+          ", " +
+          workSite.ADDRESS_CITY;
 
-				// translate time slot id to meaningful text
-				let timeSLot = employeesList[i].ExitHourToWork.dataValues;
-				employeesList[i].EXIT_HOUR_TO_WORK = timeSLot.TIME_SLOT;
+        // translate time slot id to meaningful text
+        let timeSLot = employeesList[i].ExitHourToWork.dataValues;
+        employeesList[i].EXIT_HOUR_TO_WORK = timeSLot.TIME_SLOT;
 
-				// translate time slot id to meaningful text
-				timeSLot = employeesList[i].ReturnHourToHome.dataValues;
-				employeesList[i].RETURN_HOUR_TO_HOME = timeSLot.TIME_SLOT;
-				
-				// remove column the client doesnt need
-				delete employeesList[i].updatedAt;
-				delete employeesList[i].createdAt;
-				delete employeesList[i].EMPLOYER_ID;
-				delete employeesList[i].id;
-				delete employeesList[i].Site;
-			}
-			resolve(employeesList);
-		});
-	});
-}
+        // translate time slot id to meaningful text
+        timeSLot = employeesList[i].ReturnHourToHome.dataValues;
+        employeesList[i].RETURN_HOUR_TO_HOME = timeSLot.TIME_SLOT;
 
-const getPrecentFinished = (empId) => {
-	return new Promise(function (resolve, reject) {
-		employeeSchema.getPrecentFinished(empId, (err, payload) => {
-			if (err) {
-				logger.error(err.stack);
-				reject(new ServerError(500, err))
-			}
-			resolve({ employerID: empId, precent: payload });
-		});
-	});
-}
+        //translate bicycle disqualify reason
+        let disqualifyReason = null;
+        if (employeesList[i].BicycleDisqualifyReason) {
+          disqualifyReason =
+            employeesList[i].BicycleDisqualifyReason.dataValues;
+          employeesList[i].BICYCLE_DISQUALIFY_REASON = disqualifyReason.REASON;
+        }
 
-/**
- * 
- * @param {*} workerData 
- */
-function recalculateService(workerData) {
-	return new Promise((resolve, reject) => {
-		const worker = new Worker('./services/employeesUpdateWorker.js', { workerData });
-		worker.on('message', resolve);
-		worker.on('error', reject);
-		worker.on('exit', (code) => {
-			if (code !== 0)
-				return reject(new ServerError(500, `Worker stopped with exit code ${code}`));
-		})
-	})
-}
+        if (employeesList[i].WorkShuttleDisqualifyReason) {
+          disqualifyReason =
+            employeesList[i].WorkShuttleDisqualifyReason.dataValues;
+          employeesList[i].WORK_SHUTTLE_DISQUALIFY_REASON = disqualifyReason.REASON;
+        }
 
+        if (employeesList[i].CompoundShuttleDisqualifyReason) {
+          disqualifyReason =
+            employeesList[i].CompoundShuttleDisqualifyReason.dataValues;
+          employeesList[i].COMPOUND_SHUTTLE_DISQUALIFY_REASON =
+            disqualifyReason.REASON;
+        }
 
-async function runRecalculate(uid, employer, employees) {
-	logger.info(employer.NAME + ": updating employees routes and marks...");
-	let state = employerSchema.STATE.READY;
-	try {
-		result = await recalculateService({ employer, employees });
-		if (!result.Employees) {
-			state = employerSchema.STATE.ERROR;
-		}
-		else {
-			let payload = result.Employees;
-			payload.employerID = employer.id;
-			// notify client about the upload result; 
-			sendMessage(uid, {type: "recalculate_result", payload: payload });
-		}
-	}
-	catch (error) {
-		logger.error(employer.NAME + ": saving employees information failed." + error.stack);
-		state = employerSchema.STATE.ERROR;
-	}
-	// finish working on employees
-	employerSchema.setEmployeeState(employer.id, state,
-		(err, result) => {
-			if (result)
-				logger.debug("employee state is " + JSON.stringify(result));
-			else {
-				
-				logger.error(err)
-			}
-		});
+        if (employeesList[i].CarpoolDisqualifyReason) {
+          disqualifyReason =
+            employeesList[i].CarpoolDisqualifyReason.dataValues;
+          employeesList[i].CARPOOL_DISQUALIFY_REASON = disqualifyReason.REASON;
+        }
+
+        if (employeesList[i].PublicTransportDisqualifyReason) {
+          disqualifyReason =
+            employeesList[i].PublicTransportDisqualifyReason.dataValues;
+          employeesList[i].PUBLIC_TRANSPORT_DISQUALIFY_REASON =
+            disqualifyReason.REASON;
+        }
+
+        if (employeesList[i].WalkingDisqualifyReason) {
+          disqualifyReason =
+            employeesList[i].WalkingDisqualifyReason.dataValues;
+          employeesList[i].WALKING_DISQUALIFY_REASON = disqualifyReason.REASON;
+        }
+
+        if (employeesList[i].WorkingFromHomeDisqualifyReason) {
+          disqualifyReason =
+            employeesList[i].WorkingFromHomeDisqualifyReason.dataValues;
+          employeesList[i].WORKING_FROM_HOME_DISQUALIFY_REASON =
+            disqualifyReason.REASON;
+        }
+
+        // remove column the client doesnt need
+        delete employeesList[i].updatedAt;
+        delete employeesList[i].createdAt;
+        delete employeesList[i].EMPLOYER_ID;
+        delete employeesList[i].id;
+        delete employeesList[i].Site;
+        delete employeesList[i].BicycleDisqualifyReason;
+        delete employeesList[i].WorkShuttleDisqualifyReason;
+        delete employeesList[i].CompoundShuttleDisqualifyReason;
+        delete employeesList[i].CarpoolDisqualifyReason;
+        delete employeesList[i].PublicTransportDisqualifyReason;
+        delete employeesList[i].WalkingDisqualifyReason;
+        delete employeesList[i].WorkingFromHomeDisqualifyReason;
+      }
+      resolve(employeesList);
+    });
+  });
 };
 
-module.exports = { run, getEmployeesOfEmployer, getPrecentFinished, runRecalculate }
+const getPrecentFinished = (empId) => {
+  return new Promise(function (resolve, reject) {
+    employeeSchema.getPrecentFinished(empId, (err, payload) => {
+      if (err) {
+        logger.error(err.stack);
+        reject(new ServerError(500, err));
+      }
+      resolve({ employerID: empId, precent: payload });
+    });
+  });
+};
+
+/**
+ *
+ * @param {*} workerData
+ */
+function recalculateService(workerData) {
+  return new Promise((resolve, reject) => {
+    const worker = new Worker("./services/employeesUpdateWorker.js", {
+      workerData,
+    });
+    worker.on("message", resolve);
+    worker.on("error", reject);
+    worker.on("exit", (code) => {
+      if (code !== 0)
+        return reject(
+          new ServerError(500, `Worker stopped with exit code ${code}`)
+        );
+    });
+  });
+}
+
+async function runRecalculate(uid, employer, employees) {
+  logger.info(employer.NAME + ": updating employees routes and marks...");
+  let state = employerSchema.STATE.READY;
+  try {
+    result = await recalculateService({ employer, employees });
+    if (!result.Employees) {
+      state = employerSchema.STATE.ERROR;
+    } else {
+      let payload = result.Employees;
+      payload.employerID = employer.id;
+      // notify client about the upload result;
+      sendMessage(uid, { type: "recalculate_result", payload: payload });
+    }
+  } catch (error) {
+    logger.error(
+      employer.NAME + ": saving employees information failed." + error.stack
+    );
+    state = employerSchema.STATE.ERROR;
+  }
+  // finish working on employees
+  employerSchema.setEmployeeState(employer.id, state, (err, result) => {
+    if (result) logger.debug("employee state is " + JSON.stringify(result));
+    else {
+      logger.error(err);
+    }
+  });
+}
+
+module.exports = {
+  run,
+  getEmployeesOfEmployer,
+  getPrecentFinished,
+  runRecalculate,
+};

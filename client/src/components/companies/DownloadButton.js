@@ -313,34 +313,28 @@ class DownloadButton extends Component {
          { header: 'כתובת מקום העבודה', key: 'WORK_SITE', width: 50 },
          { header: 'שעת הגעה למקום העבודה', key: 'EXIT_HOUR_TO_WORK', width: 15 },
          { header: 'שעת היציאה ממקום העבודה', key: 'RETURN_HOUR_TO_HOME', width: 15 },
-         { header: 'ציון מקורי\nקיצור שעות העבודה', key: 'SHORT_HOURS_GRADE', width: 15 },
-         { header: 'ציון מחושב\nקיצור שעות העבודה', key: 'FINAL_SHORT_HOURS_GRADE', width: 15 },
-         { header: 'ציון מקורי\nהזזת זמן הגעה לעבודה', key: 'SHIFTING_HOURS_GRADE', width: 15 },
-         { header: 'ציון מחושב\nהזזת זמן הגעה לעבודה', key: 'FINAL_SHIFTING_HOURS_GRADE', width: 15 },
-         { header: 'ציון מקורי\nדו גלגלי-אופניים', key: 'BICYCLE_GRADE', width: 15 },
-         { header: 'ציון מחושב\nדו גלגלי-אופניים', key: 'FINAL_BICYCLE_GRADE', width: 15 },
-         { header: 'ציון מקורי\nדו גלגלי-קורקינט', key: 'SCOOTER_GRADE', width: 15 },
-         { header: 'ציון מחושב\nדו גלגלי-קורקינט', key: 'FINAL_SCOOTER_GRADE', width: 15 },
-         { header: 'ציון מקורי\nShuttle On Demand', key: 'PERSONALIZED_SHUTTLE_GRADE', width: 15 },
-         { header: 'ציון מחושב\nShuttle On Demand', key: 'FINAL_PERSONALIZED_SHUTTLE_GRADE', width: 15 },
-         { header: 'ציון מקורי\nשאטלים מטעם העבודה', key: 'WORK_SHUTTLE_GRADE', width: 15 },
-         { header: 'ציון מחושב\nשאטלים מטעם העבודה', key: 'FINAL_WORK_SHUTTLE_GRADE', width: 15 },
-         { header: 'ציון מקורי\nCarshare/Vanshare', key: 'CARSHARE_GRADE', width: 15 },
-         { header: 'ציון מחושב\nCarshare/Vanshare', key: 'FINAL_CARSHARE_GRADE', width: 15 },
-         { header: 'ציון מקורי\nCarpool/Vanpool', key: 'CARPOOL_GRADE', width: 15 },
-         { header: 'ציון מחושב\nCarpool/Vanpool', key: 'FINAL_CARPOOL_GRADE', width: 15 },
-         { header: 'ציון מקורי\nמוניות שיתופיות', key: 'CABSHARE_GRADE', width: 15 },
-         { header: 'ציון מחושב\nמוניות שיתופיות', key: 'FINAL_CABSHARE_GRADE', width: 15 },
-         { header: 'ציון מקורי\nתחבורה ציבורית', key: 'PUBLIC_TRANSPORT_GRADE', width: 15 },
-         { header: 'ציון מחושב\nתחבורה ציבורית', key: 'FINAL_PUBLIC_TRANSPORT_GRADE', width: 15 },
-         { header: 'ציון מקורי\nהגעה רגלית', key: 'WALKING_GRADE', width: 15 },
-         { header: 'ציון מחושב\nהגעה רגלית', key: 'FINAL_WALKING_GRADE', width: 15 },
-         { header: 'ציון מקורי\nעבודה מהבית', key: 'WORKING_FROM_HOME_GRADE', width: 15 },
-         { header: 'ציון מחושב\nעבודה מהבית', key: 'FINAL_WORKING_FROM_HOME_GRADE', width: 15 },
-         { header: 'ציון מקורי\nעבודה במרכזים שיתופיים', key: 'SHARED_WORKSPACE_GRADE', width: 15 },
-         { header: 'ציון מחושב\nעבודה במרכזים שיתופיים', key: 'FINAL_SHARED_WORKSPACE_GRADE', width: 15 },
-         { header: 'ציון מקורי\nשינוי ימי הגעה לעבודה', key: 'SHIFTING_WORKING_DAYS_GRADE', width: 15 },
-         { header: 'ציון מחושב\nשינוי ימי הגעה לעבודה', key: 'FINAL_SHIFTING_WORKING_DAYS_GRADE', width: 15 },
+         { header: 'פתרון מומלץ 1', key: 'TOP_SOLUTION_1', width: 15},
+         { header: 'פתרון מומלץ 2', key: 'TOP_SOLUTION_2', width: 15},
+         { header: 'פתרון מומלץ 3', key: 'TOP_SOLUTION_3', width: 15},
+         { header: 'פתרון מומלץ 4', key: 'TOP_SOLUTION_4', width: 15},
+         { header: 'פתרון מומלץ 5', key: 'TOP_SOLUTION_5', width: 15},         
+         { header: 'מיקרומוביליטי\nציון', key: 'FINAL_BICYCLE_GRADE', width: 15 },
+         { header: 'מיקרומוביליטי\nסיבת פסילה', key: 'BICYCLE_DISQUALIFY_REASON', width: 25},
+         { header: 'שאטלים מטעם העבודה\nציון', key: 'FINAL_WORK_SHUTTLE_GRADE', width: 15 },
+         { header: 'שאטלים מטעם העבודה\nסיבת פסילה', key: 'WORK_SHUTTLE_DISQUALIFY_REASON', width: 25},
+         { header: 'שאטל פנים מתחמי\nציון', key: 'FINAL_COMPOUND_SHUTTLE_GRADE', width: 15 },
+         { header: 'שאטל פנים מתחמי\nסיבת פסילה', key: 'COMPOUND_SHUTTLE_DISQUALIFY_REASON', width: 15 },
+         { header: 'Carpool/Vanpool\nציון', key: 'FINAL_CARPOOL_GRADE', width: 15 },
+         { header: 'Carpool/Vanpool\nסיבת פסילה', key: 'CARPOOL_DISQUALIFY_REASON', width: 15 },
+         { header: 'תחבורה ציבורית\nציון', key: 'FINAL_PUBLIC_TRANSPORT_GRADE', width: 15 },
+         { header: 'תחבורה ציבורית\nסיבת פסילה', key: 'PUBLIC_TRANSPORT_DISQUALIFY_REASON', width: 15 },
+
+         { header: 'הגעה רגלית\nציון', key: 'FINAL_WALKING_GRADE', width: 15 },
+         { header: 'הגעה רגלית\nסיבת פסילה', key: 'WALKING_DISQUALIFY_REASON', width: 15 },
+
+         { header: 'עבודה מרחוק\nציון', key: 'FINAL_WORKING_FROM_HOME_GRADE', width: 15 },
+         { header: 'עבודה מרחוק\nסיבת פסילה', key: 'WORKING_FROM_HOME_DISQUALIFY_REASON', width: 15 },
+
          { header: 'תחבורה ציבורית למקום העבודה\nמסלול', key: 'transit', width: 50 },
          { header: 'תחבורה ציבורית למקום העבודה\nמשך בשניות', key: 'transit_duration', width: 15 },
          { header: 'תחבורה ציבורית למקום העבודה\nמרחק במטרים', key: 'transit_distance', width: 15 },
@@ -390,21 +384,21 @@ class DownloadButton extends Component {
                }
             ]
          })
-         for (let col in MARK_COLUMNS) {
-            const orig_mark = col;
-            const final_mark = MARK_COLUMNS[orig_mark];
-            //apply conditional formatting
-            ws.addConditionalFormatting({
-               ref: `${final_mark}${rowNumber}`,
-               rules: [
-                  {
-                     type: 'expression',
-                     formulae: [`IF($${orig_mark}$${rowNumber}<>$${final_mark}${rowNumber}, IF(ISBLANK($${final_mark}${rowNumber}),0, 1), 0)`],
-                     style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'D0bbe33d' } } },
-                  }
-               ]
-            })
-         }
+         // for (let col in MARK_COLUMNS) {
+         //    const orig_mark = col;
+         //    const final_mark = MARK_COLUMNS[orig_mark];
+         //    //apply conditional formatting
+         //    ws.addConditionalFormatting({
+         //       ref: `${final_mark}${rowNumber}`,
+         //       rules: [
+         //          {
+         //             type: 'expression',
+         //             formulae: [`IF($${orig_mark}$${rowNumber}<>$${final_mark}${rowNumber}, IF(ISBLANK($${final_mark}${rowNumber}),0, 1), 0)`],
+         //             style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'D0bbe33d' } } },
+         //          }
+         //       ]
+         //    })
+         //}
          row.height = 30;
       });
       const buffer = await wb.xlsx.writeBuffer();

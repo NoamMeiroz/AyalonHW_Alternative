@@ -1,169 +1,146 @@
-import React from 'react';
-import { connect, useSelector } from 'react-redux';
-import requireAuth from '../requireAuth'; //used to check if login successfull
-import * as actions from '../../actions';
+import React from "react";
+import { connect, useSelector } from "react-redux";
+import requireAuth from "../requireAuth"; //used to check if login successfull
+import * as actions from "../../actions";
 
+import "./ResultTable.css";
+import CssBaseline from "@mui/material/CssBaseline";
+import { makeStyles } from "@mui/styles";
+import Paper from "@mui/material/Paper";
+import TableContainer from "@mui/material/TableContainer";
+import TablePagination, {
+  tablePaginationClasses,
+} from "@mui/material/TablePagination";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Table from "@mui/material/Table";
+import { styled } from "@mui/material/styles";
 
-import './ResultTable.css';
-import CssBaseline from '@mui/material/CssBaseline'
-import { makeStyles } from '@mui/styles';
-import MaUTable from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import TableCell from '@mui/material/TableCell'
-import TableHead from '@mui/material/TableHead'
-import TableRow from '@mui/material/TableRow'
-
-import { useTable, usePagination, useSortBy } from 'react-table'
-import ReportSelection from './ReportSelection';
+import ReportSelection from "./ReportSelection";
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        paddingRight: '10px',
-        paddingTop: '5px'
-    }
+  root: {
+    paddingRight: "10px",
+    paddingTop: "5px",
+  },
 }));
 
-function Table({ columns, data }) {
-    // Use the state and functions returned from useTable to build your UI
-    const {
-        getTableProps,
-        getTableBodyProps,
-        headerGroups,
-        prepareRow,
-        page, // Instead of using 'rows', we'll use page,
-        // which has only the rows for the active page
+const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
+  [`&.${tablePaginationClasses.root}`]: {
+    direction: "ltr",
+  },
+}));
 
-        // The rest of these things are super handy, too ;)
-        canPreviousPage,
-        canNextPage,
-        pageOptions,
-        pageCount,
-        gotoPage,
-        nextPage,
-        previousPage,
-        setPageSize,
-        state: { pageIndex, pageSize },
-    } = useTable(
-        {
-            columns,
-            data,
-            initialState: { pageIndex: 0 },
-        },
-        useSortBy,
-        usePagination
-    )
+function SimpleTable({ columnGrouping, columns, rows }) {
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-    // Render the UI for your table
-    return (
-        <>
-            <MaUTable {...getTableProps()}>
-                <TableHead>
-                    {headerGroups.map(headerGroup => (
-                        <TableRow {...headerGroup.getHeaderGroupProps()}>
-                            {headerGroup.headers.map(column => (
-                                <TableCell className={column.className} {...column.getHeaderProps(column.getSortByToggleProps())}>
-                                    {column.render('Header')}
-                                    <span>
-                                        {column.isSorted
-                                            ? column.isSortedDesc
-                                                ? ' 🔽'
-                                                : ' 🔼'
-                                            : ''}
-                                    </span>
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    ))}
-                </TableHead>
-                <TableBody>
-                    {page.map((row, i) => {
-                        prepareRow(row)
-                        return (
-                            <TableRow {...row.getRowProps()}>
-                                {row.cells.map(cell => {
-                                    return (
-                                        <TableCell {...cell.getCellProps()}>
-                                            {cell.render('Cell')}
-                                        </TableCell>
-                                    )
-                                })}
-                            </TableRow>
-                        )
-                    })}
-                </TableBody>
-            </MaUTable>
-            {/* 
-        Pagination can be built however you'd like. 
-        This is just a very basic UI implementation:
-      */}
-            <div className="pagination">
-                <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
-                    {'<<'}
-                </button>{' '}
-                <button onClick={() => previousPage()} disabled={!canPreviousPage}>
-                    {'<'}
-                </button>{' '}
-                <button onClick={() => nextPage()} disabled={!canNextPage}>
-                    {'>'}
-                </button>{' '}
-                <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
-                    {'>>'}
-                </button>{' '}
-                <span>
-                    עמוד{' '}
-                    <strong>
-                        {pageIndex + 1} מתוך {pageOptions.length}
-                    </strong>{' '}
-                </span>
-                <span>
-                    | עבור לעמוד:{' '}
-                    <input
-                        type="number"
-                        defaultValue={pageIndex + 1}
-                        onChange={e => {
-                            const page = e.target.value ? Number(e.target.value) - 1 : 0
-                            gotoPage(page)
-                        }}
-                        style={{ width: '100px' }}
-                    />
-                </span>{' '}
-                <select
-                    value={pageSize}
-                    onChange={e => {
-                        setPageSize(Number(e.target.value))
-                    }}
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
+  const createColumnGrouping = (columnGrouping) => {
+    if (!columnGrouping) return null;
+
+    const tableCells = [];
+    let i = 0;
+    columnGrouping.forEach((columnGroup) => {
+      i++;
+      tableCells.push(
+        <TableCell
+          align="center"
+          colSpan={columnGroup.span}
+          key={`columnGroup_${i}`}
+        >
+          {columnGroup.label}
+        </TableCell>
+      );
+    });
+    return <TableRow>{tableCells}</TableRow>;
+  };
+
+  return (
+    <Paper sx={{ width: "100%" }}>
+      <TableContainer sx={{ maxHeight: 440 }}>
+        <Table stickyHeader aria-label="sticky table">
+          <TableHead>
+            {createColumnGrouping(columnGrouping)}
+            <TableRow>
+              {columns.map((column) => (
+                <TableCell
+                  key={column.id}
+                  align={column.align}
+                  style={{ top: column.top, minWidth: column.minWidth }}
                 >
-                    {[10, 20, 30, 40, 50].map(pageSize => (
-                        <option key={pageSize} value={pageSize}>
-                            הצג {pageSize}
-                        </option>
-                    ))}
-                </select>
-            </div>
-        </>
-    )
+                  {column.label}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row) => {
+                return (
+                  <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+                    {columns.map((column) => {
+                      const value = row[column.id];
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          {column.Cell ? column.Cell({row, value}) : value}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
+              })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <StyledTablePagination
+        rowsPerPageOptions={[10, 25, 100]}
+        component="div"
+        count={rows.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+    </Paper>
+  );
 }
 
 function ResultTable() {
+  const columns = useSelector((state) => state.reportTypeSelection.columns);  
+  const columnGrouping = useSelector((state) => state.reportTypeSelection.columnGrouping);
+  const data = useSelector((state) => state.reportTypeSelection.data);
 
-    const columns = useSelector(state => state.reportTypeSelection.columns);
-    const data = useSelector(state => state.reportTypeSelection.data);
+  const classes = useStyles();
 
-    const classes = useStyles();
-
-    return (<div className={classes.root}>
-        <ReportSelection />
-        <div className='tableFixHead'
-            style={{ width: '100%', height: '70vh', overflowX: 'auto', whiteSpace: 'nowrap' }}
-        >
-            <CssBaseline />
-            <Table columns={columns} data={data}
-            />
-        </div>
+  return (
+    <div className={classes.root}>
+      <ReportSelection />
+      <div
+        className="tableFixHead"
+        style={{
+          width: "100%",
+          height: "70vh",
+          overflowX: "auto",
+          whiteSpace: "nowrap",
+        }}
+      >
+        <CssBaseline />
+        <SimpleTable columns={columns} rows={data} columnGrouping={columnGrouping} />
+      </div>
     </div>
-
-    )
+  );
 }
 
-export default requireAuth(
-    connect(null, actions)(ResultTable));
+export default requireAuth(connect(null, actions)(ResultTable));

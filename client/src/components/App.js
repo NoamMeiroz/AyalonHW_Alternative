@@ -5,58 +5,62 @@ import StatusSnackBar from "./common/StatusSnackBar";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { ThemeProvider as SCThemeProvider } from "styled-components";
 import { makeStyles } from "@mui/styles";
+import { heIL } from "@mui/material/locale";
 
 import "./App.css";
 import HeaderBar from "./HeaderBar";
 import RTL from "./rtl";
 import SideBar from "./SideBar";
 
-const theme = createTheme({
-  direction: "rtl", // Both here and <body dir="rtl">
-  pallete: {
-    text: {
+const theme = createTheme(
+  {
+    direction: "rtl", // Both here and <body dir="rtl">
+    pallete: {
+      text: {
+        color: "#242736",
+      },
+    },
+    typography: {
       color: "#242736",
+      fontFamily: ['"Segoe UI, Tahoma, Geneva, Verdana, sans-serif"'].join(","),
     },
-  },
-  typography: {
-    color: "#242736",
-    fontFamily: ['"Segoe UI, Tahoma, Geneva, Verdana, sans-serif"'].join(","),
-  },
-  overrides: {
-    // Style sheet name ⚛️
-    MuiTypography: {
-      h6: {
-        fontWeight: "400",
-        color: "#0092EE",
-        fontSize: "2vmax",
+    overrides: {
+      // Style sheet name ⚛️
+      MuiTypography: {
+        h6: {
+          fontWeight: "400",
+          color: "#0092EE",
+          fontSize: "2vmax",
+        },
       },
-    },
-    MuiAppBar: {
-      colorPrimary: {
-        color: "#242736",
+      MuiAppBar: {
+        colorPrimary: {
+          color: "#242736",
+        },
       },
-    },
-    MuiButton: {
-      root: {
-        color: "#242736",
+      MuiButton: {
+        root: {
+          color: "#242736",
+        },
+        textPrimary: {
+          color: "#242736",
+        },
       },
-      textPrimary: {
-        color: "#242736",
+      MuiPaper: {
+        root: {
+          // Some CSS
+          color: "#242736",
+        },
       },
-    },
-    MuiPaper: {
-      root: {
-        // Some CSS
-        color: "#242736",
-      },
-    },
-    MuiAutocomplete: {
-      input: {
-        fontSize: "1vmax",
+      MuiAutocomplete: {
+        input: {
+          fontSize: "1vmax",
+        },
       },
     },
   },
-});
+  heIL
+);
 
 const useStyles = makeStyles({
   root: {

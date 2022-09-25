@@ -47,11 +47,11 @@ const ReportSelection = () => {
                 <ToggleButton value={reportTypes.GENERAL_REPORT} aria-label="general report">
                     כללי
                 </ToggleButton>
-                <ToggleButton value={reportTypes.TIME_POTENTIAL} aria-label="potential to short time travel">
-                    פוטנציאל צמצום זמני נסיעה
-                </ToggleButton>
                 <ToggleButton value={reportTypes.TOP_FIVE_SOLUTIONS} aria-label="top 5 solution">
                     דרוג פתרונות
+                </ToggleButton>
+                <ToggleButton value={reportTypes.TIME_POTENTIAL} aria-label="potential to short time travel">
+                    פוטנציאל צמצום זמני נסיעה
                 </ToggleButton>
                 <ToggleButton value={reportTypes.COUPLING_REPORT} aria-label="coupling report" disabled={isCouplungDisabled}>
                     דוח צימודים

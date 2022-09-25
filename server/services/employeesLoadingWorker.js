@@ -1,5 +1,6 @@
 const { workerData, parentPort } = require("worker_threads");
 const employeeSchema = require("../db/employeeSchema");
+const employerSitesSchema = require("../db/employerSitesSchema");
 const empFields = require("../config/config").employeeFieldsName;
 const DEFAULT_EXIT_HOUR = require("../config/config").DEFAULT_EXIT_HOUR_TO_WORK;
 const DEFAULT_RETURN_HOUR =
@@ -334,7 +335,7 @@ const getStreetName = (streets, locality, streetCode) => {
 /**
  *
  */
-const updateTransportProblem = (reportedProblems, transportProblem) => {
+const updateTransportProblem = (workSiteId, reportedProblems, transportProblem) => {
   reportedProblems.split(/[,]\s*|[\|]+/).forEach((problem) => {
     if (!(/^-?\d+$/.test(problem)))
       return;
@@ -368,9 +369,11 @@ const updateTransportProblem = (reportedProblems, transportProblem) => {
       default:
         break;
     }
-    if (!transportProblem[fieldToUpdate])
-      transportProblem[fieldToUpdate] = 0;
-    transportProblem[fieldToUpdate] = transportProblem[fieldToUpdate] + 1;
+    if (!transportProblem[workSiteId])
+      transportProblem[workSiteId] = {}
+    if (!transportProblem[workSiteId][fieldToUpdate])
+      transportProblem[workSiteId][fieldToUpdate] = 0;
+    transportProblem[workSiteId][fieldToUpdate] = transportProblem[workSiteId][fieldToUpdate] + 1;
   });
   return transportProblem;
 };
@@ -581,8 +584,9 @@ const main = () => {
       else hoursCount.returnToHome[employee.RETURN_HOUR_TO_HOME] = 1;
     }
     // update transport problem
-    if (employee.TRANSPORT_PROBLEM)
-      transportProblem = updateTransportProblem(employee.TRANSPORT_PROBLEM, transportProblem);
+    if (employee.TRANSPORT_PROBLEM) {
+      transportProblem = updateTransportProblem(employee.WORK_SITE, employee.TRANSPORT_PROBLEM, transportProblem);
+    }
 
     if (error !== "") employee.UPLOAD_ERROR = { error: error };
     else {
@@ -603,6 +607,11 @@ const main = () => {
       if (error !== "") employee.UPLOAD_ERROR = { error: error };
     }
     return employee;
+  });
+
+  logger.info(`update work sites with travel problems`);
+  Object.keys(transportProblem).forEach(async (workSiteId) => {
+    await employerSitesSchema.updateDifficulties(workSiteId, transportProblem[workSiteId]);
   });
 
   logger.info(`employer ${employer.NAME}: calculation employees coordinates`);

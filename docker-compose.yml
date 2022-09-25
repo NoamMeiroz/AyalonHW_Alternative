@@ -42,6 +42,8 @@ services:
       - PORT=${CLUSTERING_PORT}
       - OSRM_SERVER=osrm
       - OSRM_PORT=4000
+    ports:
+      - '3500:3500'
     restart: always
     stdin_open: true
     tty: true
