@@ -6,7 +6,6 @@ import {
   LayersControl,
   FeatureGroup,
 } from "react-leaflet";
-//import HeatmapLayer from "./HeatmapLayer";
 import { HeatmapLayer } from "react-leaflet-heatmap-layer-v3";
 import LeafletDrawControl from "./LeafletDrawControl";
 import L from "leaflet";
@@ -30,16 +29,10 @@ import tazUrl from "./TAZ.zip";
 import trainStationUrl from "./railstations.zip";
 
 import "./MapPanel.css";
-import { useThemeVariants } from "@mui/styles";
-import { Button } from "@mui/material";
 import MapEvents from "./MapEvents";
 
 const DESTINATION_POLYGON_NAME = "destinationPolygon";
 const START_POLYGON_NAME = "startPolygon";
-const gradient = {
-  0.1: '#89BDE0', 0.2: '#96E3E6', 0.4: '#82CEB6',
-  0.6: '#FAF3A5', 0.8: '#F5D98B', '1.0': '#DE9A96'
-};
 
 /**
  * Return list of companies. for each company has a unique color
@@ -369,7 +362,6 @@ class MapPanel extends Component {
                   latitudeExtractor={(item) => item.lat}
                   intensityExtractor={(item) => item.intensity}
                   max={3}
-                  //gradient={gradient}
                 />
               }
             </LayersControl.Overlay>

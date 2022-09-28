@@ -7,6 +7,8 @@ import * as actions from '../../actions';
 
 import IconButton from '@mui/material/IconButton';
 import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
+import { countTopSolutions, labels } from '../reports/TopFiveGraphs';
+import { tableRowClasses } from '@mui/material';
 
 
 class DownloadButton extends Component {
@@ -156,7 +158,7 @@ class DownloadButton extends Component {
    topSolutions = async (csvData) => {
       const fileName = "דוח דירוג פתרונות ניידות";
       let wb = new ExcelJS.Workbook();
-      let ws = wb.addWorksheet('דירוג פתרונת');
+      let ws = wb.addWorksheet('דירוג פתרונות לעובד');
 
       // set columns 
       ws.columns = [
@@ -171,7 +173,7 @@ class DownloadButton extends Component {
 
       // make header bold
       ws.getRow(1).font = { bold: true }
-
+      
       // add data
       ws.addRows(csvData);
 
@@ -182,6 +184,37 @@ class DownloadButton extends Component {
          }
          row.height = 30;
       });
+
+
+      let ws1 = wb.addWorksheet('ספירת פתרונות');
+
+      // set columns 
+      ws1.columns = [
+         { header: 'שם פתרון', key: 'SOLUTION_NAME', width: 20 },
+         { header: 'דרוג 1', key: 'TOP_SOLUTION_1', width: 20 },
+         { header: 'דרוג 2', key: 'TOP_SOLUTION_2', width: 20 },
+         { header: 'דרוג 3', key: 'TOP_SOLUTION_3', width: 20 },
+         { header: 'דרוג 4', key: 'TOP_SOLUTION_4', width: 20 },
+         { header: 'דרוג 5', key: 'TOP_SOLUTION_5', width: 20 },
+       ];
+      
+       // make header bold
+      ws1.getRow(1).font = { bold: true }
+
+       const results = countTopSolutions( csvData );
+       const countData = Object.entries(labels).map( ([solution, location]) => { 
+          const row = { 'SOLUTION_NAME': solution };
+          let pos = 0;
+          results.forEach( rank => {
+            pos = pos+1;
+            row[`TOP_SOLUTION_${pos}`] = rank.data[location];
+          });
+          return row;
+       });
+         // add data
+      ws1.addRows(countData);
+
+
       const buffer = await wb.xlsx.writeBuffer();
       const data = new Blob([buffer], { type: this.fileType });
       FileSaver.saveAs(data, fileName + this.fileExtension);

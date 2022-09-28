@@ -19,6 +19,7 @@ import Table from "@mui/material/Table";
 import { styled } from "@mui/material/styles";
 
 import ReportSelection from "./ReportSelection";
+import Graphs from "../reports/Graphs";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -121,6 +122,7 @@ function ResultTable() {
   const columns = useSelector((state) => state.reportTypeSelection.columns);  
   const columnGrouping = useSelector((state) => state.reportTypeSelection.columnGrouping);
   const data = useSelector((state) => state.reportTypeSelection.data);
+  const reportType = useSelector((state) => state.reportTypeSelection.reportType);
 
   const classes = useStyles();
 
@@ -137,6 +139,7 @@ function ResultTable() {
         }}
       >
         <CssBaseline />
+        <Graphs reportType={reportType} data={data} />
         <SimpleTable columns={columns} rows={data} columnGrouping={columnGrouping} />
       </div>
     </div>
