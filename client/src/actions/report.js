@@ -274,6 +274,6 @@ export const getSharePotential = (employerId) => {
  */
 export const setReportType = (reportType) => {
     return (dispatch, getState) => {
-        dispatch({ type: REPORT_SELECTION, reportsData: getState().reports, reportType: reportType });
+        dispatch({ type: REPORT_SELECTION, reportsData: getState().reports, companyData: getState().loadData.companyList , reportType: reportType });
     }
 };

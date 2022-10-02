@@ -1,6 +1,5 @@
 import React from "react";
 import requireAuth from "../requireAuth"; //used to check if login successfull
-import Paper from "@mui/material/Paper";
 
 import {
   Chart as ChartJS,
@@ -54,9 +53,7 @@ export const labels = {
 function TopFiveGraphs({ data }) {
   const datasets = countTopSolutions(data);
   const graphData = { labels: Object.keys(labels), datasets };
-  return <Paper sx={{width: 700, marginRight: "auto", marginLeft: "auto"}}>
-            <Bar options={options} data={graphData} />
-        </Paper>
+  return <Bar options={options} data={graphData} />
 }
 
 export function countTopSolutions(data) {

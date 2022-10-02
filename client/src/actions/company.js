@@ -154,6 +154,6 @@ export const recalculate = (employerId) => {
 export const recalculateResult = (result) => {
     return (dispatch) => {
         dispatch({ type: UPLOAD_RESULT, result: result });
-        dispatch({ type: MESSAGE, message: `תהליך חישוב מסלולים וציונים מחדש הסתיים בהצלחה.` })
+        dispatch({ type: MESSAGE, message: `תהליך חישוב מסלולים וציונים מחדש הסתיים בהצלחה.` });
     }
 };

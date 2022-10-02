@@ -51,7 +51,7 @@ const getGeneralReport = () => {
       top: 57,
     },
     {
-      label: "שאטל במתחם העבודה",
+      label: "שאטל פנים מתחמי",
       id: "FINAL_COMPOUND_SHUTTLE_GRADE",
       minWidth: 100,
       top: 57,
@@ -407,11 +407,72 @@ const getTopSolutionsData = (origData) => {
 };
 
 /**
+ * return column stracture for top five solution report
+ */
+ const getDifficultReportColumns = () => {
+  const columnProperties = {};
+  const columns = [
+    { label: "שם חברה", id: "COMPANY", minWidth: 100 },
+    { label: "מתחם", id: "COMPOUND", minWidth: 100 },
+    { label: "פקקי תנועה", id: "TRAFFIC_JAMS", minWidth: 50 },
+    { label: "עלות נסיעה", id: "TRAVEL_COSTS", minWidth: 50 },
+    { label: "חוסר בחניה", id: "LACK_OF_PARKING", minWidth: 50 },
+    { label: "עלות חניה", id: "PARKING_COSTS", minWidth: 50 },
+    { label: "אי יכולת לנצל זמן נסיעה", id: "WASTED_TRAVEL_TIME", minWidth: 50 },
+    { label: "היעדר תחבורה\nציבורית למקום העבודה", id: "LACK_OF_PUBLIC_TRANSPORT", minWidth: 50 },
+    { label: "תדירות תחבורה ציבורית", id: "PUBLIC_TRANSPORT_FREQUENCY", minWidth: 50 },
+    { label: "אחר", id: "OTHER", minWidth: 50 },
+  ];
+  columnProperties.columns = columns;
+  return columnProperties;
+};
+
+const getDifficultReportData = (origData) => {
+  let data = [];
+
+  for (const site of origData) {
+    let row = {};
+    row["COMPANY"] = site["COMPANY"];
+    row["COMPOUND"] = site["COMPOUND"];
+    row["TRAFFIC_JAMS"] = site["TRAFFIC_JAMS"];
+    row["TRAVEL_COSTS"] = site["TRAVEL_COSTS"];
+    row["LACK_OF_PARKING"] = site["LACK_OF_PARKING"];
+    row["PARKING_COSTS"] = site["PARKING_COSTS"];
+    row["WASTED_TRAVEL_TIME"] = site["WASTED_TRAVEL_TIME"];
+    row["LACK_OF_PUBLIC_TRANSPORT"] = site["LACK_OF_PUBLIC_TRANSPORT"];
+    row["PUBLIC_TRANSPORT_FREQUENCY"] = site["PUBLIC_TRANSPORT_FREQUENCY"];
+    row["OTHER"] = site["OTHER"];
+    data.push(row);
+  }
+  return data;
+};
+
+const getSiteData = (employeesList, companyData) => {
+  let sitesList = [];
+  const employeeSites = [];
+  employeesList.forEach(employee => {
+    if (!employeeSites.includes(employee.SITE_ID))
+      employeeSites.push(employee.SITE_ID);
+  });
+  companyData.forEach(company => {
+    company.Sites.forEach(workSite => {
+      if (employeeSites.includes(workSite.id)) {
+        const result = sitesList.filter(site =>  site.id === workSite.NAME);
+        if (!result.length)
+          sitesList.push({...workSite, COMPANY: company.NAME});
+      }
+    });
+  });
+
+  return sitesList
+}
+
+/**
  * Create data structure for specified reportType
  * @param {*} origData
  * @param {*} reportType
  */
-const getData = (reportsData, reportType) => {
+const getData = (reportsData, companyData, reportType) => {
   let data = [];
   switch (reportType) {
     case reportTypes.GENERAL_REPORT:
@@ -445,6 +506,11 @@ const getData = (reportsData, reportType) => {
         });
       }
       break;
+    case reportTypes.DIFFICULT_REPORT:
+      if (reportsData.employeesList) {
+        data = getDifficultReportData(getSiteData(reportsData.employeesList, companyData));
+      }
+      break;
     default:
       // show only employees with location data;
       if (reportsData.employeesList) {
@@ -475,6 +541,9 @@ const getColumns = (reportType) => {
       break;
     case reportTypes.COUPLING_REPORT:
       columns = getCouplngReportColumns();
+      break;
+    case reportTypes.DIFFICULT_REPORT:
+      columns = getDifficultReportColumns();
       break;
     default:
       columns = getGeneralReport();
@@ -514,7 +583,7 @@ export default function (state = INITIAL_STATE, action) {
         columns: columnProperties.columns,
         columnGrouping: columnProperties.columnGrouping,
         reportType: action.reportType,
-        data: getData(action.reportsData, action.reportType),
+        data: getData(action.reportsData, action.companyData, action.reportType),
         timestamp: new Date(),
       };
     default:

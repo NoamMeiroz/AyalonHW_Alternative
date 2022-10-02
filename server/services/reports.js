@@ -47,6 +47,7 @@ const getEmployeesOfEmployer = (
           employeesList[i].WORK_STREET = workSite.ADDRESS_STREET;
           employeesList[i].WORK_BUILDING = workSite.ADDRESS_BUILDING_NUMBER;
           employeesList[i].SITE_NAME = workSite.NAME;
+          employeesList[i].SITE_ID = workSite.id;
           // keep comapny name
           employeesList[i].COMPANY = employeesList[i].employer.dataValues.NAME;
           // translate time slot id to meaningful text

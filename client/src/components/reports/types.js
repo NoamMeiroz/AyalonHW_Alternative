@@ -2,4 +2,5 @@ export const GENERAL_REPORT = 'general report';
 export const TIME_POTENTIAL = 'time potential';
 export const TOP_FIVE_SOLUTIONS = 'top five';
 export const COUPLING_REPORT = 'coupling report';
+export const DIFFICULT_REPORT = 'difficults report';
 
