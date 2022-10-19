@@ -91,7 +91,6 @@ class MapPanel extends Component {
   starting = createRef();
 
   handleMoveEnd = (e) => {
-    let center = e.target._zoom;
     this.props.mapChange(e.target._zoom, e.target._animateToCenter);
   };
 
@@ -116,12 +115,8 @@ class MapPanel extends Component {
   createCompanyLayer(companyID) {
     let jsx = [];
 
-    let employees = this.props.data.filter((emp) => {
-      return emp.EMPLOYER_ID == companyID;
-    });
-    let branchList = this.props.branches.filter((branch) => {
-      return branch.EMPLOYER_ID == companyID;
-    });
+    let employees = this.props.data.filter((emp) => emp.EMPLOYER_ID == companyID);
+    let branchList = this.props.branches.filter((branch) => branch.EMPLOYER_ID == companyID );
     let empLayer = (
       <MarkerLayer
         key={companyID}

@@ -12,11 +12,11 @@ module.exports = (sequelize, Sequelize) => {
         }, 
         PROPERTY_CODE: {
             type: Sequelize.INTEGER,
-            allowNull: false,    
+            allowNull: false,
         },
         CATEGORY_CODE: {
             type: Sequelize.INTEGER,
-            allowNull: false,    
+            allowNull: false,
         },
         VALUE: {
             type: Sequelize.INTEGER,

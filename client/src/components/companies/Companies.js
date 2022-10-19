@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import * as actions from "../../actions";
 
 import requireAuth from "../requireAuth"; //used to check if login successfull
-import CompanyTable from "./CompanyTable";
 import { UPLOAD_IN_PROGRESS } from "../../actions/const";
 
 import "./Companies.css";

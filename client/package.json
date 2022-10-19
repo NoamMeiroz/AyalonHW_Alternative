@@ -10,6 +10,7 @@
     "@mui/lab": "^5.0.0-alpha.86",
     "@mui/material": "^5.8.4",
     "@mui/styles": "^5.5.0",
+    "@mui/x-data-grid": "^5.17.6",
     "@react-leaflet/core": "^1.0.2",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
@@ -53,7 +54,7 @@
   },
   "scripts": {
     "start": "react-scripts --openssl-legacy-provider start",
-    "local": "react-scripts start",
+    "dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

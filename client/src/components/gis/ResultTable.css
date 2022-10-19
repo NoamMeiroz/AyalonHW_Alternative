@@ -19,3 +19,6 @@
     top: 50px; 
 }
 
+.tableFixHead .simpleTable {
+    direction: rtl;
+}

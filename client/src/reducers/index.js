@@ -10,6 +10,7 @@ import reportTypeSelection from './reportTypeSelection';
 import reportParams from './reportParams';
 import consts from './const';
 import map from './map';
+import algorithmSettings from './algorithmSettings'
 
 
 export default combineReducers({
@@ -23,5 +24,6 @@ export default combineReducers({
     consts,
     reportParams,
     map,
+    algorithmSettings,
     form: formReducer
 });

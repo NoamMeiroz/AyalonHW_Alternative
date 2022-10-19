@@ -4,8 +4,6 @@ import requireAuth from "../requireAuth"; //used to check if login successfull
 import * as actions from "../../actions";
 
 import "./ResultTable.css";
-import CssBaseline from "@mui/material/CssBaseline";
-import { makeStyles } from "@mui/styles";
 import Paper from "@mui/material/Paper";
 import TableContainer from "@mui/material/TableContainer";
 import TablePagination, {
@@ -20,13 +18,6 @@ import { styled } from "@mui/material/styles";
 
 import ReportSelection from "./ReportSelection";
 import Graphs from "../reports/Graphs";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    paddingRight: "10px",
-    paddingTop: "5px",
-  },
-}));
 
 const StyledTablePagination = styled(TablePagination)(({ theme }) => ({
   [`&.${tablePaginationClasses.root}`]: {
@@ -68,7 +59,7 @@ function SimpleTable({ columnGrouping, columns, rows }) {
   };
 
   return (
-    <Paper sx={{ width: "100%" }}>
+    <Paper sx={{ width: "100%", direction: "ltr"}}>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
@@ -124,10 +115,8 @@ function ResultTable() {
   const data = useSelector((state) => state.reportTypeSelection.data);
   const reportType = useSelector((state) => state.reportTypeSelection.reportType);
 
-  const classes = useStyles();
-
   return (
-    <div className={classes.root}>
+    <div>
       <ReportSelection />
       <div
         className="tableFixHead"
@@ -136,9 +125,9 @@ function ResultTable() {
           height: "70vh",
           overflowX: "auto",
           whiteSpace: "nowrap",
+          direction: "ltr",
         }}
       >
-        <CssBaseline />
         <Graphs reportType={reportType} data={data} />
         <SimpleTable columns={columns} rows={data} columnGrouping={columnGrouping} />
       </div>

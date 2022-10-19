@@ -17,21 +17,6 @@ const POSITION_CLASSES = {
 };
 
 /**
- * remove a layer by its id
- */
-const removeLayer = (layerContainer, targetId) => {
-  var layers = layerContainer._layers;
-  var layer_ids = Object.keys(layers);
-  // remove previous destination area
-  layer_ids.forEach((id) => {
-    if (id == targetId) {
-      let layer = layers[id];
-      layerContainer.removeLayer(layer);
-    }
-  });
-};
-
-/**
  * show origin and destination query filter control
  */
 function DrawControl({
@@ -42,13 +27,13 @@ function DrawControl({
   destinationDrawClicked,
   deleteClicked,
 }) {
-  const map = useMap();
-  const destination = useMap();
-  const starting = useMap();
+  // const map = useMap();
+  // const destination = useMap();
+  // const starting = useMap();
 
-  const [selectedArea, setSelectedArea] = React.useState("work");
-  const [destinationGeoJSON, setDestinationGeoJSON] = React.useState(null);
-  const [startGeoJSON, setStartGeoJSON] = React.useState(null);
+  // const [selectedArea, setSelectedArea] = React.useState("work");
+  // const [destinationGeoJSON, setDestinationGeoJSON] = React.useState(null);
+  // const [startGeoJSON, setStartGeoJSON] = React.useState(null);
 
   /**
    * clear origin and destination polygon query filter

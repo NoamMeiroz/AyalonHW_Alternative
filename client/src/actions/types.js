@@ -35,3 +35,5 @@ export const DELETE_COMPANY = "delete_company";
 export const RECALCULATE_COMPANY = "recalculate_company";
 export const START_RECALCULATE_COMPANY = 'start_recalculate_company';
 export const GET_UID = 'set_uid';
+export const SOLUTION_MARKS_LIST = "solution_marks_list";
+export const SOLUTION_PROPERTIES_VALUES_LIST = "solution_prop_values_list";

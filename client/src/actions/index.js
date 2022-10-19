@@ -8,6 +8,7 @@ import { getData } from './company';
 export * from './report';
 export * from './company';
 export * from './map';
+export * from './algorithmSettings';
 
 const API_SERVER = process.env.REACT_APP_API_SERVER || `/api`;
 

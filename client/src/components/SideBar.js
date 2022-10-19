@@ -8,7 +8,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import EmojiTransportationIcon from '@mui/icons-material/EmojiTransportation';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import RoomIcon from '@mui/icons-material/Room';
-import lime from '@mui/material/colors/lime';
+import DisplaySettingsIcon from '@mui/icons-material/DisplaySettings';
 
 import './SideBar.css';
 
@@ -20,7 +20,8 @@ class SideBar extends Component {
             map: false,
             clustering: false,
             companies: false,
-            bi: false
+            bi: false,
+            algoSettings: false
         }
     };
 
@@ -51,7 +52,7 @@ class SideBar extends Component {
                 alt="חברת נתיבי איילון" width="184px" height="81" />
 
             <div className="menu-bar">
-                <IconButton edge="start" style={{ color: lime[50] }} aria-label="דף הבית"
+                <IconButton edge="start" aria-label="דף הבית"
                     className={this.state.active.home ? "active" : null}
                     onClick={(e) => { this.setActive("home"); }}
                     component={Link} to="/">
@@ -61,7 +62,7 @@ class SideBar extends Component {
                 {(this.props.auth) ?
                     <div>
                         <div>
-                            <IconButton edge="start" style={{ color: lime[50] }} aria-label="D"
+                            <IconButton edge="start" aria-label="D"
                                 className={this.state.active.map ? "active" : null}
                                 onClick={(e) => {
                                     this.setActive("map");
@@ -72,7 +73,7 @@ class SideBar extends Component {
                             </IconButton>
                         </div>
                         <div>
-                            <IconButton edge="start" style={{ color: lime[50] }} aria-label="מעסיקים"
+                            <IconButton edge="start" aria-label="מעסיקים"
                                 className={this.state.active.companies ? "active" : null}
                                 onClick={(e) => {
                                     this.setActive("companies");
@@ -83,7 +84,7 @@ class SideBar extends Component {
                             </IconButton>
                         </div>
                         <div>
-                            <IconButton edge="start" style={{ color: lime[50] }} aria-label="BI"
+                            <IconButton edge="start" aria-label="BI"
                                 className={this.state.active.bi ? "active" : null}
                                 onClick={(e) => {
                                     this.setActive("bi");
@@ -92,6 +93,17 @@ class SideBar extends Component {
                                 href="https://www.nativapp.co.il:8088/superset/dashboard/1/">
                                 <AssessmentIcon />
                                 BI
+                            </IconButton>
+                        </div>
+                        <div>
+                            <IconButton edge="start" aria-label="BI"
+                                className={this.state.active.algoSettings ? "active" : null}
+                                onClick={(e) => {
+                                    this.setActive("algoSettings");
+                                }}
+                                component={Link} to="/algorithmSettings">
+                                <DisplaySettingsIcon />
+                                הגדרות אלגוריתם
                             </IconButton>
                         </div>
                     </div>

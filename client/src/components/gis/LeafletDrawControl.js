@@ -1,7 +1,7 @@
 import { useLeafletContext } from "@react-leaflet/core";
 
 import L from "leaflet";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Draw from "leaflet-draw";
 
 function LeafletDrawControl({

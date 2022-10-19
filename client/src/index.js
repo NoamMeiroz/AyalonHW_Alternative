@@ -12,6 +12,7 @@ import SignIn from './components/auth/SignIn';
 import Companies from './components/companies/Companies';
 import MapTabsPanel from './components/gis/MapTabsPanel';
 import InfoPanel from './components/dashboard/InfoPanel';
+import AlgorithmSettings from './components/algorithmSettings/AlgorithmSettings';
 import reducers from './reducers';
 import SignOut from './components/auth/SignOut';
 
@@ -42,6 +43,7 @@ ReactDOM.render(
 					<Route path="/signin" exact component={SignIn} />
 					<Route path="/companies" exact component={getMainComponent(<Companies />)} />
 					<Route path="/map" exact component={MapTabsPanel} />
+					<Route path="/algorithmSettings" exact component={AlgorithmSettings} />
 					<Route path="/signout" exact component={SignOut} />
 					<Route path="/" component={Welcome} />
 				</Switch>
