@@ -21,7 +21,7 @@ const columns = [
   },
   {
     field: "CATEGORY",
-    headerName: "קטגוריה",
+    headerName: "קטגוריה    ",
     width: 200,
     cellClassName: "disabled_cell",
   },
