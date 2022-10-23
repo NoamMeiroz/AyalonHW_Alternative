@@ -1,27 +1,8 @@
 const { sequelize, Sequelize } = require("./database");
 const db = require("./database");
-const solutions = db.solutions;
 const solutionPropertryValues = db.solutionPropertyValues;
-const propertyCategories = db.propertyCategories;
-const employeeProperties = db.employeeProperties;
 
 const getMessage = require("./errorCode").getMessage;
-
-const getAll_old = (callback) => {
-  solutionPropertryValues
-    .findAll({
-      include: [
-        { model: solutions, as: "Solution" },
-        { model: employeeProperties, as: "Property" },
-      ],
-    })
-    .then((data) => {
-      callback(null, data);
-    })
-    .catch((err) => {
-      callback(getMessage(err), false);
-    });
-};
 
 const getAll = (callback) => {
   sequelize.query('SELECT spv.*, sol.NAME as SOLUTION, ep.NAME as PROPERTY, pc.NAME as CATEGORY FROM solution_property AS spv' +
@@ -40,21 +21,15 @@ const getAll = (callback) => {
 };
 
 
-// const updateSolutionPropertyValues = (solutionMarkEntity, callback) => {
-//   solutionPropertryValues.update({AVG_AGREEMENT: solutionMarkEntity.AVG_AGREEMENT,
-//     MULTI: solutionMarkEntity.MULTI,
-//     POSITIVE_MARK: solutionMarkEntity.POSITIVE_MARK,
-//     NEGATIVE_MARK: solutionMarkEntity.NEGATIVE_MARK,
-//     NUETRAL_MARK: solutionMarkEntity.NUETRAL_MARK,
-//     DISQUALIFIED_MARK: solutionMarkEntity.DISQUALIFIED_MARK
-//     },
-//     {where: {id: solutionMarkEntity.id}}
-//   ).then((data) => {
-//     callback(null, data);
-//   })
-//   .catch((err) => {
-//     callback(getMessage(err), false);
-//   });
-// };
+const updateSolutionPropertyValue = (solutionPropertyValue, callback) => {
+  solutionPropertryValues.update({VALUE: solutionPropertyValue.VALUE},
+    {where: {id: solutionPropertyValue.id}}
+  ).then((data) => {
+    callback(null, data);
+  })
+  .catch((err) => {
+    callback(getMessage(err), false);
+  });
+};
 
-module.exports = { getAll };
+module.exports = { getAll, updateSolutionPropertyValue };

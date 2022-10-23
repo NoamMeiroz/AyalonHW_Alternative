@@ -63,3 +63,23 @@ const API_SERVER = process.env.REACT_APP_API_SERVER || `/api`;
     }
 };
 
+/**
+ * update a solution makr
+ */
+ export const setSolutionPropertyValue   = (newSolutioPropertyValue) => {
+    let headers = actionUtils.getAxiosHeader().headers;
+    headers = { ...{ 'Content-Type': 'application/json' }, headers }
+    const data = { id: newSolutioPropertyValue.id,
+        VALUE: newSolutioPropertyValue.VALUE
+    }
+    return (dispatch) => {
+        axios.post(`${API_SERVER}/algosetting/solutionPropertyValue`, data, headers)
+            .then(payload => {
+                return;
+            }).catch(err => {
+                let message = actionUtils.handleError(err);
+                dispatch({ type: ERROR, errorMessage: message, solutionMarks: [] });
+            });
+    }
+};
+

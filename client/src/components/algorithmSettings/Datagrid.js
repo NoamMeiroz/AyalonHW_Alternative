@@ -71,13 +71,13 @@ const originalTheme = createTheme(
   originHeL
 );
 
-function Datagrid({ rows, columns, processRowUpdate, handleProcessRowUpdateError }) {
+function Datagrid({ rows, columns, processRowUpdate, handleProcessRowUpdateError, height }) {
   return (
     <Box
       className="border"
       sx={{
         width: "100%",
-        height: 750,
+        height: height ?? 750,
         overflowY: "auto",
         "& .disabled_cell": {
           backgroundColor: "rgba(210, 210, 210, 0.55)",

@@ -42,6 +42,6 @@
     "chai-as-promised": "^7.1.1",
     "mocha": "^8.1.3",
     "mochawesome": "^6.1.1",
-    "nodemon": "^2.0.19"
+    "nodemon": "^2.0.20"
   }
 }

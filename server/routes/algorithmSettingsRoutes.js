@@ -73,4 +73,30 @@ router.get("/solutionPropertiesValues", requireAuth, (req, res, next) => {
     });
 });
 
+/*
+  update a solution property values
+*/
+router.post("/solutionPropertyValue", requireAuth, (req, res, next) => {
+  let errorMessage = null;
+  if (req.body) {
+    solutionPropertiesValuesData
+      .updateSolutionPropertyValue(req.body)
+      .then((payload) => {
+        res.status(200).json(payload);
+      })
+      .catch((error) => {
+        if (error.status) res.status(error.status).send(error.message);
+        else {
+          logger.error(error.stack);
+          res.status(500).send("Internal Error");
+        }
+      });
+  } else errorMessage = "חסרים פרמטרים לעדכון הרשומה";
+
+  if (errorMessage) {
+    logger.info(errorMessage);
+    res.status(400).send(errorMessage);
+  }
+});
+
 module.exports = router;
