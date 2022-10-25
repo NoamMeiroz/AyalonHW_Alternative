@@ -1,6 +1,7 @@
 import {
   SOLUTION_MARKS_LIST,
   SOLUTION_PROPERTIES_VALUES_LIST,
+  SOLUTION_LIMITS_LIST,
 } from "../actions/types";
 
 const INITIAL_STATE = {
@@ -22,6 +23,12 @@ export default function (state = INITIAL_STATE, action) {
         solutionPropertiesValues: action.solutionPropertiesValues,
         timestamp: new Date(),
       };
+      case SOLUTION_LIMITS_LIST:
+        return {
+          ...state,
+          solutionLimits: action.solutionLimits,
+          timestamp: new Date(),
+        };
     default:
       return state;
   }

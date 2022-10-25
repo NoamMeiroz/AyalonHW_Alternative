@@ -8,6 +8,7 @@ import Box from '@mui/material/Box';
 
 import SolutionMark from './SolutionMarks';
 import SolutionPropertiesValues from './SolutionPropertiesValues';
+import SolutionLimits from './SolutionLimits';
 
 
 function TabPanel(props) {
@@ -62,7 +63,7 @@ function BasicTabs() {
         <SolutionMark />
       </TabPanel>
       <TabPanel value={value} index={1}>
-        Item Two
+        <SolutionLimits />
       </TabPanel>
       <TabPanel value={value} index={2}>
         <SolutionPropertiesValues />

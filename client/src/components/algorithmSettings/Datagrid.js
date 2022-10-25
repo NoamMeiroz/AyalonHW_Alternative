@@ -71,7 +71,7 @@ const originalTheme = createTheme(
   originHeL
 );
 
-function Datagrid({ rows, columns, processRowUpdate, handleProcessRowUpdateError, height }) {
+function Datagrid({ rows, columns, processRowUpdate, handleProcessRowUpdateError, height, editMode }) {
   return (
     <Box
       className="border"
@@ -100,7 +100,7 @@ function Datagrid({ rows, columns, processRowUpdate, handleProcessRowUpdateError
           }}
           experimentalFeatures={{ newEditingApi: true }}
           pagination
-          editMode="row"
+          editMode={editMode ?? "row" }
           processRowUpdate={processRowUpdate}
           handleProcessRowUpdateError={handleProcessRowUpdateError}
         />

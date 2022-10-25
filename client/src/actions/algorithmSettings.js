@@ -2,7 +2,8 @@ import axios from 'axios';
 import {
     ERROR,
     SOLUTION_MARKS_LIST,
-    SOLUTION_PROPERTIES_VALUES_LIST
+    SOLUTION_PROPERTIES_VALUES_LIST,
+    SOLUTION_LIMITS_LIST,
 } from './types';
 import * as actionUtils from '../utils/actionsUtil';
 
@@ -34,6 +35,21 @@ const API_SERVER = process.env.REACT_APP_API_SERVER || `/api`;
             }).catch(err => {
                 let message = actionUtils.handleError(err);
                 dispatch({ type: ERROR, errorMessage: message, solutionPropertiesValues: [] });
+            });
+    }
+};
+
+/**
+ * return the solution marks list from server
+ */
+ export const getSolutionLimits = () => {
+    return (dispatch) => {
+        axios.get(`${API_SERVER}/algosetting/solutionLimits`, actionUtils.getAxiosHeader())
+            .then(payload => {
+                dispatch({ type: SOLUTION_LIMITS_LIST, isSuccess: true, solutionLimits: payload.data });
+            }).catch(err => {
+                let message = actionUtils.handleError(err);
+                dispatch({ type: ERROR, errorMessage: message, solutionLimits: [] });
             });
     }
 };
@@ -79,6 +95,27 @@ const API_SERVER = process.env.REACT_APP_API_SERVER || `/api`;
             }).catch(err => {
                 let message = actionUtils.handleError(err);
                 dispatch({ type: ERROR, errorMessage: message, solutionMarks: [] });
+            });
+    }
+};
+
+/**
+ * update a solution makr
+ */
+ export const setSolutionLimits = (newSolutionLimit) => {
+    let headers = actionUtils.getAxiosHeader().headers;
+    headers = { ...{ 'Content-Type': 'application/json' }, headers }
+    const data = { id: newSolutionLimit.id,
+        TYPE: newSolutionLimit.TYPE,
+        VALUE: newSolutionLimit.VALUE,
+    }
+    return (dispatch) => {
+        axios.post(`${API_SERVER}/algosetting/solutionLimits`, data, headers)
+            .then(payload => {
+                return;
+            }).catch(err => {
+                let message = actionUtils.handleError(err);
+                dispatch({ type: ERROR, errorMessage: message, solutionLimits: [] });
             });
     }
 };

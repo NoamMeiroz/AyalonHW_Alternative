@@ -66,7 +66,9 @@ db.solutions.hasMany(db.solutionPropertyValues, {foreignKey: "SOLUTION_CODE", as
 db.solutionMarks.hasOne(db.solutions, {foreignKey: "CODE", as: 'Solution', sourceKey: 'SOLUTION_CODE' });
 db.solutionPropertyValues.hasOne(db.solutions, {foreignKey: "CODE", as: 'Solution', sourceKey: 'SOLUTION_CODE' });
 db.solutionPropertyValues.hasOne(db.employeeProperties, {foreignKey: "CODE", as: 'Property', sourceKey: 'PROPERTY_CODE' });
-//db.solutionPropertyValues.hasOne(db.propertyCategories, {foreignKey: "CATEGORY_CODE", as: 'Category', sourceKey: "CATEGORY_CODE" });
+
+db.solutionLimits.hasOne(db.solutions, {foreignKey: "CODE", as: 'Solution', sourceKey: 'SOLUTION_CODE' });
+
 
 module.exports = db;
 

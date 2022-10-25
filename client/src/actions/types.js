@@ -37,3 +37,4 @@ export const START_RECALCULATE_COMPANY = 'start_recalculate_company';
 export const GET_UID = 'set_uid';
 export const SOLUTION_MARKS_LIST = "solution_marks_list";
 export const SOLUTION_PROPERTIES_VALUES_LIST = "solution_prop_values_list";
+export const SOLUTION_LIMITS_LIST = "solution_limits_list";

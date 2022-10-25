@@ -36,7 +36,7 @@ const updateSolutionPropertyValue = (solutionPorpertyValue) => {
     if (!solutionPorpertyValue.id || !isInteger(solutionPorpertyValue.id))
       message = "מזהה ציון חסר או אינו מספר";
     if (!isValidNumber(solutionPorpertyValue.VALUE, 100, 0))
-        message = "ערך ממוצע הסכמה אינו בטווח המותר 0-100";
+        message = "אחוז הסכמה אינו בטווח המותר 0-100";
 
     if (message) return reject(new ServerError(errorCode, message));
     
