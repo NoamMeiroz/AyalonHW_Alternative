@@ -55,11 +55,13 @@ function SolutionPropertiesValues({ rows, dispatch }) {
       dispatch(actions.setSolutionPropertyValue(newRow));
       return newRow;
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
   const handleProcessRowUpdateError = React.useCallback((error) => {
     dispatch(actions.showMessage, error);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const solutions = _.uniqBy(rows, "SOLUTION");

@@ -118,11 +118,13 @@ function SolutionLimits({ rows, dispatch }) {
             dispatch(actions.setSolutionLimits(editRow));
             return newRow;
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [],
     );
 
     const handleProcessRowUpdateError = React.useCallback((error) => {
         dispatch(actions.showMessage, error);
+       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
 

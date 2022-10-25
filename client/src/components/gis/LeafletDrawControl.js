@@ -29,6 +29,7 @@ function LeafletDrawControl({
       }
       drawRef._toolbars.draw._modes.polygon.handler.enable();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [drawPolygon]);
 
   useEffect(() => {
@@ -36,6 +37,7 @@ function LeafletDrawControl({
       //drawRef._toolbars.edit._modes.remove.handler.options.featureGroup.clearLayers();
       featureGroup.clearLayers();
       onRemovePolygon();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [deletePolygon]);
 
   useEffect(() => {
@@ -80,6 +82,7 @@ function LeafletDrawControl({
     return () => {
       map.removeControl(drawControl);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return null;

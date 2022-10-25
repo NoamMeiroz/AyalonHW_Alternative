@@ -172,22 +172,22 @@ volumes:
     driver_opts:
       o: bind
       type: None
-      device: /home/amit/workspace/employers_program/reports/AyalonHW_Alternative/server/logs
+      device: home/amit/workspace/native_laasakim/algorithm/AyalonHW_Alternative/server/logs
   pdf_files:
     driver: local
     driver_opts:
       o: bind
       type: None
-      device: /home/amit/workspace/employers_program/reports/AyalonHW_Alternative/pdf
+      device: home/amit/workspace/native_laasakim/algorithm/AyalonHW_Alternative/pdf
   db-osrm:
     driver: local
     driver_opts: 
       o: bind
       type: None
-      device: /home/amit/workspace/employers_program/db-osrm
+      device: home/amit/workspace/native_laasakim/db-osrm
   bi-config:
     driver: local
     driver_opts:
       o: bind
       type: None
-      device: /home/amit/workspace/employers_program/reports/AyalonHW_Alternative/bi/config
+      device: home/amit/workspace/native_laasakim/algorithm/AyalonHW_Alternative/bi/config

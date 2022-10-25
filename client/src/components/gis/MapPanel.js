@@ -339,7 +339,7 @@ class MapPanel extends Component {
           center={this.props.position}
           zoom={this.props.zoom}
           maxZoom={14}
-          preferCanvas={true}
+        //  preferCanvas={true}
         >
           <MapEvents onmoveend={this.handleMoveEnd} />
           <LayersControl>

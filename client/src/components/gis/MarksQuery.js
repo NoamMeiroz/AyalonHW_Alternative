@@ -14,7 +14,13 @@ import * as actions from '../../actions';
 import './MarksQuery.css';
 import { styled } from '@mui/material/styles';
 
-const MAX_VALUE = 16;
+const MAX_VALUE = 2;
+const MARKS_VALUES = {
+    "LOW_VALUE": { "label": "נמוך", "value": 0 },
+    "MEDIUM_VALUE": { "label": "בינוני", "value": 1 },
+    "HIGH_VALUE": { "label": "גבוה", "value": 2 }
+};
+
 const MIN_VALUE = -1;
 
 const useStyles = makeStyles((theme) => ({
@@ -39,9 +45,9 @@ const useStyles = makeStyles((theme) => ({
  */
 const MarksSlider = styled(Slider)(({ theme }) => ({
     "& .MuiSlider-markLabel": {
-      fontSize: "0.6rem",
+        fontSize: "0.6rem",
     },
-  }));
+}));
 
 /**
  * return marks label (tiks)
@@ -49,35 +55,38 @@ const MarksSlider = styled(Slider)(({ theme }) => ({
 function getMarks() {
     let marks = [
         {
-            value: -1,
+            value: MIN_VALUE,
             label: <div>פתרון<br />פסול</div>,
         },
+        {
+            value: MARKS_VALUES.LOW_VALUE.value,
+            label: MARKS_VALUES.LOW_VALUE.label
+        },
+        {
+            value: MARKS_VALUES.MEDIUM_VALUE.value,
+            label: MARKS_VALUES.MEDIUM_VALUE.label
+        },
+        {
+            value: MARKS_VALUES.HIGH_VALUE.value,
+            label: MARKS_VALUES.HIGH_VALUE.label
+        }
     ];
-    for (let i = 0; i <= MAX_VALUE; i = i + 2) {
-        let mark = { value: i, label: `${i}` };
-        marks.push(mark)
-    }
+
     return marks;
 }
 
 /**
  * list of all marks and their labels
  */
-const MARK_LIST = [{ Header: "קיצור שעות העבודה", accessor: 'FINAL_SHORT_HOURS_GRADE' },
-{ Header: "הזזת זמן הגעה לעבודה", accessor: 'FINAL_SHIFTING_HOURS_GRADE' },
-{ Header: "דו גלגלי-אופניים", accessor: 'FINAL_BICYCLE_GRADE' },
-{ Header: "דו גלגלי-קורקינט", accessor: 'FINAL_SCOOTER_GRADE' },
-{ Header: "Shuttle On Demand", accessor: 'FINAL_PERSONALIZED_SHUTTLE_GRADE' },
-{ Header: "שאטלים מטעם העבודה", accessor: 'FINAL_WORK_SHUTTLE_GRADE' },
-{ Header: "Carshare/Vanshare", accessor: 'FINAL_CARSHARE_GRADE' },
-{ Header: "Carpool/Vanpool", accessor: 'FINAL_CARPOOL_GRADE' },
-{ Header: "מוניות שיתופיות", accessor: 'FINAL_CABSHARE_GRADE' },
-{ Header: "תחבורה ציבורית", accessor: 'FINAL_PUBLIC_TRANSPORT_GRADE' },
-{ Header: "הגעה רגלית", accessor: 'FINAL_WALKING_GRADE' },
-{ Header: "עבודה מהבית", accessor: 'FINAL_WORKING_FROM_HOME_GRADE' },
-{ Header: "עבודה במרכזים שיתופיים", accessor: 'FINAL_SHARED_WORKSPACE_GRADE' },
-{ Header: "שינוי ימי הגעה לעבודה", accessor: 'FINAL_SHIFTING_WORKING_DAYS_GRADE' }
-];
+const MARK_LIST = [
+    { Header: "מיקרומוביליטי", accessor: 'FINAL_BICYCLE_GRADE' },
+    { Header: "שאטלים מטעם העבודה", accessor: 'FINAL_WORK_SHUTTLE_GRADE' },
+    { Header: "שאטל פנים מתחמי", accessor: 'FINAL_COMPOUND_SHUTTLE_GRADE' },
+    { Header: "Carpool/Vanpool", accessor: 'FINAL_CARPOOL_GRADE' },
+    { Header: "תחבורה ציבורית", accessor: 'FINAL_PUBLIC_TRANSPORT_GRADE' },
+    { Header: "הגעה רגלית", accessor: 'FINAL_WALKING_GRADE' },
+    { Header: "עבודה מרחוק", accessor: 'FINAL_WORKING_FROM_HOME_GRADE' },
+ ];
 
 function valuetext(value) {
     let text = `${value} h`;
@@ -87,10 +96,10 @@ function valuetext(value) {
     return text;
 }
 
-function MarkSlider({markValues, item}) {
+function MarkSlider({ markValues, item }) {
     const dispatch = useDispatch();
     const [name, setColumn] = React.useState(item.accessor);
-    
+
     const value = useSelector(state => state.reportParams.qSelectedMarks[name]);
 
     const handleChange = (mark, newValue) => {
@@ -100,22 +109,23 @@ function MarkSlider({markValues, item}) {
         id={item.accessor}
         value={value}
         onChange={(event, newValue) => handleChange(item.accessor, newValue)}
-        valueLabelDisplay="auto"
         aria-labelledby="range-slider"
         getAriaValueText={valuetext}
         marks={getMarks()}
         step={1}
-        min={-1}
-        max={16}
+        min={MIN_VALUE}
+        max={MAX_VALUE}
+        valueLabelDisplay="off"
     />
 }
 
 /**
 * Return jsx with all slider marks
 */
-const MarkComponents = ({selectedMarks}) => {
+const MarkComponents = ({ selectedMarks }) => {
     const marks = useSelector(state => {
-        return state.reportParams.qSelectedMarks})
+        return state.reportParams.qSelectedMarks
+    })
 
     let jsx = [];
     for (let item of MARK_LIST) {
@@ -155,7 +165,7 @@ function MarksQuery({ selectedMarks }) {
 function mapStateToProps(state) {
     let selectedMarks = {};
     for (const mark of MARK_LIST) {
-        selectedMarks[mark.accessor] = [MIN_VALUE, MAX_VALUE];
+        selectedMarks[mark.accessor] = [MIN_VALUE,MAX_VALUE];
     }
     if (state.reportParams.qSelectedMarks) {
         selectedMarks = state.reportParams.qSelectedMarks;

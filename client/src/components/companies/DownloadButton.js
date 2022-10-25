@@ -16,11 +16,6 @@ import SaveRoundedIcon from '@mui/icons-material/SaveRounded';
 import { Tooltip } from '@mui/material';
 import Grid from '@mui/material/Grid'
 
-const MARK_COLUMNS = {
-   I: 'J', K: 'L', M: 'N', O: 'P', Q: 'R', S: 'T', U: 'V', W: 'X',
-   Y: 'Z', AA: 'AB', AC: 'AD', AE: 'AF', AG: 'AH', AI: 'AJ'
-};
-
 const API_SERVER = process.env.REACT_APP_API_SERVER || `/api`;
 
 class DownloadButton extends Component {
@@ -384,21 +379,6 @@ class DownloadButton extends Component {
                }
             ]
          })
-         // for (let col in MARK_COLUMNS) {
-         //    const orig_mark = col;
-         //    const final_mark = MARK_COLUMNS[orig_mark];
-         //    //apply conditional formatting
-         //    ws.addConditionalFormatting({
-         //       ref: `${final_mark}${rowNumber}`,
-         //       rules: [
-         //          {
-         //             type: 'expression',
-         //             formulae: [`IF($${orig_mark}$${rowNumber}<>$${final_mark}${rowNumber}, IF(ISBLANK($${final_mark}${rowNumber}),0, 1), 0)`],
-         //             style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'D0bbe33d' } } },
-         //          }
-         //       ]
-         //    })
-         //}
          row.height = 30;
       });
       const buffer = await wb.xlsx.writeBuffer();

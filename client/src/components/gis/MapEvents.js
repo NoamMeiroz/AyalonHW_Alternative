@@ -1,7 +1,7 @@
 import { useMapEvents } from 'react-leaflet'
 
 function MapEvents({onmoveend}) {
-    const map = useMapEvents({
+    useMapEvents({
       moveend: (e) => {
         onmoveend(e);
       },

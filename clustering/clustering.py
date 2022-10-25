@@ -31,7 +31,8 @@ from k_means_constrained.sklearn_import.cluster._k_means import _centers_dense, 
 from k_means_constrained.sklearn_import.cluster.k_means_ import _validate_center_shape, _tolerance, KMeans, \
     _init_centroids
 
-from k_means_constrained.mincostflow_vectorized import SimpleMinCostFlowVectorized
+# from k_means_constrained.mincostflow_vectorized import SimpleMinCostFlowVectorized
+from ortools.graph.python.min_cost_flow import SimpleMinCostFlow
 
 
 def k_means_constrained(X, n_clusters, size_min=None, size_max=None, init='k-means++',
@@ -277,7 +278,8 @@ def minimum_cost_flow_problem_graph(X, C, D, size_min, size_max):
 
 def solve_min_cost_flow_graph(edges, costs, capacities, supplies, n_C, n_X):
     # Instantiate a SimpleMinCostFlow solver.
-    min_cost_flow = SimpleMinCostFlowVectorized()
+    #min_cost_flow = SimpleMinCostFlowVectorized()
+    min_cost_flow = SimpleMinCostFlow()
 
     if (edges.dtype != 'int32') or (costs.dtype != 'int32') \
             or (capacities.dtype != 'int32') or (supplies.dtype != 'int32'):

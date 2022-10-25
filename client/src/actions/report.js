@@ -107,6 +107,60 @@ export const setQueryTimeSlotToHome = (timeSlotList = []) => {
 };
 
 /**
+ * if min value is -1 then don't change
+ * if min_value is 0 then don't change (0..5)
+ * if min_value is 1 then change min_value to 6 (6..10)
+ * if min_value is 2 then change min_value to 11 (11..16)
+ * if max_value is -1 then don't change
+ * if max_value is 0 then change to 5 (0..5)
+ * if max_value is 1 then change to 10 (6..10)
+ * if max_value is 2 then change to 16 (11..16)
+ * 
+ * Example1: min_value is 0 and max_value is 2 then return 0..16
+ * Example2: min_value is 1 and max_value is 1 then return 6..10
+ * 
+ * @param {*} marksList 
+ * @returns 
+ */
+const convertMarks = (marksList) => {
+    const MIN_VALUE_COLUMN = 0;
+    const MAX_VALUE_COLUMN = 1;
+    const resultList = {}
+
+    for (const [mark, values] of Object.entries(marksList)) {
+        let min_value = values[MIN_VALUE_COLUMN];
+        let max_value = values[MAX_VALUE_COLUMN];
+    
+        switch (values[MIN_VALUE_COLUMN]) {
+            case 1:
+                min_value = 6;
+                break;
+            case 2:
+                min_value = 11;
+                break;
+            default:
+                break;
+        };
+        switch (values[MAX_VALUE_COLUMN]) {
+            case 0:
+                max_value = 5;
+                break;
+            case 1:
+                max_value = 10;
+                break;
+            case 2:
+                max_value = 16;
+                break;
+            default:
+                break;
+        }
+        resultList[mark] = [min_value,max_value];
+    };
+
+    return resultList;
+}
+
+/**
  * return the list of employees for a given comapny.
  */
 export const getEmployees = (employers = [], livingCity = [], workingCity = [],
@@ -141,13 +195,15 @@ export const getEmployees = (employers = [], livingCity = [], workingCity = [],
     if (!compounds)
         compoundsList = [];
 
+    const markList = convertMarks(qSelectedMarksList);
+
     let data = {
         companies: employersList,
         livingCity: livingCityList,
         workingCity: workingCityList,
         timeSlotHome: qTimeSlotHomeList,
         timeSlotWork: qTimeSlotWorkList,
-        marks: qSelectedMarksList,
+        marks: markList,
         destinationPolygon: destinationPolygon,
         startingPolygon: startingPolygon,
         compounds: compoundsList
@@ -208,13 +264,15 @@ export const calculateCluster = (employers = [], livingCity = [], workingCity = 
     if (!compounds)
         compoundsList = [];
 
+    const markList = convertMarks(qSelectedMarksList);
+
     let data = {
         companies: employersList,
         livingCity: livingCityList,
         workingCity: workingCityList,
         timeSlotHome: qTimeSlotHomeList,
         timeSlotWork: qTimeSlotWorkList,
-        marks: qSelectedMarksList,
+        marks: markList,
         destinationPolygon: destinationPolygon,
         startingPolygon: startingPolygon,
         clusterBoundery: qClusterBoundery,

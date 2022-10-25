@@ -151,11 +151,13 @@ function SolutionMark({ rows, dispatch }) {
       dispatch(actions.setSolutionMark(newRow));
       return newRow;
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
   const handleProcessRowUpdateError = React.useCallback((error) => {
     dispatch(actions.showMessage, error);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
 

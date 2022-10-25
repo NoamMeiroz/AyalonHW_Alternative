@@ -1,6 +1,5 @@
 import React from "react";
 import { useMemo } from "react";
-import { useMap } from "react-leaflet";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
@@ -21,31 +20,23 @@ const POSITION_CLASSES = {
  */
 function DrawControl({
   position,
-  startPolygon,
-  destinationPolygon,
   startDrawClicked,
   destinationDrawClicked,
   deleteClicked,
 }) {
-  // const map = useMap();
-  // const destination = useMap();
-  // const starting = useMap();
-
-  // const [selectedArea, setSelectedArea] = React.useState("work");
-  // const [destinationGeoJSON, setDestinationGeoJSON] = React.useState(null);
-  // const [startGeoJSON, setStartGeoJSON] = React.useState(null);
-
-  /**
-   * clear origin and destination polygon query filter
-   */
-  function deleteAllPolygon() {
-    deleteClicked();
-  }
 
   // Memoize the minimap so it's not affected by position changes
   const drawingMenu = useMemo(
-    () => (
-      <Box className="drawBox">
+    () => {
+
+      /**
+       * clear origin and destination polygon query filter
+       */
+      function deleteAllPolygon() {
+        deleteClicked();
+      }
+
+      return <Box className="drawBox">
         <Tooltip title="מקור" placement="right">
           <IconButton
             onMouseDown={(e) => {
@@ -83,7 +74,8 @@ function DrawControl({
           </IconButton>
         </Tooltip>
       </Box>
-    ),
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
