@@ -11,7 +11,7 @@ const { BuildingNumber } = require('../columns/buildingNumber');
 
 const SITE_COLUMNS = [
     new Column("SITE_ID", "מספר סניף", TYPES.INT, 8, false),
-    new Column("NAME", "שם סניף", TYPES.STRING, 50, false),
+    new Column("NAME", "שם סניף", TYPES.STRING, 50, true),
     new City("ADDRESS_CITY", "עיר"),
     new Street("ADDRESS_STREET", "רחוב"),
     new BuildingNumber("ADDRESS_BUILDING_NUMBER", "מספר"),
@@ -95,10 +95,14 @@ const convertAddress = (branchList) => {
 /**
  * save list of sites for a given employer
  */
-saveSites = (employerId, siteList) => {
+saveSites = (employerId, employerName, siteList) => {
     return new Promise(function (resolve, reject) {
         siteList.forEach((site, index, array) => {
             site.EMPLOYER_ID = employerId;
+            // create branch name
+            const branchName = site.NAME;
+            if (!branchName || !branchName.length)
+                site.NAME = `${employerName}-${site.COMPOUND}`
         });
         employerSitesSchema.insertSites(employerId, siteList, (err, data) => {
             if (!err) {
@@ -124,7 +128,7 @@ const handleBranchData = (branches, emploeesList) => {
     return new Promise(function (resolve, reject) {
         // create a site object for each record
         let uniqueBranch = new Map();
-        for (branchItem of branches) {
+        for (const branchItem of branches) {
             let branch = {
                 NUM_OF_EMPLOYEES: 0
             }

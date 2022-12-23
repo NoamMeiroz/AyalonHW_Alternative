@@ -220,6 +220,23 @@ const findTopFiveSolutions = (
   }
 };
 
+const calculateFinalStage = (employee, config, solutions, employeeProperties, propertiesCategories, surveyAnswerCode) => {
+  // disqualify marks by trave times
+
+  employee = calculateMarkFromRoute(employee, config);
+
+  // find top 5 solutions
+  employee = findTopFiveSolutions(
+    employee,
+    config,
+    solutions,
+    employeeProperties,
+    propertiesCategories,
+    surveyAnswerCode
+  );
+  return employee;
+}
+
 const calculateMarks = (
   employee,
   cityCount,
@@ -270,19 +287,11 @@ const calculateMarks = (
 
   // disqualify marks by limits
   employee = checkLimits(employee, solutions, cityCount, hoursCount);
-  // disqualify marks by trave times
-  employee = calculateMarkFromRoute(employee, config);
 
-  // find top 5 solutions
-  employee = findTopFiveSolutions(
-    employee,
-    config,
-    solutions,
-    employeeProperties,
-    propertiesCategories,
-    surveyAnswerCode
-  );
+  employee = calculateFinalStage(employee, config, solutions, employeeProperties, propertiesCategories, surveyAnswerCode);
   return employee;
 };
 
-module.exports = { calculateMarks };
+module.exports = { calculateMarks, calculateFinalStage };
+
+

@@ -206,7 +206,7 @@ const findCoordinates = async (employee) => {
 };
 
 /**
- * Calcluare for each employee final marks, distance and duration of routes
+ * Calcluate for each employee final marks, distance and duration of routes
  * @param {list of employees} employees
  */
 const calculateRoutes = (employees) => {
@@ -320,8 +320,10 @@ const runAndWait = async (waitTime, callback, employeeList) => {
 };
 
 /**
- * Return name of city by code
- * @param {*} timeSlot
+ * Return street name of by locality and street codes
+ * @param {*} streets
+ * @param {*} locality
+ * @param {*} streetCode
  */
 const getStreetName = (streets, locality, streetCode) => {
   let currentStreet = streets.filter(
@@ -589,29 +591,30 @@ const main = () => {
     }
 
     if (error !== "") employee.UPLOAD_ERROR = { error: error };
-    else {
-      // translate street name
-      try {
-        employee.STREET = getStreetName(
-          streets,
-          emp["Q359|מה העיר ורחוב המגורים שלך? (עיר)"],
-          emp["Q359|רחוב"]
-        );
-        if (!employee.STREET) {
-          employee.STREET = "";
-          error = `הערך ${emp["Q359|רחוב"]} ב ${"Q359|רחוב"} אינו תקין`;
-        }
-      } catch (err) {
-        error = err.message;
+    // translate street name
+    try {
+      employee.STREET = getStreetName(
+        streets,
+        emp["Q359|מה העיר ורחוב המגורים שלך? (עיר)"],
+        emp["Q359|רחוב"]
+      );
+      if (!employee.STREET) {
+        employee.STREET = "";
+        error = `הערך ${emp["Q359|רחוב"]} ב ${"Q359|רחוב"} אינו תקין`;
       }
-      if (error !== "") employee.UPLOAD_ERROR = { error: error };
+    } catch (err) {
+      error = err.message;
     }
+    if (error !== "") employee.UPLOAD_ERROR = { error: error };
     return employee;
   });
 
   logger.info(`update work sites with travel problems`);
   Object.keys(transportProblem).forEach(async (workSiteId) => {
-    await employerSitesSchema.updateDifficulties(workSiteId, transportProblem[workSiteId]);
+    employerSitesSchema.updateDifficulties(workSiteId, transportProblem[workSiteId], (err, data) => {
+      if (err)
+        logger.error(new ServerError(500, err));
+    });
   });
 
   logger.info(`employer ${employer.NAME}: calculation employees coordinates`);

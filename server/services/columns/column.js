@@ -39,6 +39,9 @@ class Column {
                     if (value.text) {
                         result = value.text
                     }
+                    else if (value.result) {
+                        result = value.result;
+                    }
                 }
                 else
                     // convert number values as string

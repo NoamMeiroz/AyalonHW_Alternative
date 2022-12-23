@@ -40,7 +40,9 @@ class TimeSlot extends Column {
         // convert exit_hour_to_work to id
         let slot = value;
         if (slot) {
-            slot = this.propertiesCategories[this.category][slot]["NAME"];
+            const property = this.propertiesCategories[this.category];
+            const propertyCategory = property.filter(category => category.CATEGORY_CODE === slot );
+            slot = propertyCategory[0]["NAME"];
             slot = this.getTimeSlotID(slot);
             if (!slot) {
                 throw new ColumnError(ERROR_CODES.INPUT_ERROR, `הערך ${value} ב ${this.title} אינו תקין`);

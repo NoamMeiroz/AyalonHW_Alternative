@@ -4,9 +4,14 @@ const configData = require("./data/configData");
 const { getNearestWorkDay } = require('../tools');
 const googleAPI = require("./googleAPI");
 const timeSlotsData = require("./data/timeSlotsData");
+const employeePropertiesData = require("./data/employeePropertiesData");
+const surveyAnswerCodesData = require("./data/surveyAnswerCodesData");
+const solutionsData = require("./data/solutionsData");
+const propertyCategoriesData = require("./data/propertyCategoriesData");
 const { ERRORS } = require("./ERRORS");
 const { ServerError, logger } = require('../log');
-const { calculateMark, calculateDurationAndDistance } = require('./route');
+const { calculateDurationAndDistance } = require('./route');
+const { calculateFinalStage } = require("./algorithm/algorithmService");
 
 
 /**----------------------------------------------------------
@@ -170,12 +175,25 @@ const findRoutes = async function (employee, sites) {
  * @param {list of employees} employees 
  * @param {configuration} config 
  */
-const calculateRoutes = (employees, config) => {
-   result = employees.map(employee => calculateMark(employee, config));
-   result = result.map(employee => calculateDurationAndDistance(employee));
+const calculateRoutes = (employees) => {
+   result = employees.map(employee => calculateDurationAndDistance(employee));
    return result;
 }
 
+
+function runCalculateMarks(employees) {
+   result = result.map((employee) =>
+      calculateFinalStage(
+         employee,
+         config,
+         solutions,
+         employeeProperties,
+         propertiesCategories,
+         surveyAnswerCode,
+      )
+   );
+   return result;
+}
 
 /**
  * 
@@ -199,6 +217,7 @@ const updateEmployee = async function (employeeList) {
       Promise.all(promiseList)
          .then(employees => {
             let employeesList = calculateRoutes(employees, config);
+            employeeList = runCalculateMarks(employeeList);
             data = save(employeesList);
             return resolve(data);
          })
@@ -246,19 +265,45 @@ const employer = workerData.employer;
 var employeeList = workerData.employees;
 logger.info(`employer ${employer.NAME}: calculation new routes thread is running`);
 
-var config = [];
 // init configuation from database
-configData.getAllConfig()
-   .then(configuration => {
+var config = [];
+var solutions = [];
+var surveyAnswerCode = [];
+var employeeProperties = [];
+var propertiesCategories = [];
+
+configData
+   .getAllConfig()
+   .then((configuration) => {
       config = configuration;
       return timeSlotsData.getTimeSlots();
    })
    // init timeSlots
-   .then(data => {
+   .then((data) => {
       timeSlots = data;
+      return surveyAnswerCodesData.getAllSurveyAnswerCodes();
+   })
+   // init surveyAnswerCodes
+   .then((data) => {
+      surveyAnswerCode = data;
+      return solutionsData.getAllSolutions();
+   })
+   // init solutions information
+   .then((data) => {
+      solutions = data;
+      return propertyCategoriesData.getAllProperties();
+   })
+   // init properties categories
+   .then((data) => {
+      propertiesCategories = data;
+      return employeePropertiesData.getAllProperties();
+   })
+   // init employeeProperties
+   .then((data) => {
+      employeeProperties = data;
       main();
    })
-   .catch(error => {
+   .catch((error) => {
       logger.error(error.stack);
       // return result to main thread
       parentPort.postMessage({ Employees: null, message: error });

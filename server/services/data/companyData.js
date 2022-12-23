@@ -143,7 +143,7 @@ const readSheet = (uid, company_sheets) => {
                     .then(data => {
                         let employer = data;
                         // if employer is succeccfully saved the save siteList
-                        siteData.saveSites(employer.id, siteList)
+                        siteData.saveSites(employer.id, employer.NAME, siteList)
                             .then(data => {
                                 employer.Sites = data;
                                 try {

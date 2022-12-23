@@ -17,6 +17,8 @@ class ShapeLayer extends Component {
     constructor(props) {
         super(props);
         this.componentDidMount = this.componentDidMount.bind(this)
+
+        this.style = this.style.bind(this);
     }
 
 
@@ -62,9 +64,17 @@ class ShapeLayer extends Component {
         return out;
     }
 
+    style(feature) {
+        return {
+            //stroke-width: to have a constant width on the screen need to adapt with scale 
+            opacity: 0.65,
+            color: this.props.getColor(feature),
+        };
+    };
+
     render() {
         let jsx = <LayerGroup>{this.state.data.map((feature, index, arr) => (
-            <GeoJSON key={index} data={feature} style={{ opacity: 0.65 }}
+            <GeoJSON key={index} data={feature}  style={this.style} //style={{ opacity: 0.65 }}
                 pointToLayer={this.pointToLayer.bind(this)}>
                 <Popup>
                     <div style={{ whiteSpace: 'no-warp' }}>
