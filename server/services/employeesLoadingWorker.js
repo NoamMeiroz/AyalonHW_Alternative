@@ -1,5 +1,6 @@
 const { workerData, parentPort } = require("worker_threads");
 const employeeSchema = require("../db/employeeSchema");
+const employeeSurveyAnswersSchema = require("../db/employeeSurveyAnswersSchema");
 const employerSitesSchema = require("../db/employerSitesSchema");
 const empFields = require("../config/config").employeeFieldsName;
 const DEFAULT_EXIT_HOUR = require("../config/config").DEFAULT_EXIT_HOUR_TO_WORK;
@@ -42,7 +43,112 @@ const save = async function (employee) {
         console.log(err);
         return reject(err);
       }
-      return resolve(data);
+      return resolve(saveSurveyAnswer(employee, data));
+    });
+  });
+};
+
+/**
+ * if questionType is of type int then answer is converted to category by its range.
+ * if questionType is of type category then answer is matached to a category.
+ * if questionType is of type string then category is 0.
+ * @param {*} propertyCode
+ * @param {*} questionName
+ * @param {*} questionType
+ * @param {*} propertiesCategories
+ * @param {*} surveyAnswerCode
+ * @param {*} answer
+ * @returns
+ */
+const convertAnswerToValue = (
+  propertyCode,
+  questionName,
+  questionType,
+  propertiesCategories,
+  surveyAnswerCode,
+  answer
+) => {
+  category = 0;
+  if (questionType === "category")
+    category = surveyAnswerCode[questionName][answer]["NAME"];
+  else if (questionType === "int") {
+    categories = propertiesCategories[propertyCode];
+    category = categories.filter(
+      (propCategory) =>
+        answer >= propCategory.MIN_VALUE && answer <= propCategory.MAX_VALUE
+    )[0]["NAME"];
+  } else if (questionType === "string") {
+    category = answer;
+  }
+  return category;
+};
+
+const saveSurveyAnswer = async function (employeeDataList, dbEmployeeList) {
+  const jsonColumns = ['PREFFERED_SOLUTIONS', 'TRANSPORT_PROBLEM']
+  employeeAnswerSurveyList = dbEmployeeList.map((employee, index) => {
+    const employeeAnswerSurvey = {
+      EMPLOYEE_ID: employee.id,
+      PERMANENT_CAR: null,
+      PARKING: null,
+      DRIVING_LICENSE: null,
+      JOB_TYPE: null,
+      PICKUP_DISTANCE: null,
+      SEX: null,
+    };
+    employeeProperties.forEach((property) => {
+      let convertedPrecent = 0;
+      // calculate marks only on properties that stored in db
+      if (typeof employeeAnswerSurvey[property.OBJ_COLUMN_NAME] !== 'undefined') {
+        let answer = employeeDataList[index][property.OBJ_COLUMN_NAME];
+        if (answer) {
+          // find answer catagory
+          employeeAnswerSurvey[property.OBJ_COLUMN_NAME] = convertAnswerToValue(
+            property.CODE,
+            property.OBJ_COLUMN_NAME,
+            property.TYPE,
+            propertiesCategories,
+            surveyAnswerCode,
+            answer
+          );
+        }
+      }
+      else if (jsonColumns.includes(property.OBJ_COLUMN_NAME) && employeeDataList[index][property.OBJ_COLUMN_NAME])  {
+        let answerList = employeeDataList[index][property.OBJ_COLUMN_NAME].split(/[,]\s*|[\|]+/).map(
+          (answer) => {
+            try {
+              category = convertAnswerToValue(
+                property.CODE,
+                property.OBJ_COLUMN_NAME,
+                property.TYPE,
+                propertiesCategories,
+                surveyAnswerCode,
+                parseInt(answer)
+              );
+              return category;
+            } catch (error) {
+              logger.error(error.stack);
+              return null;
+            }
+          }
+        );
+        // remove null items
+        answerList = answerList.filter(n => n)
+        employeeAnswerSurvey[property.OBJ_COLUMN_NAME] = answerList;
+      }
+    });
+    
+    employeeAnswerSurvey.AGE = employeeDataList[index].AGE
+
+    return employeeAnswerSurvey
+  });
+  return new Promise(function (resolve, reject) {
+    // save all employees in the db
+    employeeSurveyAnswersSchema.insertBulk(employeeAnswerSurveyList, (err, data) => {
+      if (err) {
+        console.log(err);
+        return reject(err);
+      }
+      return resolve(dbEmployeeList);
     });
   });
 };
@@ -472,7 +578,7 @@ configData
         true
       ),
       new Column(
-        "PREFERED_SULOTIONS",
+        "PREFFERED_SOLUTIONS",
         "לפנייך רשימת פתרונות הנוגעים לאופן ההגעה והחזרה. אנא סמן פתרונות בהם תשקול להשתמש אילו היו זמינים במקום העבודה שלך (ניתן לבחור יותר מתשובה אחת)",
         TYPES.STRING,
         20,
@@ -539,8 +645,6 @@ const main = () => {
       WORK_STREET: getSiteStreet(emp[empFields.BRANCH_ID], sites),
       BUILDING_NUMBER: 0,
       UPLOAD_ERROR: null,
-      BEST_ROUTE_TO_WORK: null,
-      BEST_ROUTE_TO_HOME: null,
       EXIT_HOUR_TO_WORK: DEFAULT_EXIT_HOUR,
       RETURN_HOUR_TO_HOME: DEFAULT_RETURN_HOUR,
       TOP_SOLUTION_1: null,
@@ -548,7 +652,7 @@ const main = () => {
       TOP_SOLUTION_3: null,
       TOP_SOLUTION_4: null,
       TOP_SOLUTION_5: null,
-      JOB_TYPE: "1", // until this field will be read from survey file it is always 1 (full time job)
+      JOB_TYPE: 1, // until this field will be read from survey file it is always 1 (full time job)
     };
 
     // add solution columns marks

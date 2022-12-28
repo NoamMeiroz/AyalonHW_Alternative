@@ -17,11 +17,13 @@ import { connect } from "react-redux";
 import requireAuth from "../requireAuth"; //used to check if login successfull
 import * as actions from "../../actions";
 import MapSidebar from "./MapSidebar";
-import MarkerLayer from "./MarkerLayer";
+import MarkerLayer from "./layers/MarkerLayer";
 import Legend from "./Legend";
 import { template } from "../../utils/string";
 import BubbleMarker from "./BubbleMarker";
-import ShapeLayer from "./ShapeLayer";
+import ShapeLayer from "./layers/ShapeLayer";
+import LightTrainShapeLayer from "./layers/LightTrainShapeLayer";
+import BRTShapeLayer from "./layers/BRTShapeLayer";
 import DrawControl from "./DrawingControl";
 import ClusterLayer from "../clustering/ClusterLayer";
 import ClusterBounderyQuery from "../clustering/ClusterBounderyQuery";
@@ -153,7 +155,7 @@ class MapPanel extends Component {
 			/>
 		);
 		jsx.push(empLayer);
-		jsx.push(branchLayer);
+		//jsx.push(branchLayer);
 
 		return <LayerGroup>{jsx}</LayerGroup>;
 	}
@@ -332,37 +334,6 @@ class MapPanel extends Component {
 		this.setState({ deletePolygons: !this.state.deletePolygons });
 	};
 
-	getLightTrainColor = (feature) => {
-		let color = "black";
-		const colors = { "סגול": "purple", 
-		"אדום": "red", 
-		"ירוק": "green", 
-		"כתום":"orange",
-		"כחול": "blue",
-		"צהוב": "yellow",
-		"ירוק בהיר": "lightgreen",
-	   "כחול בהיר": "lightblue",
-	   "נופית": "maroon" };
-
-		return colors[feature.properties.NAME];
-	}
-
-	getBRTColor = (feature) => {
-		let color = "black";
-		const colors = { "קו ורוד": "black", 
-		"קו כחול": "blue", 
-		"קו כתום": "orange", 
-		"קו צהוב":"yellow",
-		"קו חום": "brown",
- };
-
-		return colors[feature.properties.NAME];
-	}
-
-	getTazColor = (feature) => {
-		return "blue";
-	}
-
 	render() {
 		return (
 			<Box display="flex">
@@ -404,17 +375,15 @@ class MapPanel extends Component {
 							/>
 						</LayersControl.Overlay>
 						<LayersControl.Overlay name="רכבת קלה">
-							<ShapeLayer
+							<LightTrainShapeLayer
 								zipUrl={lightTrainUrl}
 								fieldsName={{ NAME: "שם קו", STATUS: "סטטוס ביצוע" }}
-								getColor={this.getLightTrainColor}
 							/>
 						</LayersControl.Overlay>
 						<LayersControl.Overlay name="קווי BRT">
-							<ShapeLayer
+							<BRTShapeLayer
 								zipUrl={BRTlineUrl}
 								fieldsName={{ NAME: "שם קו", STATUS: "סטטוס ביצוע" }}
-								getColor={this.getBRTColor}
 							/>
 						</LayersControl.Overlay>
 						<LayersControl.Overlay name="איזורי תנועה">

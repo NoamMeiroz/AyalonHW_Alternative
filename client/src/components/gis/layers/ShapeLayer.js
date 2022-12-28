@@ -68,7 +68,6 @@ class ShapeLayer extends Component {
         return {
             //stroke-width: to have a constant width on the screen need to adapt with scale 
             opacity: 0.65,
-            color: this.props.getColor(feature),
         };
     };
 

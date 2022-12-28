@@ -38,6 +38,7 @@ db.solutionMarks = require("./models/algorithm/solutionMarks.js")(sequelize, Seq
 db.solutionLimits = require("./models/algorithm/solutionLimits.js")(sequelize, Sequelize);
 db.solutionPropertyValues = require("./models/algorithm/solutionPropertiesValues.js")(sequelize, Sequelize);
 db.solutionDisqualifyReasons = require("./models/algorithm/solutionDisqualifyReasons.js")(sequelize, Sequelize);
+db.employeeSurveyAnswers = require("./models/algorithm/employeeSurveyAnswers.js")(sequelize, Sequelize);
 
 
 db.employer.hasMany(db.employerSites, {foreignKey: "EMPLOYER_ID", as: "Sites"});
@@ -56,6 +57,7 @@ db.employee.belongsTo(db.solutionDisqualifyReasons, { foreignKey: "PUBLIC_TRANSP
 db.employee.belongsTo(db.solutionDisqualifyReasons, { foreignKey: "WALKING_DISQUALIFY_REASON", as: 'WalkingDisqualifyReason' });
 db.employee.belongsTo(db.solutionDisqualifyReasons, { foreignKey: "WORKING_FROM_HOME_DISQUALIFY_REASON", as: 'WorkingFromHomeDisqualifyReason' });
 
+db.employeeSurveyAnswers.belongsTo(db.employee, { foreignKey: "EMPLOYER_ID", as: 'Employee' });
 
 db.surveyAnswerCode.belongsTo(db.propertyCategories, {foreignKey: "PROPERTY_CATEGORIES", as: 'PropertyCategory' });
 

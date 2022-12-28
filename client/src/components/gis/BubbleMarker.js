@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import L from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import 'react-leaflet-markercluster/dist/styles.min.css';
-import MarkerLayer from './MarkerLayer';
+import MarkerLayer from './layers/MarkerLayer';
 import { template } from '../../utils/string';
 
 import './BubbleMarker.css';

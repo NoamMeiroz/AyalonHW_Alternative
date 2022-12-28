@@ -87,12 +87,12 @@ const translatePreferedSolutions = (
   surveyAnswerCode
 ) => {
   let preferedSolutions = [];
-  if (employee.PREFERED_SULOTIONS) {
+  if (employee.PREFFERED_SOLUTIONS) {
     const property = employeeProperties.filter(
-      (property) => property.OBJ_COLUMN_NAME === "PREFERED_SULOTIONS"
+      (property) => property.OBJ_COLUMN_NAME === "PREFFERED_SOLUTIONS"
     );
     if (property) {
-      preferedSolutions = employee.PREFERED_SULOTIONS.split(/[,]\s*|[\|]+/).map(
+      preferedSolutions = employee.PREFFERED_SOLUTIONS.split(/[,]\s*|[\|]+/).map(
         (answer) => {
           try {
             category = convertAnswerToCategory(
@@ -115,7 +115,7 @@ const translatePreferedSolutions = (
     } else
       throw new ServerError(
         ERRORS.MISSING_EMPLOYEE_PROPERTIES,
-        "PREFERED_SULOTIONS"
+        "PREFFERED_SOLUTIONS"
       );
   }
   // remove null elements;
