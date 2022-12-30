@@ -84,7 +84,7 @@ const convertAnswerToValue = (
 };
 
 const saveSurveyAnswer = async function (employeeDataList, dbEmployeeList) {
-  const jsonColumns = ['PREFFERED_SOLUTIONS', 'TRANSPORT_PROBLEM']
+  const jsonColumns = ['PREFFERED_SOLUTIONS', 'TRANSPORT_PROBLEM', 'MAIN_SOLUTION_TRASPORTION_TO_WORK']
   employeeAnswerSurveyList = dbEmployeeList.map((employee, index) => {
     const employeeAnswerSurvey = {
       EMPLOYEE_ID: employee.id,
@@ -94,6 +94,11 @@ const saveSurveyAnswer = async function (employeeDataList, dbEmployeeList) {
       JOB_TYPE: null,
       PICKUP_DISTANCE: null,
       SEX: null,
+      ELECTRIC_CAR: null,
+      WORK_FROM_HOME: null,
+      IS_DIFFICULTS_TO_ARRIVE_WORK_HOME: null,
+      HAS_CHILDREN: null,
+      PICKUP_CHILDREN: null
     };
     employeeProperties.forEach((property) => {
       let convertedPrecent = 0;
@@ -133,11 +138,22 @@ const saveSurveyAnswer = async function (employeeDataList, dbEmployeeList) {
         );
         // remove null items
         answerList = answerList.filter(n => n)
+        // add user other information
+        let pos = employeeDataList[index][property.OBJ_COLUMN_NAME].lastIndexOf('|');
+        if (pos>-1) {
+          answerList.push(employeeDataList[index][property.OBJ_COLUMN_NAME].substring(pos+1));
+        }
         employeeAnswerSurvey[property.OBJ_COLUMN_NAME] = answerList;
+
+          
       }
     });
     
-    employeeAnswerSurvey.AGE = employeeDataList[index].AGE
+    // answers without conversions
+    employeeAnswerSurvey.AGE = employeeDataList[index].AGE;
+    employeeAnswerSurvey.EXTRA_INPUT = employeeDataList[index].EXTRA_INPUT;
+
+
 
     return employeeAnswerSurvey
   });
@@ -581,7 +597,7 @@ configData
         "PREFFERED_SOLUTIONS",
         "לפנייך רשימת פתרונות הנוגעים לאופן ההגעה והחזרה. אנא סמן פתרונות בהם תשקול להשתמש אילו היו זמינים במקום העבודה שלך (ניתן לבחור יותר מתשובה אחת)",
         TYPES.STRING,
-        20,
+        50,
         true
       ),
       new Column(
@@ -618,7 +634,63 @@ configData
         "TRANSPORT_PROBLEM",
         "מהם הקשיים שאתה חווה בהגעה ובחזרה מהעבודה? (ניתן לבחור יותר מתשובה אחת)",
         TYPES.STRING,
-        20,
+        50,
+        true
+      ),
+      new Column(
+        "MAIN_SOLUTION_TRASPORTION_TO_WORK",
+        "מהו אופן ההגעה העיקרי שלך לעבודה?",
+        TYPES.STRING,
+        50,
+        true
+      ),
+      new Column(
+        "PERMANENT_CAR",
+        "האם ברשותך רכב קבוע?",
+        TYPES.INT,
+        1,
+        true
+      ),
+      new Column(
+        "ELECTRIC_CAR",
+        "האם תשקול להחליף את רכב החברה שברשותך לרכב חשמלי במידה ויוצע לך?",
+        TYPES.INT,
+        1,
+        true
+      ), 
+      new Column(
+        "WORK_FROM_HOME",
+        "האם אתה עובד מהבית?",
+        TYPES.INT,
+        1,
+        true
+      ),
+      new Column(
+        "EXTRA_INPUT",
+        "משהו נוסף שתרצה שנדע?",
+        TYPES.STRING,
+        200,
+        true
+      ),
+      new Column(
+        "IS_DIFFICULTS_TO_ARRIVE_WORK_HOME",
+        "האם אתה חווה קשיים בהגעה ובחזרה מהעבודה?",
+        TYPES.INT,
+        1,
+        true
+      ),
+      new Column(
+        "HAS_CHILDREN",
+        "האם יש לך ילדים?",
+        TYPES.INT,
+        1,
+        true
+      ),
+      new Column(
+        "PICKUP_CHILDREN",
+        "האם אתה אחראי להסעת ילדיך? ",
+        TYPES.INT,
+        1,
         true
       ),
     ];
